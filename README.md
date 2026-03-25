@@ -31,6 +31,14 @@ ai-core/
 
 Les skills sont des commandes slash (`/`) invocables directement dans Claude Code.
 
+| Skill | Description |
+|-------|-------------|
+| `clean-code` | Applique les principes du livre "Clean Code" de Robert C. Martin pour transformer du code fonctionnel en code propre |
+| `excalidraw` | Génère des diagrammes Excalidraw à partir d'une description en langage naturel |
+| `git-commit` | Génère des messages de commit conventionnels avec staging intelligent |
+| `react-best-practices` | Bonnes pratiques React/Next.js de performance selon Vercel Engineering |
+| `skill-creator` | Crée, modifie et évalue des skills Claude Code |
+
 Pour utiliser un skill de ce repo, copiez ou référencez le dossier `skills/<nom-du-skill>/` dans votre configuration Claude Code locale (`~/.claude/skills/`).
 
 ```bash
