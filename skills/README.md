@@ -19,6 +19,7 @@ Skills are added to your Claude Code configuration and become available immediat
 |-------|----------|-------------|
 | `agent-creator` | Development | Guides the creation of Claude Code agents: subagents (hierarchical delegation) and multi-agent swarms (peer-to-peer coordination). Covers frontmatter, system prompt design, triggering examples, and tool/permission configuration. |
 | `clean-code` | Code Quality | Applies Robert C. Martin's Clean Code principles to review, refactor, and improve code quality: naming, functions, comments, formatting, error handling, tests, and code smells detection. |
+| `e2e-testing` | Testing | Reliable end-to-end test suites: Page Object Model, fixtures, network mocking, mobile/desktop split, locale-agnostic selectors, no hardcoded dates, visual regression, and accessibility testing. |
 | `excalidraw` | Documentation | Generates Excalidraw diagrams from natural language descriptions. Supports flowcharts, system architecture, relationship diagrams, and mind maps. Outputs `.excalidraw` files. |
 | `git-commit` | Development | Analyses your diff and generates a standardized Conventional Commits message. Handles staging, type/scope detection, and commit execution. |
 | `react-best-practices` | Development | 64 React and Next.js performance rules from Vercel Engineering, covering rendering, re-renders, server-side patterns, bundle optimization, and more. |
