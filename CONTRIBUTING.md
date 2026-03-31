@@ -1,41 +1,44 @@
-# Contribuer à ai-core
+# Contributing to ai-core
 
-Bienvenue dans la Guilde IA Club Med. Ce guide explique comment contribuer au référentiel `ai-core`.
+Thank you for taking the time to contribute. This guide covers everything you need to add a skill, agent, doc, or benchmark to this repository.
 
-## Prérequis
+## Prerequisites
 
-- [Claude Code](https://claude.ai/code) installé et configuré
-- Accès au dépôt (voir #guilde-ia sur Slack)
+- [Claude Code](https://claude.ai/code) installed and configured
+- Access to the repository — ask on **#guilde-ia** (Slack)
 
 ## Workflow
 
-1. Créez une branche depuis `main`
-   ```bash
-   git checkout -b feat/mon-skill
-   ```
-2. Ajoutez votre contribution dans le bon répertoire (voir [Structure](#structure))
-3. Commitez en suivant les [conventions de commit](#commits)
-4. Soumettez une Pull Request avec une description claire
+```bash
+git checkout -b feat/my-contribution   # branch off main
+# add your content in the right directory
+git commit -m "feat(skills): add my-skill"
+# open a Pull Request against main
+```
 
-## Structure
+Commits must follow [Conventional Commits](https://www.conventionalcommits.org/). Use the `/git-commit` skill to generate the message automatically.
 
-| Répertoire   | Contenu                                      |
-| ------------ | -------------------------------------------- |
-| `skills/`    | Skills Claude Code (commandes `/`)           |
-| `agents/`    | Agents spécialisés                           |
-| `docs/`      | Documentation, tutoriels, bonnes pratiques   |
-| `benchmarks/`| Évaluations et comparatifs de modèles/outils |
+Common types: `feat`, `fix`, `docs`, `chore`, `refactor`
 
-## Ajouter un skill
+## Repository structure
 
-Chaque skill est un dossier `skills/<nom>/` contenant un fichier `SKILL.md` avec le frontmatter suivant :
+| Directory | Contents |
+|-----------|----------|
+| `skills/` | Claude Code slash commands |
+| `agents/` | Specialised AI agents |
+| `docs/` | Tutorials, guides, best practices |
+| `benchmarks/` | Model and tooling evaluations |
+
+## Adding a skill
+
+Create a folder `skills/<name>/` with a `SKILL.md` file using this frontmatter:
 
 ```yaml
 ---
-name: nom-du-skill
-description: 'Description courte utilisée par Claude pour déclencher le skill'
+name: skill-name
+description: 'Short description used by Claude to trigger the skill'
 model: haiku          # haiku | sonnet | opus
-allowed-tools: Bash   # outils autorisés
+allowed-tools: Bash
 version: 1.0.0
 changelog:
   - version: 1.0.0
@@ -43,26 +46,12 @@ changelog:
     changes:
       - Initial release
 created-at: YYYY-MM-DD
-created-by: "Prénom Nom <email@clubmed.com>"
+created-by: "First Last <email@clubmed.com>"
 ---
 ```
 
-## Ajouter un agent
-
-Chaque agent est un dossier `agents/<nom>/` contenant un fichier `AGENT.md` décrivant son rôle, ses outils et ses instructions système.
-
-## Commits
-
-Les commits suivent la convention [Conventional Commits](https://www.conventionalcommits.org/) :
-
-```
-<type>(scope): <description en anglais>
-```
-
-Types courants : `feat`, `fix`, `docs`, `chore`, `refactor`
-
-Utilisez le skill `/git-commit` pour générer automatiquement le message.
+Use the `/skill-creator` skill for guided creation, iteration, and benchmarking.
 
 ## Questions
 
-Posez vos questions sur **#guilde-ia** (Slack) ou contactez [jeremy.wallez@clubmed.com](mailto:jeremy.wallez@clubmed.com).
+Open a [GitHub issue](https://github.com/ClubMediterranee/ai-core/issues).

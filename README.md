@@ -1,55 +1,107 @@
-# ai-core
+<p align="center">
+  <img src="./docs/assets/banner.png" alt="Club Med AI Guild" width="100%" />
+</p>
 
-Référentiel central de la **Guilde IA Club Med** — configurations Claude Code, skills, agents, documentation, tutoriels et benchmarks partagés entre les équipes.
+<p align="center">
+  The central knowledge base of the <strong>Club Med AI Guild</strong> —<br/>
+  skills, agents, benchmarks, tutorials, and best practices shared across teams.
+</p>
 
-## Objectif
+<p align="center">
+  <a href="https://github.com/ClubMediterranee/ai-core/stargazers">
+    <img src="https://img.shields.io/github/stars/ClubMediterranee/ai-core?style=flat-square&color=b08850" alt="Stars" />
+  </a>
+  <a href="https://github.com/ClubMediterranee/ai-core/network/members">
+    <img src="https://img.shields.io/github/forks/ClubMediterranee/ai-core?style=flat-square&color=b08850" alt="Forks" />
+  </a>
+  <a href="https://github.com/ClubMediterranee/ai-core/commits/main">
+    <img src="https://img.shields.io/github/last-commit/ClubMediterranee/ai-core?style=flat-square&color=4a9d8f" alt="Last commit" />
+  </a>
+  <a href="https://github.com/ClubMediterranee/ai-core/graphs/contributors">
+    <img src="https://img.shields.io/github/contributors/ClubMediterranee/ai-core?style=flat-square&color=4a9d8f" alt="Contributors" />
+  </a>
+  <a href="https://github.com/ClubMediterranee/ai-core/pulls">
+    <img src="https://img.shields.io/badge/PRs-welcome-b08850?style=flat-square" alt="PRs welcome" />
+  </a>
+</p>
 
-Centraliser les ressources d'IA générative utilisées au quotidien par les développeurs Club Med :
-- Standardiser les pratiques autour de Claude Code
-- Partager skills et agents réutilisables entre projets
-- Documenter les bonnes pratiques, retours d'expérience et benchmarks
-- Accélérer l'onboarding des nouveaux membres de la guilde
+<p align="center">
+  <a href="#overview">Overview</a> ·
+  <a href="#whats-inside">What's inside</a> ·
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#contributing">Contributing</a>
+</p>
 
-## Structure
+---
+
+## Overview
+
+`ai-core` is the shared AI resource layer for Club Med's engineering teams. It centralises everything the AI Guild produces so anyone can find, reuse, and build on it:
+
+- **Claude Code skills** — slash commands that extend Claude Code for common dev tasks
+- **Agents** — specialised AI agents for complex, multi-step workflows
+- **Docs & tutorials** — practical guides, patterns, and team standards
+- **Benchmarks** — quantitative evaluations of models, tools, and approaches
+
+The goal is simple: avoid reinventing the wheel, move faster, and raise the quality bar across all teams.
+
+## What's inside
 
 ```
 ai-core/
-├── skills/          # Skills Claude Code réutilisables
-├── agents/          # Agents spécialisés
-├── docs/            # Documentation, tutoriels, guides
-└── benchmarks/      # Évaluations et comparatifs de modèles/outils
+├── skills/        # Claude Code slash commands  →  skills/README.md
+├── agents/        # Specialised AI agents
+├── docs/          # Tutorials, guides, ADRs, best practices
+└── benchmarks/    # Model & tooling evaluations
 ```
-
-## Prérequis
-
-- [Claude Code](https://claude.ai/code) installé et configuré
-- Accès au compte Anthropic de la guilde (voir #guilde-ia sur Slack)
-
-## Utilisation
 
 ### Skills
 
-Les skills sont des commandes slash (`/`) invocables directement dans Claude Code.
+8 skills available, installable in one command. Categories covered:
 
-Voir [`skills/README.md`](skills/README.md) pour la liste complète et les instructions d'installation.
+| Category | Skills |
+|----------|--------|
+| Development | `git-commit` · `react-best-practices` · `typescript-advanced-types` |
+| Config | `agent-creator` · `skill-creator` |
+| Code Quality | `clean-code` |
+| Testing | `e2e-testing` |
+| Documentation | `excalidraw` |
 
-### Agents
+→ Full descriptions and usage in [`skills/README.md`](skills/README.md)
 
-Les agents se trouvent dans `agents/` et s'utilisent via la commande `/agent` de Claude Code.
+## Quick start
 
-### Documentation
+**Prerequisites:** [Claude Code](https://claude.ai/code) installed · access to the Guild's Anthropic account (ask on **#guilde-ia** in Slack)
 
-La documentation est disponible dans `docs/` — tutoriels, guides de bonnes pratiques, benchmarks et retours d'expérience.
+### Install skills
 
-## Contribuer
+```bash
+npx skills add https://github.com/ClubMediterranee/ai-core
+```
 
-1. Créez une branche à partir de `main`
-2. Ajoutez votre skill / agent / doc dans le bon répertoire
-3. Respectez les conventions de nommage existantes
-4. Soumettez une PR avec une description claire
+An interactive selector lets you pick which skills to install. They are immediately available as `/slash-commands` in Claude Code.
 
-> Les commits suivent la convention [Conventional Commits](https://www.conventionalcommits.org/).
+## Contributing
 
-## Mainteneurs
+All contributions are welcome — a new skill, a benchmark result, a tutorial, a fix.
 
-Guilde IA Club Med — [jeremy.wallez@clubmed.com](mailto:jeremy.wallez@clubmed.com)
+```bash
+git checkout -b feat/my-contribution
+# Add your content in the right directory
+git commit -m "feat(skills): add my-skill"   # Conventional Commits
+# Open a PR against main
+```
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for conventions, skill frontmatter format, and guidelines.
+
+## Contributors
+
+<a href="https://github.com/ClubMediterranee/ai-core/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=ClubMediterranee/ai-core" alt="Contributors" />
+</a>
+
+---
+
+<p align="center">
+  <sub>Built with care by the <strong>AI Guild · Club Med</strong> &nbsp;·&nbsp; <a href="https://github.com/ClubMediterranee/ai-core/issues/new">Report an issue</a></sub>
+</p>
