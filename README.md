@@ -57,11 +57,12 @@ ai-core/
 
 ### Skills
 
-8 skills available, installable in one command. Categories covered:
+9 skills available, installable in one command. Categories covered:
 
 | Category | Skills |
 |----------|--------|
 | Development | `git-commit` · `react-best-practices` · `typescript-advanced-types` |
+| Automation | `agent-browser` |
 | Config | `agent-creator` · `skill-creator` |
 | Code Quality | `clean-code` |
 | Testing | `e2e-testing` |
