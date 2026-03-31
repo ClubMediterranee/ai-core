@@ -38,6 +38,7 @@ Les skills sont des commandes slash (`/`) invocables directement dans Claude Cod
 | `git-commit` | Génère des messages de commit conventionnels avec staging intelligent |
 | `react-best-practices` | Bonnes pratiques React/Next.js de performance selon Vercel Engineering |
 | `skill-creator` | Crée, modifie et évalue des skills Claude Code |
+| `typescript-advanced-types` | Guide de référence du système de types avancés TypeScript : generics, types conditionnels, mapped types, template literals, et patterns type-safe (API client, event emitter, builder, discriminated unions) |
 
 Pour utiliser un skill de ce repo, copiez ou référencez le dossier `skills/<nom-du-skill>/` dans votre configuration Claude Code locale (`~/.claude/skills/`).
 
