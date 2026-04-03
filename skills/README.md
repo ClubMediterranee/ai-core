@@ -26,4 +26,5 @@ Skills are added to your Claude Code configuration and become available immediat
 | `react-best-practices` | Development | 64 React and Next.js performance rules from Vercel Engineering, covering rendering, re-renders, server-side patterns, bundle optimization, and more. |
 | `skill-creator` | Config | Guides the full lifecycle of a skill: draft, eval, iterate, and optimize trigger description. Includes a browser-based reviewer and quantitative benchmarking. |
 | `typescript-advanced-types` | Development | Reference guide for TypeScript's advanced type system: generics, conditional types, mapped types, template literals, utility types, and patterns like type-safe API clients, event emitters, builders, and discriminated unions. |
-
+| `a11y-web` | Accessibility | Audits and fixes RGAA 4.1.2 accessibility issues in any web framework (React, Vue, Svelte, Astro, Angular, Next.js, etc.). Proactive static analysis before deployment. |
+| `a11y-audit` | Accessibility | Audits live pages using Playwright + axe-core. Verifies real contrast, dynamic content, and focus order on deployed pages via sitemap or URL list. |
