@@ -29,7 +29,7 @@
 
 ## What's inside
 
-### [Skills](skills/README.md) — 13 available
+### [Skills](skills/README.md) — 14 available
 
 Slash commands that extend Claude Code for common dev tasks.
 
@@ -41,7 +41,7 @@ Slash commands that extend Claude Code for common dev tasks.
 | Testing | `e2e-testing` |
 | Design | `trident-icons` · `figma-generate-personal-token` |
 | Code Quality | `clean-code` |
-| Documentation | `excalidraw` |
+| Documentation | `excalidraw` · `diary` |
 | Config | `agent-creator` · `skill-creator` |
 
 ### [MCP Servers](mcps/README.md) — 3 available
