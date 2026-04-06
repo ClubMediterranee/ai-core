@@ -27,18 +27,6 @@
 
 ---
 
-## Quick start
-
-**Prerequisites:** [Claude Code](https://claude.ai/code) installed · access to the Guild's Anthropic account (ask on **#guilde-ia** in Slack)
-
-```bash
-npx skills add https://github.com/ClubMediterranee/ai-core
-```
-
-An interactive selector lets you pick which skills to install. They are immediately available as slash commands in Claude Code.
-
----
-
 ## What's inside
 
 ### [Skills](skills/README.md) — 12 available
@@ -67,19 +55,6 @@ Curated MCP servers to connect Claude to external tools.
 | `playwright` | Testing / Automation |
 
 ---
-
-## Contributing
-
-All contributions are welcome — a new skill, a benchmark result, a tutorial, a fix.
-
-```bash
-git checkout -b feat/my-contribution
-# Add your content in the right directory
-git commit -m "feat(skills): add my-skill"   # Conventional Commits
-# Open a PR against main
-```
-
-Read [CONTRIBUTING.md](CONTRIBUTING.md) for conventions and guidelines.
 
 ## Contributors
 
