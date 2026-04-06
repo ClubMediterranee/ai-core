@@ -79,7 +79,7 @@ git commit -m "feat(skills): add my-skill"   # Conventional Commits
 # Open a PR against main
 ```
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md) for conventions, skill frontmatter format, and guidelines.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for conventions and guidelines.
 
 ## Contributors
 
