@@ -28,3 +28,4 @@ Skills are added to your Claude Code configuration and become available immediat
 | `typescript-advanced-types` | Development | Reference guide for TypeScript's advanced type system: generics, conditional types, mapped types, template literals, utility types, and patterns like type-safe API clients, event emitters, builders, and discriminated unions. |
 | `a11y-web` | Accessibility | Audits and fixes RGAA 4.1.2 accessibility issues in any web framework (React, Vue, Svelte, Astro, Angular, Next.js, etc.). Proactive static analysis before deployment. |
 | `a11y-audit` | Accessibility | Audits live pages using Playwright + axe-core. Verifies real contrast, dynamic content, and focus order on deployed pages via sitemap or URL list. |
+| `trident-icons` | Design | Searches the @clubmed/trident-icons library (559 icons, 17 categories) by semantic description and generates ready-to-use React import code. Fetches the live catalog automatically. |
