@@ -41,7 +41,7 @@ Slash commands that extend Claude Code for common dev tasks.
 | Testing | `e2e-testing` |
 | Design | `trident-icons` · `trident-ui-install` · `figma-generate-personal-token` |
 | Code Quality | `clean-code` |
-| Documentation | `excalidraw` |
+| Documentation | `excalidraw` · `diary` |
 | Config | `agent-creator` · `skill-creator` |
 
 ### [MCP Servers](mcps/README.md) — 3 available
