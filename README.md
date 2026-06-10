@@ -29,9 +29,34 @@
 
 ## What's inside
 
+### [Plugins](plugins/README.md) — 5 available
+
+Role-based bundles that install a curated set of skills in one command.
+
+```bash
+# Once globally — register the marketplace on your machine
+claude plugin marketplace add ClubMediterranee/ai-core
+
+# Per project — install the plugin that matches your stack
+claude plugin install clubmed-frontend@clubmed --scope project        # React / Next.js / TypeScript
+claude plugin install clubmed-backend-node@clubmed --scope project    # Node.js / API / PostgreSQL
+claude plugin install clubmed-backend-python@clubmed --scope project  # Django / FastAPI / Python
+claude plugin install clubmed-backend-java@clubmed --scope project    # Java 21+ / Spring Boot
+claude plugin install clubmed-infra@clubmed --scope project           # Terraform / Kubernetes / Security
+
+```
+
+| Plugin | Stack | Skills included |
+|--------|-------|-----------------|
+| `clubmed-frontend` | React · Next.js · TypeScript · GraphQL | 9 skills |
+| `clubmed-backend-node` | Node.js · API · PostgreSQL · Prisma | 11 skills |
+| `clubmed-backend-python` | Django · FastAPI · async Python | 11 skills |
+| `clubmed-backend-java` | Java 21+ · Spring Boot · API | 9 skills |
+| `clubmed-infra` | Terraform · Kubernetes · Container security | 7 skills |
+
 ### [Skills](skills/README.md) — 38 available
 
-Slash commands that extend Claude Code for common dev tasks.
+Individual slash commands that extend Claude Code for specific tasks. Install plugins above to get them pre-bundled, or pick skills individually.
 
 | Category | Skills |
 |----------|--------|
@@ -41,9 +66,9 @@ Slash commands that extend Claude Code for common dev tasks.
 | Code Quality | `clean-code` |
 | Config | `agent-creator` · `skill-creator` |
 | Database | `database-migration` · `postgresql-optimization` · `prisma-expert` |
-| Design | `figma-generate-personal-token` · `trident-icons` · `trident-ui-install` |
-| Development | `git-commit` · `error-handling-patterns` |
-| Documentation | `excalidraw` |
+| Design | `excalidraw` · `figma-generate-personal-token` · `trident-icons` · `trident-ui-install` |
+| Development | `git-commit` |
+| Error Handling | `error-handling-patterns` |
 | Infrastructure | `container-security-hardening` · `k8s-security-policies` · `terraform-specialist` |
 | Java | `java-pro` |
 | Node.js | `nodejs-best-practices` |
