@@ -1,0 +1,26 @@
+{
+  "name": "clubmed-frontend",
+  "displayName": "Club Med — Frontend",
+  "version": "1.0.0",
+  "description": "Skills for frontend developers: React, Next.js, GraphQL, TypeScript, testing, and design tools.",
+  "author": {
+    "name": "Jeremy Wallez",
+    "email": "jeremy.wallez@clubmed.com"
+  },
+  "repository": "https://github.com/ClubMediterranee/ai-core",
+  "license": "MIT",
+  "keywords": ["react", "nextjs", "graphql", "typescript", "testing", "figma", "design"],
+  "skills": [
+    "./skills/react-best-practices",
+    "./skills/react-patterns",
+    "./skills/react-component-performance",
+    "./skills/nextjs-best-practices",
+    "./skills/graphql",
+    "./skills/typescript-expert",
+    "./skills/typescript-advanced-types",
+    "./skills/testing-patterns",
+    "./skills/clean-code",
+    "./skills/excalidraw",
+    "./skills/figma-generate-personal-token"
+  ]
+}

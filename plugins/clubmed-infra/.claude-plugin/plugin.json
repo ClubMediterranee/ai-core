@@ -1,0 +1,23 @@
+{
+  "name": "clubmed-infra",
+  "displayName": "Club Med — Infrastructure",
+  "version": "1.0.0",
+  "description": "Skills for infrastructure and platform engineers: Terraform, Kubernetes, container security, and security scanning.",
+  "author": {
+    "name": "Jeremy Wallez",
+    "email": "jeremy.wallez@clubmed.com"
+  },
+  "repository": "https://github.com/ClubMediterranee/ai-core",
+  "license": "MIT",
+  "keywords": ["terraform", "kubernetes", "docker", "security", "observability", "iac"],
+  "skills": [
+    "./skills/terraform-specialist",
+    "./skills/container-security-hardening",
+    "./skills/k8s-security-policies",
+    "./skills/security-scanning-security-hardening",
+    "./skills/security-scanning-security-sast",
+    "./skills/observability-patterns",
+    "./skills/clean-code",
+    "./skills/excalidraw"
+  ]
+}
