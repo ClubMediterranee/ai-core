@@ -1,0 +1,25 @@
+{
+  "name": "clubmed-backend-java",
+  "displayName": "Club Med — Backend Java",
+  "version": "1.0.0",
+  "description": "Skills for Java backend developers: Java 21+, Spring Boot, API design, security, and databases.",
+  "author": {
+    "name": "Jeremy Wallez",
+    "email": "jeremy.wallez@clubmed.com"
+  },
+  "repository": "https://github.com/ClubMediterranee/ai-core",
+  "license": "MIT",
+  "keywords": ["java", "spring-boot", "api", "security", "postgresql", "observability"],
+  "skills": [
+    "./skills/java-pro",
+    "./skills/api-patterns",
+    "./skills/api-security-best-practices",
+    "./skills/backend-security-coder",
+    "./skills/postgresql-optimization",
+    "./skills/database-migration",
+    "./skills/error-handling-patterns",
+    "./skills/observability-patterns",
+    "./skills/clean-code",
+    "./skills/excalidraw"
+  ]
+}

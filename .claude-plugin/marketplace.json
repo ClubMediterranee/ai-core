@@ -1,0 +1,93 @@
+{
+  "$schema": "https://code.claude.com/schemas/marketplace.json",
+  "name": "clubmed",
+  "displayName": "Club Med AI",
+  "description": "Club Med AI Guild \u2014 skills and tools shared across developer and designer teams.",
+  "version": "1.0.0",
+  "owner": {
+    "name": "Jeremy Wallez",
+    "email": "jeremy.wallez@clubmed.com"
+  },
+  "metadata": {
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "clubmed-frontend",
+      "displayName": "Club Med \u2014 Frontend",
+      "description": "React, Next.js, GraphQL, TypeScript, testing, and design tools.",
+      "version": "1.0.0",
+      "source": "./plugins/clubmed-frontend",
+      "keywords": [
+        "react",
+        "nextjs",
+        "graphql",
+        "typescript",
+        "testing",
+        "figma"
+      ],
+      "category": "development"
+    },
+    {
+      "name": "clubmed-backend-node",
+      "displayName": "Club Med \u2014 Backend Node.js",
+      "description": "Node.js, API design, security, PostgreSQL, Prisma, observability, and testing.",
+      "version": "1.0.0",
+      "source": "./plugins/clubmed-backend-node",
+      "keywords": [
+        "nodejs",
+        "api",
+        "security",
+        "postgresql",
+        "prisma"
+      ],
+      "category": "development"
+    },
+    {
+      "name": "clubmed-backend-python",
+      "displayName": "Club Med \u2014 Backend Python",
+      "description": "Django, FastAPI, async patterns, API design, security, and databases.",
+      "version": "1.0.0",
+      "source": "./plugins/clubmed-backend-python",
+      "keywords": [
+        "python",
+        "django",
+        "fastapi",
+        "async",
+        "api",
+        "security"
+      ],
+      "category": "development"
+    },
+    {
+      "name": "clubmed-backend-java",
+      "displayName": "Club Med \u2014 Backend Java",
+      "description": "Java 21+, Spring Boot, API design, security, and databases.",
+      "version": "1.0.0",
+      "source": "./plugins/clubmed-backend-java",
+      "keywords": [
+        "java",
+        "spring-boot",
+        "api",
+        "security",
+        "postgresql"
+      ],
+      "category": "development"
+    },
+    {
+      "name": "clubmed-infra",
+      "displayName": "Club Med \u2014 Infrastructure",
+      "description": "Terraform, Kubernetes, container security, and security scanning.",
+      "version": "1.0.0",
+      "source": "./plugins/clubmed-infra",
+      "keywords": [
+        "terraform",
+        "kubernetes",
+        "docker",
+        "security",
+        "iac"
+      ],
+      "category": "development"
+    }
+  ]
+}
