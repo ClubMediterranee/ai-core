@@ -54,7 +54,7 @@ claude plugin install clubmed-infra@clubmed --scope project           # Terrafor
 | `clubmed-backend-java` | Java 21+ · Spring Boot · API | 9 skills |
 | `clubmed-infra` | Terraform · Kubernetes · Container security | 7 skills |
 
-### [Skills](skills/README.md) — 38 available
+### [Skills](skills/README.md) — 39 available
 
 Individual slash commands that extend Claude Code for specific tasks. Install plugins above to get them pre-bundled, or pick skills individually.
 
@@ -68,6 +68,7 @@ Individual slash commands that extend Claude Code for specific tasks. Install pl
 | Database | `database-migration` · `postgresql-optimization` · `prisma-expert` |
 | Design | `excalidraw` · `figma-generate-personal-token` · `trident-icons` · `trident-ui-install` |
 | Development | `git-commit` |
+| Project Management | `jira-fetch` |
 | Error Handling | `error-handling-patterns` |
 | Infrastructure | `container-security-hardening` · `k8s-security-policies` · `terraform-specialist` |
 | Java | `java-pro` |

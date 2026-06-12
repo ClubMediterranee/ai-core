@@ -35,6 +35,7 @@ Skills are added to your Claude Code configuration and become available immediat
 | `fastapi-pro` | Python | Build high-performance async APIs with FastAPI, SQLAlchemy 2.0, and Pydantic V2. Master microservices, WebSockets, and modern Python async patterns. |
 | `figma-generate-personal-token` | Design | Manages the full lifecycle of `FIGMA_TOKEN`: detects existing tokens, validates them via the Figma API, and auto-generates a new one via browser (auto-login with `FIGMA_USERNAME`/`FIGMA_PASSWORD`, or manual fallback). Persists the token to `.env`. |
 | `git-commit` | Development | Analyses your diff and generates a standardized Conventional Commits message. Handles staging, type/scope detection, and commit execution. |
+| `jira-fetch` | Project Management | Fetches a Jira ticket and writes its full structured content to `.jira/<KEY>/`. Extracts all standard fields, all custom fields, attachments, and linked assets (Figma URLs, images, files). Supports MCP and CLI methods. |
 | `graphql` | API | GraphQL schema design, resolvers, DataLoader for N+1 prevention, federation, and client integration. Covers security controls against malicious queries. |
 | `java-pro` | Java | Master Java 21+ with modern features like virtual threads, pattern matching, and Spring Boot 3.x. Expert in the latest Java ecosystem including GraalVM, Project Loom, and cloud-native patterns. |
 | `k8s-security-policies` | Infrastructure | Comprehensive guide for implementing NetworkPolicy, PodSecurityPolicy, RBAC, and Pod Security Standards in Kubernetes. |
