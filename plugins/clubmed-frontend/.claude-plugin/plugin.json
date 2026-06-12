@@ -21,6 +21,7 @@
     "./skills/testing-patterns",
     "./skills/clean-code",
     "./skills/excalidraw",
-    "./skills/figma-generate-personal-token"
+    "./skills/figma-generate-personal-token",
+    "./skills/jira-fetch"
   ]
 }

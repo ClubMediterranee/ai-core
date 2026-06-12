@@ -48,7 +48,7 @@ claude plugin install clubmed-infra@clubmed --scope project           # Terrafor
 
 | Plugin | Stack | Skills included |
 |--------|-------|-----------------|
-| `clubmed-frontend` | React · Next.js · TypeScript · GraphQL | 9 skills |
+| `clubmed-frontend` | React · Next.js · TypeScript · GraphQL | 10 skills |
 | `clubmed-backend-node` | Node.js · API · PostgreSQL · Prisma | 11 skills |
 | `clubmed-backend-python` | Django · FastAPI · async Python | 11 skills |
 | `clubmed-backend-java` | Java 21+ · Spring Boot · API | 9 skills |

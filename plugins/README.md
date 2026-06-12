@@ -63,6 +63,7 @@ claude plugin update clubmed-infra@clubmed --scope project
 | `clean-code` | Robert C. Martin's Clean Code principles: naming, functions, formatting, error handling, and code smells. |
 | `excalidraw` | Generates Excalidraw diagrams from natural language — flowcharts, system architecture, mind maps. |
 | `figma-generate-personal-token` | Manages `FIGMA_TOKEN` lifecycle: detect, validate, auto-generate, and persist. |
+| `jira-fetch` | Fetches a Jira ticket and writes its full structured content to `.jira/<KEY>/`. Extracts all fields, custom fields, attachments, and Figma URLs. |
 
 ---
 
