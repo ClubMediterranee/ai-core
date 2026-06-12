@@ -1,19 +1,16 @@
 ---
-name: figma-generate-personal-token
-description: 'Generates, validates, and persists a Figma personal access token to FIGMA_TOKEN. Use this skill whenever a Figma token is needed, missing, expired, or must be refreshed — before any task that calls the Figma API. Triggers on: "generate figma token", "create figma token", "set up figma token", "update figma token", "FIGMA_TOKEN missing", "FIGMA_TOKEN not set", "FIGMA_TOKEN expired", "figma token invalid", "figma authentication", "configure figma access", or any task that requires Figma API access and the token is absent or invalid. Works by checking for an existing valid token first, then auto-login with FIGMA_USERNAME/FIGMA_PASSWORD if available, otherwise falls back to manual login — no manual copy-paste required.'
-version: 1.0.0
-changelog:
-  - version: 1.0.0
-    date: 2026-04-05
-    changes:
-      - Initial release — check, generate, persist token
-created-at: 2026-04-05
+name: figma-authentication
+description: 'Generates, validates, and persists a Figma personal access token to .claude/settings.local.json (Claude Code local settings). Use this skill whenever a Figma token is needed, missing, expired, or must be refreshed — before any task that calls the Figma API. Triggers on: "generate figma token", "create figma token", "set up figma token", "update figma token", "FIGMA_TOKEN missing", "FIGMA_TOKEN not set", "FIGMA_TOKEN expired", "figma token invalid", "figma authentication", "configure figma access", or any task that requires Figma API access and the token is absent or invalid. Works by checking for an existing valid token first, then auto-login with FIGMA_USERNAME/FIGMA_PASSWORD if available, otherwise falls back to manual login — no manual copy-paste required. Token is stored in .claude/settings.local.json and auto-injected by Claude Code into every shell session.'
+version: 2.1.0
+created-at: 2026-06-12
 created-by: "Jeremy Wallez <jeremy.wallez@clubmed.com>"
 ---
 
-# figma-generate-personal-token
+# figma-authentication
 
-Manages the complete lifecycle of `FIGMA_TOKEN`: detection, validation, automated generation via browser, and persistence to the project `.env`.
+Manages the complete lifecycle of `FIGMA_TOKEN`: detection, validation, automated generation via browser, and persistence to `.claude/settings.local.json`.
+
+The token is stored in the `env` block of `.claude/settings.local.json` — Claude Code injects it automatically into every shell session. No `export` or `.env` sourcing required.
 
 Supports auto-login if `FIGMA_USERNAME` and `FIGMA_PASSWORD` are available in the environment or `.env` files.
 
@@ -24,11 +21,13 @@ Supports auto-login if `FIGMA_USERNAME` and `FIGMA_PASSWORD` are available in th
 ### Step 1 — Run the main script
 
 ```bash
-SCRIPT_OUTPUT=$(python3 .claude/skills/figma-generate-personal-token/scripts/manage-token.py)
+FIGMA_USERNAME=$(python3 .claude/skills/figma-authentication/scripts/manage-token.py)
 EXIT_CODE=$?
-echo "$SCRIPT_OUTPUT"
 echo "EXIT_CODE=$EXIT_CODE"
 ```
+
+Human-readable output goes directly to stderr and is visible in the conversation.
+`$FIGMA_USERNAME` is populated only on exit 3 (username is not sensitive). The password is **never** written to stdout or any file — it stays in the process environment.
 
 The script returns:
 - `exit 0` → token valid, nothing to do
@@ -40,14 +39,9 @@ The script returns:
 
 ### Step 2 — Auto-login with credentials (exit 3)
 
-The script found `FIGMA_USERNAME` and `FIGMA_PASSWORD`. Its stdout contains two lines with the values
-to use — note: `FIGMA_AUTO_LOGIN_*` is just the script's output format, **not** the name of the source
-env vars. Extract them from `$SCRIPT_OUTPUT`:
+The script found `FIGMA_USERNAME` and `FIGMA_PASSWORD`. `$FIGMA_USERNAME` is available from Step 1.
 
-```bash
-USERNAME=$(echo "$SCRIPT_OUTPUT" | grep "^FIGMA_AUTO_LOGIN_USERNAME=" | cut -d= -f2-)
-PASSWORD=$(echo "$SCRIPT_OUTPUT" | grep "^FIGMA_AUTO_LOGIN_PASSWORD=" | cut -d= -f2-)
-```
+> ⚠️ **Security rule — never extract or echo the password.** Always reference it as `$FIGMA_PASSWORD`. Claude Code displays the variable *name*, not its expanded value. If `FIGMA_PASSWORD` is not in the shell environment (credentials come from a `.env` file), source it in the same shell call before using it.
 
 **Open the browser, fill the form and submit in one chain:**
 
@@ -55,10 +49,13 @@ PASSWORD=$(echo "$SCRIPT_OUTPUT" | grep "^FIGMA_AUTO_LOGIN_PASSWORD=" | cut -d= 
 agent-browser open "https://www.figma.com/login" && agent-browser wait --load networkidle && agent-browser snapshot -i
 ```
 
-Fill the form (refs `@eX` come from the snapshot):
+Fill the form (refs `@eX` come from the snapshot). If `$FIGMA_PASSWORD` may not be in env, source `.env` first — all in one call:
 
 ```bash
-agent-browser fill @eX "$USERNAME" && agent-browser fill @eY "$PASSWORD" && agent-browser click @eZ
+# Source .env if FIGMA_PASSWORD is not already in environment
+[ -z "$FIGMA_PASSWORD" ] && [ -f ".env.local" ] && set -a && source .env.local && set +a
+[ -z "$FIGMA_PASSWORD" ] && [ -f ".env" ] && set -a && source .env && set +a
+agent-browser fill @eX "$FIGMA_USERNAME" && agent-browser fill @eY "$FIGMA_PASSWORD" && agent-browser click @eZ
 ```
 
 Wait for post-login redirect:
@@ -106,15 +103,41 @@ After login, open settings. Figma redirects to the files page but **opens the se
 agent-browser open "https://www.figma.com/settings" && agent-browser wait --load networkidle
 ```
 
-Take ONE snapshot, grep the Security tab ref, then click it directly:
+**Primary — language-agnostic via aria attributes** (`--stdin` avoids quote escaping issues):
 
 ```bash
-agent-browser snapshot -i | grep -E "tab.*(Séc|Secur)"
+agent-browser eval --stdin <<'EVALEOF'
+(() => {
+  const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+  // aria-controls / href / data-* attributes are language-independent
+  const secTab = tabs.find(t =>
+    [t.getAttribute('aria-controls'), t.getAttribute('href'), t.dataset?.tab, t.id]
+      .some(v => v?.toLowerCase().includes('security') ||
+                 v?.toLowerCase().includes('token') ||
+                 v?.toLowerCase().includes('access'))
+  );
+  if (secTab) {
+    secTab.scrollIntoView({ block: 'center', behavior: 'instant' });
+    secTab.click();
+    return 'clicked via aria: ' + secTab.textContent.trim();
+  }
+  // Fallback: click the last tab (Security is typically last in Figma settings)
+  const lastTab = tabs[tabs.length - 1];
+  if (lastTab) { lastTab.click(); return 'clicked last tab (fallback): ' + lastTab.textContent.trim(); }
+  return 'NOT_FOUND';
+})()
+EVALEOF
+```
+
+If result is `NOT_FOUND` → **snapshot fallback** with multilingual label support:
+
+```bash
+# Covers EN / FR / ES / DE / PT / IT Figma UI languages
+agent-browser snapshot -i | grep -iE "tab.*(Séc|Secur|Segur|Sicher|Sécur|Sicur)"
 agent-browser click @eREF
 ```
 
 > ⚠️ **Never use `agent-browser scroll`** inside a Figma modal — it can close the dialog.
-> ⚠️ **Do NOT use JS eval with escaped quotes** to find the Security tab — it returns `null` unreliably. Use snapshot refs instead.
 
 ---
 
@@ -187,7 +210,7 @@ agent-browser wait 1000
 
 ### Step 6 — Retrieve and persist the token
 
-Click the Copy button and read via `pbpaste` (primary method — most reliable):
+Click the Copy button and read via clipboard (cross-platform: `pbpaste` on macOS, `xclip`/`wl-paste` on Linux):
 
 ```bash
 agent-browser eval --stdin <<'EVALEOF'
@@ -199,11 +222,22 @@ agent-browser eval --stdin <<'EVALEOF'
 })()
 EVALEOF
 agent-browser wait 300
-TOKEN_VALUE=$(pbpaste)
+
+# Cross-platform clipboard read
+TOKEN_VALUE=""
+if command -v pbpaste &>/dev/null; then
+  TOKEN_VALUE=$(pbpaste)                                    # macOS
+elif command -v xclip &>/dev/null; then
+  TOKEN_VALUE=$(xclip -selection clipboard -o 2>/dev/null) # Linux (X11)
+elif command -v wl-paste &>/dev/null; then
+  TOKEN_VALUE=$(wl-paste 2>/dev/null)                      # Linux (Wayland)
+elif command -v xdotool &>/dev/null; then
+  TOKEN_VALUE=$(xdotool getclipboard 2>/dev/null)          # Linux (X11 alt)
+fi
 echo "Token retrieved: ${TOKEN_VALUE:0:8}..."
 ```
 
-If `pbpaste` returns empty or not a Figma token, try reading from the DOM as a last resort:
+If clipboard read returns empty or not a Figma token, try reading from the DOM as a last resort:
 
 ```bash
 TOKEN_VALUE=$(agent-browser eval --stdin <<'EVALEOF'
@@ -223,10 +257,10 @@ if [ -z "$TOKEN_VALUE" ] || [[ "$TOKEN_VALUE" != figd_* ]]; then
 fi
 ```
 
-Then save:
+Then save to `.claude/settings.local.json`:
 
 ```bash
-python3 .claude/skills/figma-generate-personal-token/scripts/manage-token.py --save "$TOKEN_VALUE"
+python3 .claude/skills/figma-authentication/scripts/manage-token.py --save "$TOKEN_VALUE"
 ```
 
 ### Step 7 — Close the browser
@@ -239,30 +273,27 @@ agent-browser close
 
 ---
 
-## Supported `.env` files (priority order)
+## Storage — `.claude/settings.local.json`
 
-The script searches and updates in this order:
+The token is stored in the `env` block of `.claude/settings.local.json`:
 
-| File | Usage | Priority |
-|------|-------|----------|
-| `.env.local` | Vite/Next.js — gitignored by default | 1st (read) |
-| `.env` | Standard — **write target** | 2nd (read) / **1st (write)** |
-| `.env.development.local` | Local dev | 3rd |
-| `.env.development` | Dev only | 4th |
+```json
+{
+  "env": {
+    "FIGMA_TOKEN": "figd_xxxxx"
+  }
+}
+```
 
-The token is **always written to `.env`**. If `.env` is not gitignored, a warning is shown.
+Claude Code automatically injects all `env` entries into the shell environment for every session — **no manual `export` or `source` needed**.
 
-## Variables read (credentials)
+The script enforces gitignore protection before every write: if `.claude/settings.local.json` is not already in `.gitignore`, it is added automatically.
+
+## Variables read (credentials — still from env / .env files)
 
 ```dotenv
 FIGMA_USERNAME=your@email.com   # or FIGMA_EMAIL
 FIGMA_PASSWORD=your_password
-```
-
-## Variables written (token)
-
-```dotenv
-FIGMA_TOKEN=figd_xxxxx
 ```
 
 ---
@@ -270,8 +301,10 @@ FIGMA_TOKEN=figd_xxxxx
 ## Security
 
 - Token is never logged in plaintext (masked: `figd_W86...zjyM`)
-- Password is masked in human-readable output (`********`); the structured exit-3 output prints it in plaintext so the agent can extract it — do not persist `$SCRIPT_OUTPUT`
-- If `.env` is not gitignored, the script shows a warning
+- Password is **never written to stdout, a file, or any shell variable** — it stays in the process environment (`$FIGMA_PASSWORD`)
+- `agent-browser fill @eY "$FIGMA_PASSWORD"` is safe: Claude Code displays the variable *name*, not its expanded value
+- `.claude/settings.local.json` is protected with `chmod 600` on creation
+- Gitignore guard runs **before every write** — the file can never be committed accidentally
 - Never commit `FIGMA_USERNAME` or `FIGMA_PASSWORD` in a non-gitignored `.env` file
 
 ---
@@ -285,13 +318,13 @@ FIGMA_TOKEN=figd_xxxxx
 → Do not use a shell `for` loop over refs. Use exclusively the JS command in Step 5 which checks everything in a single evaluation.
 
 **"`agent-browser clipboard read` returns empty"**
-→ Use `pbpaste` directly on macOS. It is more reliable and synchronous.
+→ Use the cross-platform clipboard snippet in Step 6 (`pbpaste` on macOS, `xclip`/`wl-paste` on Linux). It is more reliable and synchronous.
 
 **"Figma keeps redirecting without showing tokens"**
 → Figma may require 2FA re-authentication. Let the user complete the flow in the visible browser.
 
-**"Permission denied on .env"**
-→ `chmod 644 .env` then retry.
+**"Permission denied on settings.local.json"**
+→ `chmod 644 .claude/settings.local.json` then retry.
 
 **"Token generated but immediately invalid"**
 → Figma may have a propagation delay of a few seconds. The script retries automatically 3 times with a 2s interval.
@@ -304,4 +337,8 @@ FIGMA_TOKEN=figd_xxxxx
 → Figma's expiry field is a custom combobox, not a native `<select>`. Do not use `agent-browser select`. Instead: click the combobox ref to open it, then click the last `[role="option"]` via JS (see Step 5).
 
 **"DOM input read returns empty even though the token is visible on screen"**
-→ Figma's token display input uses internal React state; `.value` may not reflect the rendered text. Always use the Copy button + `pbpaste` as the primary retrieval method (see Step 6).
+→ Figma's token display input uses internal React state; `.value` may not reflect the rendered text. Always use the Copy button + clipboard read as the primary retrieval method (see Step 6).
+
+**"FIGMA_TOKEN not set even after saving"**
+→ The token is injected by Claude Code at session start. Restart the Claude Code session or run:
+→ `export FIGMA_TOKEN=$(python3 -c "import json; d=json.load(open('.claude/settings.local.json')); print(d['env']['FIGMA_TOKEN'])")`

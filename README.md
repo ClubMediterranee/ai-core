@@ -66,7 +66,7 @@ Individual slash commands that extend Claude Code for specific tasks. Install pl
 | Code Quality | `clean-code` |
 | Config | `agent-creator` · `skill-creator` |
 | Database | `database-migration` · `postgresql-optimization` · `prisma-expert` |
-| Design | `excalidraw` · `figma-generate-personal-token` · `trident-icons` · `trident-ui-install` |
+| Design | `excalidraw` · `figma-authentication` · `figma-client` · `trident-icons` · `trident-ui-install` |
 | Development | `git-commit` |
 | Project Management | `jira-fetch` |
 | Error Handling | `error-handling-patterns` |
