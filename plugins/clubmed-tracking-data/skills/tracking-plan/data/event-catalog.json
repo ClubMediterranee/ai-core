@@ -1,0 +1,317 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "3.0",
+  "updated_at": "2026-06-16",
+  "description": "Decision tree for inferring GA4 events from Figma signals. Two sections: (1) patterns — 13 interaction templates used to classify Figma interactions; (2) canonical_events — confirmed reusable event names the agent MUST prefer.",
+  "naming_conventions": {
+    "click_zone": "click_%zone where zone = functional block name on the page (accommodation, activities, header, search…)",
+    "display_content": "display_%content_type where content_type = the component type (highlight, newsletter, top_banner…)",
+    "page_name": "{site_section}_{page_identifier}, e.g. shopping_homepage, be_accommodation, error_not_found",
+    "detail_click_slug": "snake_case, language-independent stable id — not a localised label"
+  },
+  "double_push_pattern": {
+    "description": "All click_* events MUST be pushed twice in sequence: first with event_click: null to reset the previous value, then with event_click populated.",
+    "example": [
+      {
+        "event": "click_%zone",
+        "event_click": null
+      },
+      {
+        "event": "click_%zone",
+        "event_click": {
+          "detail_click": "%action"
+        }
+      }
+    ]
+  },
+  "patterns": [
+    {
+      "id": "P01",
+      "name": "page_load",
+      "summary": "Initial page load or SPA virtual page (new URL or route change)",
+      "when": "Every page rendered — real navigation AND error pages",
+      "event_name": "page_view",
+      "notes": "search_results fires alongside page_view on search-result pages. For SPA layers that do NOT change the URL, use P02 instead."
+    },
+    {
+      "id": "P02",
+      "name": "layer_open",
+      "summary": "Full-screen SPA layer or side panel opens without URL navigation",
+      "when": "A click triggers a full-screen overlay or panel in a SPA (no browser navigation)",
+      "event_name": "page_view",
+      "sequence": [
+        "P07 (click trigger)",
+        "P02 (virtual page_view)"
+      ],
+      "notes": "Two events in sequence: (1) click_%zone (P07) is the trigger, then (2) this page_view with page_name ending in _layer. page_name = {section}_{step}_layer, e.g. be_accommodation_layer."
+    },
+    {
+      "id": "P03",
+      "name": "search_interaction",
+      "summary": "User interacts with a search or filter widget (dates, destination, participants, criteria)",
+      "when": "Any field of the search widget is opened, filled, or validated",
+      "event_name": "click_search",
+      "event_name_variants": [
+        "click_price_remote"
+      ],
+      "detail_click_examples": [
+        "criterias_when",
+        "criterias_where",
+        "criterias_who",
+        "submit_search"
+      ],
+      "notes": "click_search = global search widget. click_price_remote = search widget embedded inside a product/detail page."
+    },
+    {
+      "id": "P04",
+      "name": "global_nav",
+      "summary": "Click on persistent navigation UI: header, footer, contact bar, info banner",
+      "when": "User clicks a header CTA, footer link, contact element, or a persistent info banner",
+      "event_name": "click_header",
+      "event_name_variants": [
+        "click_footer",
+        "click_contact",
+        "click_infobanner"
+      ],
+      "notes": "click_header: account, auth, save CTAs. click_footer / click_contact: contact, FAQ, legal, WhatsApp. click_infobanner: persistent top banners. detail_click = specific action."
+    },
+    {
+      "id": "P05",
+      "name": "funnel_progress",
+      "summary": "User advances or retreats in a multi-step form or checkout flow",
+      "when": "Continue / Back / Skip CTA in a multi-step funnel",
+      "event_name": "click_bottom_bar",
+      "detail_click_examples": [
+        "validate_step",
+        "back_step",
+        "open_receipt",
+        "skip_step",
+        "travel_plans"
+      ],
+      "notes": "Named click_bottom_bar on Club Med BE. On other apps, name the zone after its UI element — the pattern is what matters."
+    },
+    {
+      "id": "P06",
+      "name": "criteria_edit",
+      "summary": "User edits journey or search criteria from within a funnel step without leaving it",
+      "when": "Breadcrumb or inline shortcut for editing dates, transport, participants while inside the funnel",
+      "event_name": "click_breadcrumb",
+      "detail_click_examples": [
+        "edit_date",
+        "edit_transport",
+        "edit_participants",
+        "edit_date_validate",
+        "edit_confirmation",
+        "skip_step"
+      ],
+      "notes": "Named click_breadcrumb on Club Med. On other apps, use click_%zone where zone is the modification widget name."
+    },
+    {
+      "id": "P07",
+      "name": "content_click",
+      "summary": "Click on any product or content element in a named functional zone",
+      "when": "Any user click that is NOT header/footer/search widget/funnel nav — the default for all content interactions",
+      "event_name": "click_%zone",
+      "notes": "zone = functional block name (accommodation, activities, transport, highlights, resort, dashboard…). detail_click = specific action. This is the most common pattern — default to it for any content click."
+    },
+    {
+      "id": "P08",
+      "name": "media_view",
+      "summary": "User opens a media gallery, floor plan, 360° view, or video",
+      "when": "Photo gallery, room plan, immersive view, or video is opened",
+      "event_name": "click_%zone",
+      "detail_click_examples": [
+        "media_photos",
+        "media_room_plan",
+        "media_video",
+        "media_360",
+        "media_virtual_tour"
+      ],
+      "notes": "Sub-pattern of P07. detail_click = media_%type. zone = the page section containing the media trigger."
+    },
+    {
+      "id": "P09",
+      "name": "option_toggle",
+      "summary": "User adds or removes an optional item (upsell, add-on, insurance, upgrade)",
+      "when": "Add/remove a paid option, insurance, upgrade, or any optional product component",
+      "event_name": "click_upsell",
+      "detail_click_examples": [
+        "add_%item",
+        "remove_%item",
+        "add_transfer",
+        "add_insurance",
+        "add_activity"
+      ],
+      "notes": "click_upsell for standalone upsell blocks. Use click_%zone (P07) when add/remove is inside a zone (e.g., room personalization inside click_accommodation)."
+    },
+    {
+      "id": "P10",
+      "name": "filter_sort",
+      "summary": "User applies, removes, or resets a filter or sort on a catalog or layer",
+      "when": "Filter chip selected, sort changed, filter panel opened or reset",
+      "event_name": "click_%zone_layer",
+      "detail_click_examples": [
+        "filter_%filter_type",
+        "advanced_filter_%filter_type",
+        "filter_remove_all",
+        "advanced_filter_mobile"
+      ],
+      "notes": "zone = the catalog or layer being filtered. On full-page catalogs without a _layer suffix, use click_%zone instead."
+    },
+    {
+      "id": "P11",
+      "name": "error",
+      "summary": "User-visible error: form validation failure, action error, or error page render",
+      "when": "Form submitted with validation errors, an action fails, or a 4xx/5xx page renders",
+      "event_name": "form_error",
+      "event_name_variants": [
+        "click_error"
+      ],
+      "notes": "form_error = form validation failure (no extra params). click_error = action error (detail_click = error_%type). Error pages use page_view (P01) with page_name = error_%type."
+    },
+    {
+      "id": "P12",
+      "name": "ecommerce",
+      "summary": "GA4 standard ecommerce: product view, funnel entry, wishlist, purchase, conversion",
+      "when": "User views a product, enters checkout, saves to wishlist, purchases, or triggers a transactional conversion",
+      "event_name": "purchase",
+      "event_name_variants": [
+        "begin_checkout",
+        "add_to_cart",
+        "add_to_wishlist",
+        "view_item",
+        "view_item_list",
+        "select_item",
+        "option_held",
+        "upsell_transaction"
+      ],
+      "notes": "Standard GA4 ecommerce schema. items[] required for purchase / add_to_cart / view_item. option_held and upsell_transaction are conversion milestones within the funnel."
+    },
+    {
+      "id": "P13",
+      "name": "content_display",
+      "summary": "Content becomes visible to the user without an explicit click (impression event)",
+      "when": "A banner, modal, notification, or recommendation renders in the viewport",
+      "event_name": "display_%content_type",
+      "notes": "content_type = component type (highlight, newsletter, floating_banner, top_banner, toaster, popin…). Fire when the component enters the viewport or is rendered visible."
+    }
+  ],
+  "canonical_events": [
+    {
+      "name": "page_view",
+      "pattern": "P01"
+    },
+    {
+      "name": "search_results",
+      "pattern": "P01"
+    },
+    {
+      "name": "sign_up",
+      "pattern": "P01"
+    },
+    {
+      "name": "newsletter_confirmation",
+      "pattern": "P13"
+    },
+    {
+      "name": "click_header",
+      "pattern": "P04"
+    },
+    {
+      "name": "click_footer",
+      "pattern": "P04"
+    },
+    {
+      "name": "click_contact",
+      "pattern": "P04"
+    },
+    {
+      "name": "click_infobanner",
+      "pattern": "P04"
+    },
+    {
+      "name": "click_search",
+      "pattern": "P03"
+    },
+    {
+      "name": "click_price_remote",
+      "pattern": "P03"
+    },
+    {
+      "name": "click_bottom_bar",
+      "pattern": "P05"
+    },
+    {
+      "name": "click_breadcrumb",
+      "pattern": "P06"
+    },
+    {
+      "name": "click_oidc",
+      "pattern": "P04"
+    },
+    {
+      "name": "click_upsell",
+      "pattern": "P09"
+    },
+    {
+      "name": "form_error",
+      "pattern": "P11"
+    },
+    {
+      "name": "click_error",
+      "pattern": "P11"
+    },
+    {
+      "name": "display_highlight",
+      "pattern": "P13"
+    },
+    {
+      "name": "display_newsletter",
+      "pattern": "P13"
+    },
+    {
+      "name": "display_floating_banner",
+      "pattern": "P13"
+    },
+    {
+      "name": "display_top_banner",
+      "pattern": "P13"
+    },
+    {
+      "name": "purchase",
+      "pattern": "P12"
+    },
+    {
+      "name": "begin_checkout",
+      "pattern": "P12"
+    },
+    {
+      "name": "add_to_cart",
+      "pattern": "P12"
+    },
+    {
+      "name": "add_to_wishlist",
+      "pattern": "P12"
+    },
+    {
+      "name": "view_item",
+      "pattern": "P12"
+    },
+    {
+      "name": "view_item_list",
+      "pattern": "P12"
+    },
+    {
+      "name": "select_item",
+      "pattern": "P12"
+    },
+    {
+      "name": "option_held",
+      "pattern": "P12"
+    },
+    {
+      "name": "upsell_transaction",
+      "pattern": "P12"
+    }
+  ]
+}

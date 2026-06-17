@@ -877,8 +877,16 @@ def collect_interactions(node: dict, depth: int, max_depth: int, results: list, 
 
 # ─── Variable extractor ───────────────────────────────────────────────────────
 
-def extract_variables(node: dict, file_key: str, token: str, max_depth: int) -> dict:
-    """Extract design token bindings from fill/stroke paints, resolved to human-readable names."""
+def extract_variables(node: dict, file_key: str, token: str, max_depth: int,
+                      skip: bool = False) -> dict:
+    """Extract design token bindings from fill/stroke paints, resolved to human-readable names.
+
+    When `skip` is True, the (Enterprise, file-scoped, often slow) /variables/local call
+    is not made at all — returns {}. Use for workflows that don't need design tokens
+    (e.g. tracking-plan inference), where this call is pure overhead.
+    """
+    if skip:
+        return {}
     raw: dict[str, str] = {}
 
     def scan(obj: dict, depth: int = 0) -> None:
@@ -899,7 +907,10 @@ def extract_variables(node: dict, file_key: str, token: str, max_depth: int) -> 
         return {}
 
     try:
-        vars_data = api_get(f"/files/{file_key}/variables/local", token)
+        # /variables/local is file-scoped and can be slow (~10-30s depending on the
+        # file's linked libraries). The default 15s timeout makes it fail and retry 3×
+        # (~48s wasted, AND the variables are lost). Give it room to actually succeed.
+        vars_data = api_get(f"/files/{file_key}/variables/local", token, timeout=60)
         variables_meta = vars_data.get("meta", {}).get("variables", {})
         resolved: dict[str, str] = {}
         for var_id, hex_val in raw.items():
@@ -2257,6 +2268,10 @@ def _build_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument("--image-fills",          type=str_to_bool, default=True,  metavar="true|false",
                         help="Download image fill PNGs to images/fills/. "
                              "Set false to skip downloads — image_fills[] metadata is still present in JSON.")
+    parser.add_argument("--variables",            type=str_to_bool, default=True,  metavar="true|false",
+                        help="Resolve design tokens via /variables/local (colors, typography, spacing). "
+                             "This endpoint is file-scoped and slow; set false for workflows that don't "
+                             "need design tokens (e.g. tracking-plan) — 'variables' is then {}.")
     parser.add_argument("--format",      choices=["png", "svg"], default="png")
     parser.add_argument("--scale",       type=int,         default=2)
     parser.add_argument("--output-json", default=None, metavar="PATH")
@@ -2305,7 +2320,8 @@ def main() -> None:
 
     # ── Pass 1: Collect ───────────────────────────────────────────────────────
     extracted = _collect_pass1(node, args.depth)
-    variables = extract_variables(node, file_key, token, max_depth=args.depth)
+    variables = extract_variables(node, file_key, token, max_depth=args.depth,
+                                  skip=not args.variables)
 
     # Remove fills inherited from master components (instance override artifact).
     # Only fires an API call when nodes with 2+ distinct imageRefs are found.
