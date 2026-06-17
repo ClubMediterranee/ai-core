@@ -1,0 +1,20 @@
+{
+  "name": "clubmed-tracking-data",
+  "displayName": "Club Med - Tracking & Analytics",
+  "version": "1.0.0",
+  "description": "Build and maintain tracking plans from Figma: infer events from design, validate against GTM, confirm with the data team, export to Excel, PDF or Markdown.",
+  "author": {
+    "name": "Jeremy Wallez",
+    "email": "jeremy.wallez@clubmed.com"
+  },
+  "repository": "https://github.com/ClubMediterranee/ai-core",
+  "license": "MIT",
+  "keywords": ["tracking", "gtm", "analytics", "figma", "tracking-plan"],
+  "skills": [
+    "./skills/figma-authentication",
+    "./skills/figma-client",
+    "./skills/tracking-plan",
+    "./skills/tracking-plan-render"
+  ],
+  "mcpServers": "./.mcp.json"
+}

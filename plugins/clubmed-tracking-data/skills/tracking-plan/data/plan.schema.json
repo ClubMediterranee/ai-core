@@ -1,0 +1,226 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ClubMediterranee/ai-core/docs/tracking/data/plan.schema.json",
+  "title": "Tracking Plan",
+  "description": "Canonical, tool-agnostic GA4 tracking plan. See ../tracking-plan-schema.md for the narrative. The agent emits this; renderers (Excel/Confluence/tests) and the linter consume it.",
+  "type": "object",
+  "required": ["meta", "entries"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["name", "site_section", "data_layer", "schema_version"],
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+$",
+          "description": "Version of this contract the plan targets (MAJOR.MINOR). Publishers may refuse a plan whose MAJOR they do not support."
+        },
+        "name": { "type": "string" },
+        "site_section": {
+          "type": "string",
+          "enum": ["all_site", "shopping", "booking_engine", "customer_account", "oidc", "prereg"]
+        },
+        "tms": { "type": "string" },
+        "analytics": { "type": "string" },
+        "data_layer": { "type": "string", "const": "clubMedLayer" },
+        "ga4_property": { "type": "string", "pattern": "^G-[A-Z0-9]+$" },
+        "gtm_containers": { "type": "array", "items": { "type": "string", "pattern": "^GTM-" } },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "figma": { "type": "array", "items": { "type": "string" } },
+            "url": { "type": "array", "items": { "type": "string" } },
+            "legacy_sheet": { "type": "string" }
+          }
+        },
+        "generated_at": { "type": "string", "format": "date", "description": "ISO 8601 date (YYYY-MM-DD)." },
+        "journeys": {
+          "type": "array",
+          "description": "Declared cross-entry journeys consumed by check_journeys.py (milestone ordering, item identity). Each entry references plan entry ids in order.",
+          "items": { "type": "object" }
+        },
+        "hints": { "type": ["string", "null"], "description": "Free-text context provided by the user at skill invocation to guide inference priority and confidence." },
+        "steps": { "type": "object" },
+        "status": {
+          "type": "string",
+          "enum": ["draft", "inprogress", "ready"],
+          "description": "Lifecycle state of the plan. draft = init done, no entries yet. inprogress = inference ran, pending_approval entries exist. ready = all entries confirmed/rejected, safe to validate and render."
+        },
+        "note": { "type": "string" }
+      }
+    },
+
+    "pages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["page_name", "site_section"],
+        "properties": {
+          "page_name": { "type": "string" },
+          "site_section": { "type": "string" },
+          "url_pattern": { "type": "string" },
+          "figma": { "type": ["string", "null"] },
+          "entries": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "family", "payload_shape"],
+        "properties": {
+          "name": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+          "family": { "type": "string", "enum": ["click", "display", "ecommerce", "lifecycle", "custom"] },
+          "kind": { "type": "string", "enum": ["interaction", "impression", "conversion", "page", "event"] },
+          "is_conversion": { "type": "boolean" },
+          "payload_shape": { "type": "string", "enum": ["flat", "nested_event_click", "ecommerce_items", "user_context"] },
+          "params": { "type": "array", "items": { "type": "string" } },
+          "ga4_mapping": {
+            "type": "object",
+            "description": "GA4 /collect param mapping. String params map to ep.<k>, NUMERIC params to epn.<k> (verified live). user props to up.<k>.",
+            "properties": {
+              "en": { "type": "string" },
+              "ep": { "type": "array", "items": { "type": "string" }, "description": "string event params (ep.<k>)" },
+              "epn": { "type": "array", "items": { "type": "string" }, "description": "numeric event params (epn.<k>)" },
+              "up": { "type": "array", "items": { "type": "string" } },
+              "items": { "type": "array", "items": { "type": "string" } }
+            }
+          },
+          "description": { "type": "string" }
+        }
+      }
+    },
+
+    "entries": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/planEntry" }
+    },
+
+    "variables_used": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/variable" }
+    },
+
+    "gap_analysis": { "type": "object" },
+    "open_questions": { "type": "array", "items": { "type": "string" } },
+    "ga4_config": { "type": "object" },
+    "evidence_from_figma": {
+      "type": "object",
+      "description": "Figma-derived signals backing inferred entries (interactions, instances, hidden layers). Present on Figma-sourced plans."
+    },
+    "parcours_observed": {
+      "type": "array",
+      "description": "Live cross-page event sequence captured during a journey run. Present on journey/parcours plans.",
+      "items": { "type": "object" }
+    }
+  },
+
+  "$defs": {
+    "planEntry": {
+      "type": "object",
+      "required": ["id", "event", "payload", "origin"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9_.]*$", "description": "Dot-separated stable identifier, e.g. shopping.homepage.click_header.main_logo" },
+        "page": { "type": "string" },
+        "section": {
+          "type": "string",
+          "description": "Sub-section header (groups entries in renderers). When absent, renderers MUST fall back to the literal 'Spécifications'."
+        },
+        "description": { "type": "string" },
+        "trigger": { "type": "string" },
+        "event": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+        "payload": { "type": "object", "required": ["event"] },
+        "example": { "type": "object" },
+        "params": {
+          "type": "array",
+          "description": "Parameters pushed in the payload. Each item describes one field: name, type, description and example. Consumed by renderers and dev agents.",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "additionalProperties": false,
+            "properties": {
+              "name":        { "type": "string", "description": "Parameter name as pushed in the data layer (snake_case)." },
+              "type":        { "type": "string", "enum": ["string", "number", "boolean", "enum", "object", "array"], "description": "Value type." },
+              "description": { "type": "string", "description": "Human-readable description of what this parameter represents." },
+              "example":     { "type": "string", "description": "Concrete example value or enum values separated by |." }
+            }
+          }
+        },
+        "lifecycle": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "lot": { "type": ["string", "null"] },
+            "qa": { "type": ["string", "null"] },
+            "status": { "type": ["string", "null"] },
+            "ticket": { "type": ["string", "null"] }
+          }
+        },
+        "screenshot": { "type": "string" },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Implementation anchor: where in the UI/codebase this push is wired. Consumed by dev agents (where to emit clubMedLayer.push) and the e2e generator (locator instead of a guessed selector). Optional — legacy entries may lack it.",
+          "properties": {
+            "kind": { "type": "string", "enum": ["dom", "figma", "component"], "description": "Provenance of the anchor." },
+            "role": { "type": "string", "description": "ARIA role (live DOM), e.g. 'link', 'button', 'tab'." },
+            "accessible_name": { "type": "string", "description": "Accessible name to match the element by (live DOM)." },
+            "selector": { "type": "string", "description": "CSS / data-testid selector when a robust one is known." },
+            "figma_node_id": { "type": "string", "description": "Figma node id of the interaction (figma-client interactions[].node_id)." },
+            "figma_path": { "type": "string", "description": "Figma layer path (figma-client interactions[].path)." },
+            "component": { "type": "string", "description": "Code component name hint, e.g. 'ProductThematics'." },
+            "stability": {
+              "type": "string",
+              "enum": ["stable", "fragile", "needs-selector"],
+              "description": "How reliable the anchor is. 'needs-selector' = no robust locator found; a human/dev must supply one."
+            }
+          }
+        },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "origin": { "type": "string", "enum": ["confirmed", "legacy", "inferred"] },
+        "rationale": { "type": "string" },
+        "VERIFICATION": {
+          "type": "string",
+          "description": "Free-text note recording a live-verification outcome for this entry (e.g. an inference later confirmed or corrected against the live site)."
+        },
+        "_status": {
+          "type": "string",
+          "enum": ["pending_approval", "approved", "rejected"],
+          "description": "Workflow state managed by the tracking-plan agents. pending_approval = written by inference-agent, awaiting user confirmation. approved = confirmed by user in confirm-agent. rejected = user skipped it (entry kept for audit, excluded from renderers). Validation blocks if any pending_approval remain."
+        }
+      },
+      "allOf": [
+        {
+          "comment": "Inferred entries must carry a rationale and a confidence — mirrors linter check C1.",
+          "if": { "properties": { "origin": { "const": "inferred" } } },
+          "then": { "required": ["rationale", "confidence"] }
+        }
+      ]
+    },
+
+    "variable": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "placeholder": { "type": "string" },
+        "description": { "type": "string" },
+        "scope": { "type": "string" },
+        "format": { "type": "string", "enum": ["string", "number", "enum", "date", "boolean"] },
+        "enum_values": { "type": ["array", "null"], "items": { "type": "string" } },
+        "examples": { "type": ["array", "string"] },
+        "aliases": { "type": "array", "items": { "type": "string" } },
+        "ga4_scope": { "type": "string", "enum": ["event", "user"] },
+        "origin": { "type": "string" },
+        "note": { "type": "string" }
+      }
+    }
+  }
+}

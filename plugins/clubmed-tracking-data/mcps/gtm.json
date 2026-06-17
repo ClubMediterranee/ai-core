@@ -1,0 +1,9 @@
+{
+  "_note": "Human-readable documentation only. Functional MCP config is in ../.mcp.json",
+  "name": "gtm",
+  "displayName": "Google Tag Manager",
+  "description": "Read GTM containers, tags, triggers and variables. Required by tracking-plan.",
+  "auth": "OAuth (Google account - browser flow on first use)",
+  "command": "claude mcp add -t http gtm https://mcp.gtmeditor.com",
+  "reset_auth": "rm -rf ~/.mcp-auth"
+}
