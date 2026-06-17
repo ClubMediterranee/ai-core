@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "gtm": {
-      "transport": "http",
+      "type": "http",
       "url": "https://mcp.gtmeditor.com"
     }
   }

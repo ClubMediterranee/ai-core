@@ -98,7 +98,6 @@ The validator gates on `meta.status`:
 ## Seed data (`data/`)
 
 - `data/event-catalog.json`       — 13 patterns + 29 canonical events. Match here first.
-- `data/variable-dictionary.json` — typed, scoped variables. Use these names.
 - `data/plan.schema.json`         — closed JSON Schema the output MUST satisfy.
 - `data/live-coverage.json`       — which events are confirmed live.
 
@@ -289,7 +288,7 @@ On success: set `meta.steps["validate-plan"] = "done"` and continue to Phase 6.
 Read `steps/enrich/agent.md` → `<ENRICH_AGENT>` and execute inline.
 
 **Step 1 — New patterns:**
-Check if any approved entries use event names not in `data/event-catalog.json → canonical_events`.
+Check if any approved entries use event names not already covered by the GTM snapshot (ga4_events_confirmed).
 If found, offer to add them to the catalog (persistent — benefits future runs).
 
 **Step 2 — Missing events:**

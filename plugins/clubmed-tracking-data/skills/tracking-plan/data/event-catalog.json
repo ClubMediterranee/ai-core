@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "version": "3.0",
-  "updated_at": "2026-06-16",
-  "description": "Decision tree for inferring GA4 events from Figma signals. Two sections: (1) patterns — 13 interaction templates used to classify Figma interactions; (2) canonical_events — confirmed reusable event names the agent MUST prefer.",
+  "updated_at": "2026-06-17",
+  "description": "Decision tree for inferring events from UI signals. 13 generic patterns — platform-agnostic. Canonical event names come from the GTM snapshot at runtime.",
   "naming_conventions": {
     "click_zone": "click_%zone where zone = functional block name on the page (accommodation, activities, header, search…)",
     "display_content": "display_%content_type where content_type = the component type (highlight, newsletter, top_banner…)",
@@ -194,124 +194,6 @@
       "when": "A banner, modal, notification, or recommendation renders in the viewport",
       "event_name": "display_%content_type",
       "notes": "content_type = component type (highlight, newsletter, floating_banner, top_banner, toaster, popin…). Fire when the component enters the viewport or is rendered visible."
-    }
-  ],
-  "canonical_events": [
-    {
-      "name": "page_view",
-      "pattern": "P01"
-    },
-    {
-      "name": "search_results",
-      "pattern": "P01"
-    },
-    {
-      "name": "sign_up",
-      "pattern": "P01"
-    },
-    {
-      "name": "newsletter_confirmation",
-      "pattern": "P13"
-    },
-    {
-      "name": "click_header",
-      "pattern": "P04"
-    },
-    {
-      "name": "click_footer",
-      "pattern": "P04"
-    },
-    {
-      "name": "click_contact",
-      "pattern": "P04"
-    },
-    {
-      "name": "click_infobanner",
-      "pattern": "P04"
-    },
-    {
-      "name": "click_search",
-      "pattern": "P03"
-    },
-    {
-      "name": "click_price_remote",
-      "pattern": "P03"
-    },
-    {
-      "name": "click_bottom_bar",
-      "pattern": "P05"
-    },
-    {
-      "name": "click_breadcrumb",
-      "pattern": "P06"
-    },
-    {
-      "name": "click_oidc",
-      "pattern": "P04"
-    },
-    {
-      "name": "click_upsell",
-      "pattern": "P09"
-    },
-    {
-      "name": "form_error",
-      "pattern": "P11"
-    },
-    {
-      "name": "click_error",
-      "pattern": "P11"
-    },
-    {
-      "name": "display_highlight",
-      "pattern": "P13"
-    },
-    {
-      "name": "display_newsletter",
-      "pattern": "P13"
-    },
-    {
-      "name": "display_floating_banner",
-      "pattern": "P13"
-    },
-    {
-      "name": "display_top_banner",
-      "pattern": "P13"
-    },
-    {
-      "name": "purchase",
-      "pattern": "P12"
-    },
-    {
-      "name": "begin_checkout",
-      "pattern": "P12"
-    },
-    {
-      "name": "add_to_cart",
-      "pattern": "P12"
-    },
-    {
-      "name": "add_to_wishlist",
-      "pattern": "P12"
-    },
-    {
-      "name": "view_item",
-      "pattern": "P12"
-    },
-    {
-      "name": "view_item_list",
-      "pattern": "P12"
-    },
-    {
-      "name": "select_item",
-      "pattern": "P12"
-    },
-    {
-      "name": "option_held",
-      "pattern": "P12"
-    },
-    {
-      "name": "upsell_transaction",
-      "pattern": "P12"
     }
   ]
 }

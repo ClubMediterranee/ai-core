@@ -7,7 +7,7 @@ whether to include it, then write the decision back.
 You do NOT infer new events. You do NOT skip entries silently.
 You do NOT set `meta.steps['confirm']` or `meta.status` — the orchestrator owns those.
 Every pending_approval entry must be presented to the user — no exceptions.
-Address the user **in French**.
+Address the user **in their language** (detect from their messages).
 
 ## Inputs (injected by orchestrator)
 
@@ -44,98 +44,65 @@ If 0 pending entries → skip to step 4.
 ### 2. Confirm entries — batches of 4 (one AskUserQuestion call = up to 4 tabs)
 
 Group pending entries in batches of 4. Each batch = one AskUserQuestion call with
-4 questions displayed as **tabs side by side** — the user sees all events in the batch
-at once and navigates between tabs to answer each one.
+4 questions displayed as **tabs side by side**.
 
-For N entries: ceil(N/4) calls total.
-Example: 8 entries → call 1 (tabs 1-4) + call 2 (tabs 5-8).
-
-For each entry in the batch, build a question using the format below.
-**Never omit fields** — surface everything that helps the user judge the event.
+For N entries: ceil(N/4) calls total. Example: 8 entries → call 1 (tabs 1-4) + call 2 (tabs 5-8).
 
 #### Build the question text
 
-The `question` field is rendered as PLAIN TEXT — no markdown, no **bold**, no *italic*.
-Keep it short and readable without formatting:
+The `question` field is rendered as PLAIN TEXT — no markdown, no bold, no italic.
 
 ```
 <N>/<total> — <event_name>
 <site_section> · <page_slug>
 
-Trigger : <trigger>
-Parcours : <where the user is in the flow — plain text>
-Source : <"GTM confirmé ✓" or "Inféré depuis Figma · Confiance <n>%">
+Trigger: <trigger>
+User journey: <where the user is in the flow — plain text>
+Source: <"GTM confirmed ✓" or "Inferred from Figma · Confidence <n>%">
 ```
 
-All rich formatting (codeblocks, tables, images) goes in the `preview` of options only.
+#### Build the `preview` for the "Include" option
 
-#### Build the `preview` content for the "Inclure" option
-
-Show two things:
-
-**1. Screenshot reference** — if `entry.screenshot` is set, show the path as plain text
-so the user knows which element is tracked (images don't render in preview):
-
+**1. Screenshot reference** (skip for lifecycle events like page_view, form_error):
 ```
-Element : <entry.screenshot path>
+Element: <entry.screenshot path>
 ```
 
-Skip this line for lifecycle events (page_view, form_error) — no element screenshot makes sense.
-
-**2. Full proposed payload** as a JSON codeblock.
-
-The payload shows what is **pushed into `clubMedLayer`** — keys are business names
-read by GTM DL variables, not GA4 spec names. Enrich by checking `dl_variables`
-for relevant fields:
-- `event_click.*` → leaf names inside `event_click: {}`
-- ecommerce items → fields from `ecommerce.items.0.*` DL variables
-
+**2. Full payload** as a JSON codeblock — keys are DL variable names (not GA4 spec names):
 ```json
 {
   "event": "<event_name>",
   "event_click": {
     "detail_click": "<slug>",
-    "resort_code": "{{resort_code}}"
+    "room_type": "{{room_type}}"
   }
 }
 ```
 
-**3. Params table** — show the enriched `params[]` from the entry, with type + description + example:
+**3. Params table** from `entry.params[]`:
 
-| Paramètre | Type | Description | Exemple |
+| Parameter | Type | Description | Example |
 |---|---|---|---|
 | detail_click | `string` | Stable action slug | change_comfort |
 | room_type | `enum` | Room comfort category | superior \| deluxe \| suite |
 
-If a param has no description or type (unknown), flag it in the table:
+Flag missing descriptions: `— ⚠️ description missing`
 
-| resort_code | `string` | — ⚠️ description manquante | MPAC |
+#### Build the `preview` for the "Modify" option
 
-The user can fill missing descriptions via the **Modifier** flow.
+Show current payload + available DL variables to add/remove:
 
-#### Build the `preview` content for the "Modifier" option
-
-Show the current payload + an editable field list. The user can:
-- Add a field: list relevant DL variables not yet in the payload (from GTM snapshot)
-- Remove a field: list current payload fields
-- Change a value: list current slugs/values
-
-```markdown
-**Payload actuel :**
-```json
-{ ... }
 ```
+Current payload:
+{ ... }
 
-**Ajouter un champ** — variables GTM disponibles pour cet event :
-- `event_click.room_type` → room_type: "{{room_type}}"
-- `event_click.resort_code` → resort_code: "{{resort_code}}"
-- `event_click.price` → price: {{price}}
-- ... (list relevant DL variables from snapshot)
+Add a field — available DL variables:
+- event_click.room_type → room_type: "{{room_type}}"
+- event_click.resort_code → resort_code: "{{resort_code}}"
 
-**Retirer un champ** — champs actuels :
+Remove a field — current fields:
 - detail_click
 - room_type
-- ...
 ```
 
 #### AskUserQuestion call
@@ -145,27 +112,27 @@ AskUserQuestion(
   question: "<built above>",
   options: [
     {
-      label: "Inclure",
-      description: "Ajouter cet event au plan.",
+      label: "Include",
+      description: "Add this event to the plan.",
       preview: "<full payload codeblock + params table>"
     },
     {
-      label: "Ignorer",
-      description: "Exclure du plan. Conservé dans open-questions.md.",
-      preview: "Cet event ne sera pas inclus dans le plan.\nIl sera conservé dans open-questions.md pour révision ultérieure."
+      label: "Skip",
+      description: "Exclude from plan. Kept in open-questions.md.",
+      preview: "This event will not be included in the plan.\nKept in open-questions.md for later review."
     },
     {
-      label: "Modifier",
-      description: "Ajouter / retirer des champs ou changer le payload.",
+      label: "Modify",
+      description: "Add / remove fields or change the payload.",
       preview: "<current payload + add/remove field list>"
     }
   ]
 )
 ```
 
-### 3. Handle each decision — write to plan.json immediately after each one
+### 3. Handle each decision — write to plan.json immediately
 
-**Inclure:**
+**Include:**
 ```bash
 python3 -c "
 import json
@@ -178,7 +145,7 @@ json.dump(plan, open('${PLAN_FILE}', 'w'), indent=2, ensure_ascii=False)
 "
 ```
 
-**Ignorer:**
+**Skip:**
 ```bash
 python3 -c "
 import json
@@ -191,38 +158,37 @@ json.dump(plan, open('${PLAN_FILE}', 'w'), indent=2, ensure_ascii=False)
 "
 ```
 
-**Modifier — follow-up question immediately:**
+**Modify — follow-up question immediately:**
 
 ```
 AskUserQuestion(
-  question: "Que souhaitez-vous modifier sur **<event_name>** ?",
+  question: "What would you like to change on <event_name>?",
   options: [
     {
-      label: "Ajouter un champ",
-      description: "Ajouter un paramètre au payload.",
+      label: "Add a field",
+      description: "Add a parameter to the payload.",
       preview: "<list of available DL variables not yet in payload>"
     },
     {
-      label: "Retirer un champ",
-      description: "Retirer un paramètre du payload.",
+      label: "Remove a field",
+      description: "Remove a parameter from the payload.",
       preview: "<list of current payload fields>"
     },
     {
-      label: "Changer le event name",
-      description: "Renommer l'event.",
-      preview: "<current event name + list of canonical events from event-catalog>"
+      label: "Change the event name",
+      description: "Rename the event.",
+      preview: "<current event name>"
     },
     {
-      label: "Changer le detail_click",
-      description: "Modifier le slug de l'action.",
+      label: "Change the detail_click",
+      description: "Update the action slug.",
       preview: "<current detail_click slug>"
     }
   ]
 )
 ```
 
-After each modification, ask free-text follow-up if needed (e.g. "Quel champ ajouter ?" →
-user types the field name), apply the change, set `_status: "approved"`, write to plan.json.
+Apply the modification, set `_status: "approved"`, write to plan.json.
 
 ### 4. Write open-questions.md for rejected entries
 
