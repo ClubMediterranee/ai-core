@@ -1,33 +1,32 @@
 {
   "version": "1.0.0",
+  "_note": "Human-readable registry only. Not parsed by Claude Code. Functional MCP config lives in .mcp.json files inside each plugin.",
   "servers": [
     {
       "name": "context7",
       "description": "Up-to-date documentation for any library or framework, fetched live from official sources. Prevents hallucinated APIs.",
       "category": "Development",
-      "config": {
-        "command": "npx",
-        "args": ["-y", "@upstash/context7-mcp@latest"]
-      }
+      "command": "claude mcp add context7 -- npx -y @upstash/context7-mcp@latest"
     },
     {
       "name": "figma",
       "description": "Access Figma files, components, and design tokens directly. Implement designs in any framework in one shot.",
       "category": "Design",
       "auth": "OAuth (browser prompt on first use)",
-      "config": {
-        "transport": "http",
-        "url": "https://mcp.figma.com/mcp"
-      }
+      "command": "claude mcp add --transport http figma https://mcp.figma.com/mcp"
+    },
+    {
+      "name": "gtm",
+      "description": "Google Tag Manager - read containers, tags, triggers and variables. Used by tracking-plan to confirm which events have a GA4 tag and to validate parameter names against declared Data Layer variables.",
+      "category": "Analytics",
+      "auth": "OAuth (Google account - browser flow on first use)",
+      "command": "claude mcp add -t http gtm https://mcp.gtmeditor.com"
     },
     {
       "name": "playwright",
       "description": "Browser automation: navigate, click, fill forms, take screenshots, extract data from live pages.",
       "category": "Testing / Automation",
-      "config": {
-        "command": "npx",
-        "args": ["-y", "@playwright/mcp@latest"]
-      }
+      "command": "claude mcp add playwright -- npx -y @playwright/mcp@latest"
     }
   ]
 }

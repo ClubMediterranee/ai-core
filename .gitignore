@@ -21,3 +21,6 @@ __pycache__/
 
 # Playwright MCP
 .playwright-mcp/
+
+# Claude Code local settings — contains secrets, never commit
+.claude/settings.local.json
