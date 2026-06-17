@@ -2,7 +2,7 @@
   "$schema": "https://code.claude.com/schemas/marketplace.json",
   "name": "clubmed",
   "displayName": "Club Med AI",
-  "description": "Club Med AI Guild \u2014 skills and tools shared across developer and designer teams.",
+  "description": "Club Med AI Guild - skills and tools shared across developer and designer teams.",
   "version": "1.0.0",
   "owner": {
     "name": "Jeremy Wallez",
@@ -14,9 +14,9 @@
   "plugins": [
     {
       "name": "clubmed-frontend",
-      "displayName": "Club Med \u2014 Frontend",
+      "displayName": "Club Med - Frontend",
       "description": "React, Next.js, GraphQL, TypeScript, testing, and design tools.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "source": "./plugins/clubmed-frontend",
       "keywords": [
         "react",
@@ -30,7 +30,7 @@
     },
     {
       "name": "clubmed-backend-node",
-      "displayName": "Club Med \u2014 Backend Node.js",
+      "displayName": "Club Med - Backend Node.js",
       "description": "Node.js, API design, security, PostgreSQL, Prisma, observability, and testing.",
       "version": "1.0.0",
       "source": "./plugins/clubmed-backend-node",
@@ -45,7 +45,7 @@
     },
     {
       "name": "clubmed-backend-python",
-      "displayName": "Club Med \u2014 Backend Python",
+      "displayName": "Club Med - Backend Python",
       "description": "Django, FastAPI, async patterns, API design, security, and databases.",
       "version": "1.0.0",
       "source": "./plugins/clubmed-backend-python",
@@ -61,7 +61,7 @@
     },
     {
       "name": "clubmed-backend-java",
-      "displayName": "Club Med \u2014 Backend Java",
+      "displayName": "Club Med - Backend Java",
       "description": "Java 21+, Spring Boot, API design, security, and databases.",
       "version": "1.0.0",
       "source": "./plugins/clubmed-backend-java",
@@ -76,7 +76,7 @@
     },
     {
       "name": "clubmed-infra",
-      "displayName": "Club Med \u2014 Infrastructure",
+      "displayName": "Club Med - Infrastructure",
       "description": "Terraform, Kubernetes, container security, and security scanning.",
       "version": "1.0.0",
       "source": "./plugins/clubmed-infra",
@@ -88,6 +88,21 @@
         "iac"
       ],
       "category": "development"
+    },
+    {
+      "name": "clubmed-tracking-data",
+      "displayName": "Club Med - Tracking & Analytics",
+      "description": "Build and maintain tracking plans from Figma: infer events from design, validate against GTM, confirm with the data team, export to Excel, PDF or Markdown.",
+      "version": "1.0.0",
+      "source": "./plugins/clubmed-tracking-data",
+      "keywords": [
+        "tracking",
+        "gtm",
+        "analytics",
+        "figma",
+        "tracking-plan"
+      ],
+      "category": "data"
     }
   ]
 }

@@ -29,7 +29,7 @@
 
 ## What's inside
 
-### [Plugins](plugins/README.md) — 5 available
+### [Plugins](plugins/README.md) — 6 available
 
 Role-based bundles that install a curated set of skills in one command.
 
@@ -43,6 +43,7 @@ claude plugin install clubmed-backend-node@clubmed --scope project    # Node.js 
 claude plugin install clubmed-backend-python@clubmed --scope project  # Django / FastAPI / Python
 claude plugin install clubmed-backend-java@clubmed --scope project    # Java 21+ / Spring Boot
 claude plugin install clubmed-infra@clubmed --scope project           # Terraform / Kubernetes / Security
+claude plugin install clubmed-data@clubmed --scope project            # GA4 tracking plans / analytics
 
 ```
 
@@ -53,8 +54,9 @@ claude plugin install clubmed-infra@clubmed --scope project           # Terrafor
 | `clubmed-backend-python` | Django · FastAPI · async Python | 11 skills |
 | `clubmed-backend-java` | Java 21+ · Spring Boot · API | 9 skills |
 | `clubmed-infra` | Terraform · Kubernetes · Container security | 7 skills |
+| `clubmed-data` | GA4 tracking plans · analytics · Figma | 3 skills |
 
-### [Skills](skills/README.md) — 39 available
+### [Skills](skills/README.md) — 40 available
 
 Individual slash commands that extend Claude Code for specific tasks. Install plugins above to get them pre-bundled, or pick skills individually.
 

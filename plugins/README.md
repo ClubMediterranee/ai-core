@@ -18,6 +18,7 @@ claude plugin install clubmed-backend-node@clubmed --scope project    # Node.js 
 claude plugin install clubmed-backend-python@clubmed --scope project  # Django / FastAPI / Python
 claude plugin install clubmed-backend-java@clubmed --scope project    # Java 21+ / Spring Boot
 claude plugin install clubmed-infra@clubmed --scope project           # Terraform / Kubernetes / Security
+claude plugin install clubmed-data@clubmed --scope project            # GA4 tracking plans / analytics
 ```
 
 Skills become available immediately as slash commands in Claude Code.
@@ -38,6 +39,7 @@ claude plugin update clubmed-backend-node@clubmed --scope project
 claude plugin update clubmed-backend-python@clubmed --scope project
 claude plugin update clubmed-backend-java@clubmed --scope project
 claude plugin update clubmed-infra@clubmed --scope project
+claude plugin update clubmed-data@clubmed --scope project
 ```
 
 ---
@@ -150,6 +152,20 @@ claude plugin update clubmed-infra@clubmed --scope project
 | `observability-patterns` | Production-ready monitoring, logging, tracing, SLI/SLO management, and incident response. |
 | `clean-code` | Robert C. Martin's Clean Code principles for infrastructure-as-code. |
 | `excalidraw` | Generates Excalidraw diagrams from natural language descriptions. |
+
+---
+
+### `clubmed-data` — Club Med Data & Tracking
+
+> Skills for the data / analytics team: build GA4 tracking plans from a Figma link or a URL, inspired by the existing Club Med plan.
+
+**Keywords:** `tracking` · `ga4` · `analytics` · `gtm` · `tracking-plan` · `figma` · `data`
+
+| Skill | Description |
+|-------|-------------|
+| `tracking-plan` | GA4 tracking-plan engine. From a Figma link and/or a URL, infers the trackable moments (clicks, impressions, ecommerce, page views) and produces a validated, tool-agnostic `plan.json`. Rendering (Excel/Confluence/Markdown) and publishing are separate skills that consume the plan. |
+| `figma-client` | Figma REST client — fetches node metadata, interactions, instances, hidden layers, and semantic hints. Feeds the Figma inference path. |
+| `figma-authentication` | Manages the `FIGMA_TOKEN` lifecycle: detect, validate, auto-generate, and persist. Dependency of `figma-client`. |
 
 ---
 

@@ -10,6 +10,7 @@ A curated list of Model Context Protocol servers recommended by the Club Med AI 
 |--------|----------|-------------|:----:|---------|
 | `context7` | Development | Up-to-date docs for any library, fetched live. Prevents hallucinated APIs. | ✅ _(optional key for higher rate limits)_ | `claude mcp add context7 -- npx -y @upstash/context7-mcp@latest` |
 | `figma` | Design | Access Figma files and design tokens. Implement designs in one shot. | 🔑 OAuth | `claude mcp add --transport http figma https://mcp.figma.com/mcp` |
+| `gtm` | Analytics | Google Tag Manager — read containers, tags, triggers, variables. Required by `tracking-plan`. | 🔑 OAuth (Google) | `claude mcp add -t http gtm https://mcp.gtmeditor.com` |
 | `playwright` | Testing / Automation | Browser automation: navigate, click, screenshot, extract data. | ✅ | `claude mcp add playwright -- npx -y @playwright/mcp@latest` |
 | `trident-icons` | Design | Search Club Med Trident icons by semantic description. | ✅ | 🚧 In progress |
 
