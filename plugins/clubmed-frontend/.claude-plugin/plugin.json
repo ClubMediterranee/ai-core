@@ -1,7 +1,7 @@
 {
   "name": "clubmed-frontend",
   "displayName": "Club Med — Frontend",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Skills for frontend developers: React, Next.js, GraphQL, TypeScript, testing, and design tools.",
   "author": {
     "name": "Jeremy Wallez",
@@ -21,7 +21,8 @@
     "./skills/testing-patterns",
     "./skills/clean-code",
     "./skills/excalidraw",
-    "./skills/figma-generate-personal-token",
+    "./skills/figma-authentication",
+    "./skills/figma-client",
     "./skills/jira-fetch"
   ]
 }
