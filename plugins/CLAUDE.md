@@ -69,6 +69,22 @@ If you need to point to a non-default agents directory, declare it explicitly:
 
 ## Adding MCP servers to a plugin
 
+> **Sync rule — always update the global registry AND README when adding an MCP anywhere.**
+>
+> Whether the server is declared in a plugin's `.mcp.json` or directly in `mcps/registry.json`, both of the following files must be updated in the same commit:
+> - `mcps/registry.json` — add the server entry (name, description, category, auth, command)
+> - `mcps/README.md` — add a row in the table (Server · Category · Description · Auth · Install)
+> - `README.md` — add a row in the `### MCP Servers` table (Server · Category)
+>
+> Quick check before committing:
+> ```bash
+> # List all server names in registry vs README — they must match
+> python3 -c "import json; r=json.load(open('mcps/registry.json')); [print(s['name']) for s in r['servers']]"
+> grep '^\|' mcps/README.md | awk -F'|' '{print $2}' | xargs
+> ```
+
+
+
 Declare servers inline (simple case, fewer than 3 servers) or via an external `.mcp.json` file (recommended when there are multiple servers or env vars).
 
 **Inline** in `plugin.json`:

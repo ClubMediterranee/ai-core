@@ -82,7 +82,7 @@ Individual slash commands that extend Claude Code for specific tasks. Install pl
 | Testing | `e2e-testing` · `testing-patterns` |
 | TypeScript | `typescript-advanced-types` · `typescript-expert` |
 
-### [MCP Servers](mcps/README.md) — 3 available
+### [MCP Servers](mcps/README.md) — 5 available
 
 Curated MCP servers to connect Claude to external tools.
 
@@ -90,7 +90,9 @@ Curated MCP servers to connect Claude to external tools.
 |--------|----------|
 | `context7` | Development |
 | `figma` | Design |
+| `gtm` | Analytics |
 | `playwright` | Testing / Automation |
+| `trident-icons` | Design |
 
 ---
 

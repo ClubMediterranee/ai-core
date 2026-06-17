@@ -1,7 +1,7 @@
 ---
 name: figma-authentication
 description: 'Generates, validates, and persists a Figma personal access token to .claude/settings.local.json (Claude Code local settings). Use this skill whenever a Figma token is needed, missing, expired, or must be refreshed — before any task that calls the Figma API. Triggers on: "generate figma token", "create figma token", "set up figma token", "update figma token", "FIGMA_TOKEN missing", "FIGMA_TOKEN not set", "FIGMA_TOKEN expired", "figma token invalid", "figma authentication", "configure figma access", or any task that requires Figma API access and the token is absent or invalid. Works by checking for an existing valid token first, then auto-login with FIGMA_USERNAME/FIGMA_PASSWORD if available, otherwise falls back to manual login — no manual copy-paste required. Token is stored in .claude/settings.local.json and auto-injected by Claude Code into every shell session.'
-version: 2.1.0
+version: 2.1.1
 created-at: 2026-06-12
 created-by: "Jeremy Wallez <jeremy.wallez@clubmed.com>"
 ---
@@ -46,7 +46,7 @@ The script found `FIGMA_USERNAME` and `FIGMA_PASSWORD`. `$FIGMA_USERNAME` is ava
 **Open the browser, fill the form and submit in one chain:**
 
 ```bash
-agent-browser --headed open "https://www.figma.com/login" && agent-browser wait --load networkidle && agent-browser snapshot -i
+agent-browser close --all 2>/dev/null; AGENT_BROWSER_HEADED=1 agent-browser open "https://www.figma.com/login" && agent-browser wait --load networkidle && agent-browser snapshot -i
 ```
 
 Fill the form (refs `@eX` come from the snapshot). If `$FIGMA_PASSWORD` may not be in env, source `.env` first — all in one call:
@@ -79,7 +79,7 @@ agent-browser wait --fn "!window.location.href.includes('/login')" --timeout 120
 No credentials available. Navigate to settings and immediately check the resulting URL:
 
 ```bash
-agent-browser --headed open "https://www.figma.com/settings" && agent-browser wait --load networkidle && agent-browser get url
+agent-browser close --all 2>/dev/null; AGENT_BROWSER_HEADED=1 agent-browser open "https://www.figma.com/settings" && agent-browser wait --load networkidle && agent-browser get url
 ```
 
 - If the URL does **not** contain `/login` → already logged in, **skip to Step 4 immediately**
@@ -100,7 +100,7 @@ Then continue to Step 4.
 After login, open settings. Figma redirects to the files page but **opens the settings dialog automatically**:
 
 ```bash
-agent-browser --headed open "https://www.figma.com/settings" && agent-browser wait --load networkidle
+AGENT_BROWSER_HEADED=1 agent-browser open "https://www.figma.com/settings" && agent-browser wait --load networkidle
 ```
 
 **Primary — language-agnostic via aria attributes** (`--stdin` avoids quote escaping issues):
