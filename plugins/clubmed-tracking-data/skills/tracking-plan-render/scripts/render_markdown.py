@@ -10,30 +10,6 @@ import json
 import sys
 from pathlib import Path
 
-PARAM_SUPPLEMENT = {
-    "resort_code":                 {"description": "Resort identifier code",              "format": "string",  "examples": "MPAC"},
-    "resort_name":                 {"description": "Resort display name",                  "format": "string",  "examples": "Marrakech la Palmeraie"},
-    "resort_exclusive_collection": {"description": "Exclusive Collection tier",            "format": "enum",    "examples": "no | exclusive_collection | villas_and_chalets"},
-    "room_type":                   {"description": "Room comfort category",                "format": "enum",    "examples": "superior | deluxe | suite | villa"},
-    "detail_click":                {"description": "Stable action slug — language-neutral","format": "string",  "examples": "change_comfort | media_photos | see_details"},
-}
-
-def load_param_lookup(skill_dir=None):
-    lookup = {}
-    if skill_dir:
-        vd_path = Path(skill_dir) / "data" / "variable-dictionary.json"
-        if vd_path.exists():
-            vd = json.loads(vd_path.read_text(encoding="utf-8"))
-            for v in vd.get("variables", []):
-                lookup[v["name"]] = {
-                    "description": v.get("description",""),
-                    "format":      v.get("format","string"),
-                    "examples":    str(v.get("examples","") or ""),
-                }
-    for k, v in PARAM_SUPPLEMENT.items():
-        if k not in lookup or not lookup[k].get("description"):
-            lookup[k] = v
-    return lookup
 
 LABELS = {
     "en": {
@@ -79,12 +55,11 @@ def build_payload_md(entry):
         return f"```js\nclubMedLayer.push({json.dumps(p, ensure_ascii=False, indent=2)});\n```"
 
 
-def render(plan_file: str, output_dir: str, lang: str = "en", skill_dir: str = None):
+def render(plan_file: str, output_dir: str, lang: str = "en"):
     plan         = json.load(open(plan_file, encoding="utf-8"))
     meta         = plan["meta"]
     name         = meta["name"]
     L            = LABELS.get(lang, LABELS["en"])
-    param_lookup = load_param_lookup(skill_dir)
     approved     = [e for e in plan["entries"] if e.get("_status") == "approved"]
     rejected     = [e for e in plan["entries"] if e.get("_status") == "rejected"]
 
@@ -178,8 +153,7 @@ def render(plan_file: str, output_dir: str, lang: str = "en", skill_dir: str = N
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Usage: render_markdown.py <plan.json> <output_dir> [lang=en|fr] [skill_dir]")
+        print("Usage: render_markdown.py <plan.json> <output_dir> [lang=en|fr]")
         sys.exit(1)
     lang      = sys.argv[3] if len(sys.argv) > 3 else "en"
-    skill_dir = sys.argv[4] if len(sys.argv) > 4 else None
-    render(sys.argv[1], sys.argv[2], lang, skill_dir)
+    render(sys.argv[1], sys.argv[2], lang)

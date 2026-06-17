@@ -3,7 +3,7 @@
 PDF renderer for plan.json via reportlab.
 - Description callout (rationale) at top of each event block
 - Styled code block for Push dataLayer
-- Params table with description + example from variable-dictionary
+- Params table reads description/type/example directly from plan.json entries
 - KeepTogether prevents event blocks from splitting across pages
 """
 
@@ -99,29 +99,6 @@ def make_styles():
     return s
 
 
-def load_param_lookup(skill_dir: str) -> dict:
-    """Load variable descriptions from variable-dictionary.json + hardcoded supplements."""
-    lookup = {}
-    vd_path = Path(skill_dir) / "data" / "variable-dictionary.json"
-    if vd_path.exists():
-        vd = json.loads(vd_path.read_text(encoding="utf-8"))
-        for v in vd.get("variables", []):
-            lookup[v["name"]] = {
-                "description": v.get("description", ""),
-                "examples":    str(v.get("examples", "") or ""),
-            }
-    # Supplement with domain knowledge for params not in the dictionary
-    supplements = {
-        "resort_code":                 ("Resort identifier code",             "MPAC"),
-        "resort_name":                 ("Resort display name",                 "Marrakech la Palmeraie"),
-        "resort_exclusive_collection": ("Exclusive Collection tier",           "no | exclusive_collection | villas_and_chalets"),
-        "room_type":                   ("Room comfort category",               "superior | deluxe | suite | villa"),
-        "detail_click":                ("Stable action slug — language-neutral","change_comfort | media_photos | see_details"),
-    }
-    for k, (desc, ex) in supplements.items():
-        if k not in lookup or not lookup[k].get("description"):
-            lookup[k] = {"description": desc, "examples": ex}
-    return lookup
 
 
 def build_payload_text(entry: dict) -> str:
@@ -173,17 +150,12 @@ def description_block(label: str, text: str, s) -> Table:
     return tbl
 
 
-def params_table(params: list, param_lookup: dict, L: dict, s) -> Table:
+def params_table(params: list, L: dict, s) -> Table:
     """Four-column params table: Parameter | Type | Description | Example."""
     hdr = [L["param"], "Type", L["param_desc"], L["param_example"]]
     rows = [hdr]
     for p in params:
-        rows.append([
-            p.get("name", ""),
-            p.get("type", "string"),
-            p.get("description", "—"),
-            p.get("example", "—"),
-        ])
+        rows.append([p.get("name",""), p.get("type","string"), p.get("description","—"), p.get("example","—")])
     tbl = Table(rows, colWidths=[40*mm, 22*mm, 74*mm, 34*mm])
     tbl.setStyle(TableStyle([
         ("BACKGROUND",     (0,0),(-1,0),  NAVY_S),
@@ -218,7 +190,7 @@ def header_footer(canvas, doc):
     canvas.restoreState()
 
 
-def render(plan_file: str, output_dir: str, lang: str = "en", skill_dir: str = None):
+def render(plan_file: str, output_dir: str, lang: str = "en"):
     plan         = json.load(open(plan_file, encoding="utf-8"))
     meta         = plan["meta"]
     name         = meta["name"]
@@ -226,7 +198,6 @@ def render(plan_file: str, output_dir: str, lang: str = "en", skill_dir: str = N
     L            = LABELS.get(lang, LABELS["en"])
     approved     = [e for e in plan["entries"] if e.get("_status") == "approved"]
     rejected     = [e for e in plan["entries"] if e.get("_status") == "rejected"]
-    param_lookup = load_param_lookup(skill_dir or str(Path(__file__).parent.parent))
 
     out_path = Path(output_dir) / f"{name}.pdf"
     doc = SimpleDocTemplate(
@@ -360,8 +331,7 @@ def render(plan_file: str, output_dir: str, lang: str = "en", skill_dir: str = N
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Usage: render_pdf.py <plan.json> <output_dir> [lang=en|fr] [skill_dir]")
+        print("Usage: render_pdf.py <plan.json> <output_dir> [lang=en|fr]")
         sys.exit(1)
-    lang      = sys.argv[3] if len(sys.argv) > 3 else "en"
-    skill_dir = sys.argv[4] if len(sys.argv) > 4 else None
-    render(sys.argv[1], sys.argv[2], lang, skill_dir)
+    lang = sys.argv[3] if len(sys.argv) > 3 else "en"
+    render(sys.argv[1], sys.argv[2], lang)
