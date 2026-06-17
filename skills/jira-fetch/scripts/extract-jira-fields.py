@@ -11,10 +11,13 @@ Output:
     Lists attachments under <output-dir>/attachments/ (download requires --download flag)
 """
 
+from __future__ import annotations
+
 import argparse
 import json
 import os
-import re
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -30,25 +33,15 @@ KNOWN_CUSTOM_FIELDS = {
     "customfield_11547": "DOR",
 }
 
-FIGMA_URL_RE = re.compile(r"https://www\.figma\.com/[^\s\)\]\"'<]+")
+# Figma URL field — read from the dedicated custom field only.
+FIGMA_FIELD_ID = "customfield_11563"
 
-# Standard fields to always include at the top of the output.
-STANDARD_FIELDS = [
-    ("summary", "Summary"),
-    ("status", "Status"),
-    ("assignee", "Assignee"),
-    ("reporter", "Reporter"),
-    ("priority", "Priority"),
-    ("issuetype", "Issue Type"),
-    ("labels", "Labels"),
-    ("components", "Components"),
-    ("fixVersions", "Fix Versions"),
-    ("story_points", "Story Points"),  # handled specially
-    ("created", "Created"),
-    ("updated", "Updated"),
-    ("duedate", "Due Date"),
-    ("description", "Description"),
-]
+# Human-readable labels for the small set of standard fields rendered in the header.
+STANDARD_FIELD_LABELS: dict[str, str] = {
+    "labels": "Labels",
+    "components": "Components",
+    "fixVersions": "Fix Versions",
+}
 
 
 # ---------------------------------------------------------------------------
@@ -186,18 +179,18 @@ def render_adf(node, depth: int = 0) -> str:
 
 def render_table(node: dict, depth: int) -> str:
     rows = node.get("content", [])
+    if not rows:
+        return ""
     output_rows = []
-    is_header = True
-    for row in rows:
+    for i, row in enumerate(rows):
         cells = row.get("content", [])
-        cell_texts = []
-        for cell in cells:
-            text = render_adf(cell.get("content", []), depth).strip().replace("\n", " ")
-            cell_texts.append(text)
+        cell_texts = [
+            render_adf(cell.get("content", []), depth).strip().replace("\n", " ")
+            for cell in cells
+        ]
         output_rows.append("| " + " | ".join(cell_texts) + " |")
-        if is_header:
+        if i == 0:
             output_rows.append("| " + " | ".join("---" for _ in cell_texts) + " |")
-            is_header = False
     return "\n".join(output_rows) + "\n"
 
 
@@ -221,14 +214,6 @@ def render_value(value) -> str:
         parts = [render_value(v) for v in value if v is not None]
         return ", ".join(p for p in parts if p)
     return str(value)
-
-
-# ---------------------------------------------------------------------------
-# Figma URL extraction
-# ---------------------------------------------------------------------------
-
-def collect_figma_urls(text: str) -> list[str]:
-    return FIGMA_URL_RE.findall(text)
 
 
 # ---------------------------------------------------------------------------
@@ -260,82 +245,57 @@ def build_ticket_md(data: dict) -> tuple[str, list[str], list[dict]]:
     if "fields" in data:
         fields = data["fields"]
         key = data.get("key", "UNKNOWN")
-    elif "key" in data:
-        fields = data
-        key = data.get("key", "UNKNOWN")
     else:
         fields = data
-        key = "UNKNOWN"
+        key = data.get("key", "UNKNOWN")
 
-    all_figma_urls: list[str] = []
     sections: list[str] = []
 
-    # Header
+    # Header table
     summary = fields.get("summary", "(no summary)")
-    status_raw = fields.get("status", {})
-    status = render_value(status_raw)
-    assignee_raw = fields.get("assignee") or {}
-    assignee = render_value(assignee_raw) or "Unassigned"
-    reporter_raw = fields.get("reporter") or {}
-    reporter = render_value(reporter_raw) or "Unknown"
-    priority_raw = fields.get("priority") or {}
-    priority = render_value(priority_raw) or "—"
-    story_points = (
-        fields.get("story_points")
-        or fields.get("customfield_10016")  # common SP field
-        or fields.get("customfield_10028")
-        or "—"
-    )
+    status = render_value(fields.get("status") or {})
+    assignee = render_value(fields.get("assignee") or {}) or "Unassigned"
+    reporter = render_value(fields.get("reporter") or {}) or "Unknown"
+    priority = render_value(fields.get("priority") or {}) or "—"
 
     header = f"# {key}: {summary}\n\n"
-    header += f"| Field | Value |\n|---|---|\n"
+    header += "| Field | Value |\n|---|---|\n"
     header += f"| Status | {status} |\n"
     header += f"| Assignee | {assignee} |\n"
     header += f"| Reporter | {reporter} |\n"
     header += f"| Priority | {priority} |\n"
-    header += f"| Story Points | {story_points} |\n"
 
-    for field_id in ("labels", "components", "fixVersions"):
+    for field_id, label in STANDARD_FIELD_LABELS.items():
         val = render_value(fields.get(field_id))
         if val:
-            label = field_id.replace("V", " V").replace("f", " f").title().strip()
             header += f"| {label} | {val} |\n"
 
-    for date_field in ("created", "updated", "duedate"):
+    for date_field, label in (("created", "Created"), ("updated", "Updated"), ("duedate", "Due Date")):
         val = fields.get(date_field)
         if val:
-            header += f"| {date_field.title()} | {val} |\n"
+            header += f"| {label} | {val} |\n"
 
     sections.append(header)
 
-    # Description (always first body section)
+    # Description
     desc = fields.get("description")
     if desc:
         rendered = render_value(desc)
         if rendered.strip():
             sections.append(f"\n## Description\n\n{rendered}")
-            all_figma_urls.extend(collect_figma_urls(rendered))
 
-    # Custom fields — known ones first, then unknown ones
-    rendered_field_ids: set[str] = {"description"}
-
-    # Known Club Med fields in canonical order
+    # Known Club Med custom fields in canonical order (skip Figma — handled separately below)
+    rendered_field_ids: set[str] = {"description", FIGMA_FIELD_ID}
     for field_id, label in KNOWN_CUSTOM_FIELDS.items():
         rendered_field_ids.add(field_id)
+        if field_id == FIGMA_FIELD_ID:
+            continue
         value = fields.get(field_id)
         if not value:
             continue
         rendered = render_value(value)
         if rendered.strip():
             sections.append(f"\n## {label}\n\n{rendered}")
-            if "figma" not in label.lower():
-                all_figma_urls.extend(collect_figma_urls(rendered))
-            else:
-                # The Figma URL field itself — treat as URLs
-                for line in rendered.splitlines():
-                    line = line.strip()
-                    if line.startswith("http"):
-                        all_figma_urls.append(line)
 
     # All other custom fields not already handled
     for field_id, value in fields.items():
@@ -349,9 +309,7 @@ def build_ticket_md(data: dict) -> tuple[str, list[str], list[dict]]:
         rendered = render_value(value)
         if not rendered.strip():
             continue
-        label = f"Custom: {field_id}"
-        sections.append(f"\n## {label}\n\n{rendered}")
-        all_figma_urls.extend(collect_figma_urls(rendered))
+        sections.append(f"\n## Custom: {field_id}\n\n{rendered}")
 
     # Attachments
     attachments = list_attachments(fields)
@@ -360,24 +318,21 @@ def build_ticket_md(data: dict) -> tuple[str, list[str], list[dict]]:
         for a in attachments:
             size_kb = a["size"] // 1024 if a["size"] else 0
             att_lines.append(f"- [{a['filename']}]({a['url']}) — {a['content_type']} ({size_kb} KB)")
-            all_figma_urls.extend(collect_figma_urls(a["url"]))
         sections.append("\n".join(att_lines))
 
-    # Deduplicated Figma URLs section
-    seen: set[str] = set()
-    unique_figma: list[str] = []
-    for url in all_figma_urls:
-        url = url.rstrip(".,;)")
-        if url not in seen:
-            seen.add(url)
-            unique_figma.append(url)
+    # Figma URLs — read from the dedicated field only
+    figma_urls: list[str] = []
+    figma_raw = render_value(fields.get(FIGMA_FIELD_ID))
+    for line in figma_raw.splitlines():
+        line = line.strip().rstrip(".,;)")
+        if line.startswith("http"):
+            figma_urls.append(line)
 
-    if unique_figma:
-        figma_section = "\n## Figma URLs\n\n"
-        figma_section += "\n".join(f"- {u}" for u in unique_figma)
-        sections.insert(1, figma_section)  # place right after header
+    if figma_urls:
+        figma_section = "\n## Figma URLs\n\n" + "\n".join(f"- {u}" for u in figma_urls)
+        sections.insert(1, figma_section)
 
-    return "\n".join(sections), unique_figma, attachments
+    return "\n".join(sections), figma_urls, attachments
 
 
 def main():
@@ -406,7 +361,6 @@ def main():
         print(f"Written: {ticket_path}", file=sys.stderr)
 
         raw_dest = out_dir / "raw.json"
-        import shutil
         shutil.copy2(json_path, raw_dest)
         print(f"Written: {raw_dest}", file=sys.stderr)
 
@@ -416,7 +370,10 @@ def main():
             if args.download:
                 for a in attachments:
                     dest = att_dir / a["filename"]
-                    os.system(f'curl -sSL "{a["url"]}" -o "{dest}"')
+                    subprocess.run(
+                        ["curl", "-sSL", a["url"], "-o", str(dest)],
+                        check=False,
+                    )
                     print(f"Downloaded: {dest}", file=sys.stderr)
             else:
                 links_file = att_dir / "attachments.md"
