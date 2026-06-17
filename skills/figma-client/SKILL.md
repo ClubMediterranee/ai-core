@@ -2,7 +2,7 @@
 name: figma-client
 description: "Figma REST client — fetches node metadata, auto-layout with css_hints, sub-frame hierarchy, INSTANCE children (variants, visual_signatures, designer_notes), texts with font_class, image fills with local_path, icon SVGs, hidden layers, carousel signals, list item shapes, interactions, and component descriptions."
 allowed-tools: Bash, Read
-version: 1.0.0
+version: 1.0.1
 created-at: 2026-06-12
 created-by: "Jeremy Wallez <jeremy.wallez@clubmed.com>"
 ---

@@ -269,25 +269,51 @@ def parse_figma_url(url: str) -> tuple[str, str | None]:
 
 # ─── API Helpers ──────────────────────────────────────────────────────────────
 
-def api_get(path: str, token: str, timeout: int = 15, retries: int = 3) -> dict:
-    """GET a Figma API endpoint. Retries on timeout/network errors with exponential backoff."""
+_API_MIN_INTERVAL = 0.3  # seconds between Figma API calls — stays well under burst limit
+_api_last_call: float = 0.0
+
+
+def api_get(path: str, token: str, timeout: int = 15, retries: int = 6) -> dict:
+    """GET a Figma API endpoint with throttling and 429-aware retry.
+
+    Enforces a minimum interval between calls to avoid triggering Figma's burst
+    detection. On 429, waits the Retry-After value (or 60 s fallback) before
+    retrying — up to `retries` attempts — so the token is never permanently blocked.
+    """
+    global _api_last_call
     req = urllib.request.Request(
         f"https://api.figma.com/v1{path}",
         headers={"X-Figma-Token": token},
     )
     last_exc: Exception | None = None
     for attempt in range(retries):
+        # Throttle: enforce minimum gap between consecutive API calls
+        elapsed = time.monotonic() - _api_last_call
+        if elapsed < _API_MIN_INTERVAL:
+            time.sleep(_API_MIN_INTERVAL - elapsed)
+        _api_last_call = time.monotonic()
+
         try:
             with urllib.request.urlopen(req, timeout=timeout) as r:
                 return json.load(r)
         except urllib.error.HTTPError as e:
+            if e.code == 429:
+                retry_after = int(e.headers.get("Retry-After", 60))
+                print(
+                    f"[figma-client] 429 rate-limited on {path} — waiting {retry_after}s "
+                    f"(attempt {attempt + 1}/{retries})",
+                    file=sys.stderr,
+                )
+                time.sleep(retry_after)
+                last_exc = RuntimeError(f"Figma API 429 on {path}")
+                continue
             body = e.read().decode("utf-8", errors="replace")
             raise RuntimeError(f"Figma API {e.code} on {path}: {body[:200]}") from e
         except (TimeoutError, OSError) as e:
             last_exc = e
             if attempt < retries - 1:
                 time.sleep(2 ** attempt)  # 1s, 2s, 4s
-    raise RuntimeError(f"Figma API timeout after {retries} attempts on {path}") from last_exc
+    raise RuntimeError(f"Figma API failed after {retries} attempts on {path}") from last_exc
 
 
 def download_file(url: str, dest: Path, retries: int = 3) -> None:
