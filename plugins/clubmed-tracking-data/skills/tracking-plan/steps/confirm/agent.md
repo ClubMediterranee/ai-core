@@ -84,7 +84,7 @@ Element: <entry.screenshot path>
 | Parameter | Type | Description | Example |
 |---|---|---|---|
 | detail_click | `string` | Stable action slug | change_comfort |
-| room_type | `enum` | Room comfort category | superior \| deluxe \| suite |
+| room_type | `string` | Room comfort category | superior \| deluxe \| suite |
 
 Flag missing descriptions: `— ⚠️ description missing`
 

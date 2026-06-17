@@ -1,7 +1,7 @@
 {
   "name": "clubmed-tracking-data",
   "displayName": "Club Med - Tracking & Analytics",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Build and maintain tracking plans from Figma: infer events from design, validate against GTM, confirm with the data team, export to Excel, PDF or Markdown.",
   "author": {
     "name": "Jeremy Wallez",

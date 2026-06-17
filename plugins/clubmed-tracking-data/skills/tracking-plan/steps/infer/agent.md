@@ -149,7 +149,7 @@ Derive type, description and example entirely from what you observed:
 - Figma labels, instance names, designer notes
 - GTM DL variable paths (tell you the name)
 - Screenshot context (tell you the semantic meaning)
-- Your knowledge of the domain (e.g. `room_type` on an accommodation screen → enum of comfort tiers)
+- Your knowledge of the domain (e.g. `room_type` on an accommodation screen → string with possible values in example)
 
 ```json
 "params": [
@@ -161,7 +161,7 @@ Derive type, description and example entirely from what you observed:
   },
   {
     "name":        "room_type",
-    "type":        "enum",
+    "type":        "string",
     "description": "Room comfort category selected by the user",
     "example":     "superior | deluxe | suite"
   }
@@ -215,7 +215,7 @@ print(f'wrote {len(new_entries)} entries')
   },
   "params": [
     { "name": "detail_click", "type": "string", "description": "Tab identifier slug", "example": "change_comfort" },
-    { "name": "room_type",    "type": "enum",   "description": "Room comfort category", "example": "superior | deluxe | suite" }
+    { "name": "room_type",    "type": "string", "description": "Room comfort category", "example": "superior | deluxe | suite" }
   ],
   "screenshot": "figma/images/previews/I3282-33362.png",
   "target": {

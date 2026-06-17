@@ -146,7 +146,7 @@
             "additionalProperties": false,
             "properties": {
               "name":        { "type": "string", "description": "Parameter name as pushed in the data layer (snake_case)." },
-              "type":        { "type": "string", "enum": ["string", "number", "boolean", "enum", "object", "array"], "description": "Value type." },
+              "type":        { "type": "string", "enum": ["string", "number", "boolean", "object", "array"], "description": "Value type." },
               "description": { "type": "string", "description": "Human-readable description of what this parameter represents." },
               "example":     { "type": "string", "description": "Concrete example value or enum values separated by |." }
             }
