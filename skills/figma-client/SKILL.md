@@ -2,7 +2,7 @@
 name: figma-client
 description: "Figma REST client — fetches node metadata, auto-layout with css_hints, sub-frame hierarchy, INSTANCE children (variants, visual_signatures, designer_notes), texts with font_class, image fills with local_path, icon SVGs, hidden layers, carousel signals, list item shapes, interactions, and component descriptions."
 allowed-tools: Bash, Read
-version: 1.0.1
+version: 1.0.2
 created-at: 2026-06-12
 created-by: "Jeremy Wallez <jeremy.wallez@clubmed.com>"
 ---
@@ -40,7 +40,7 @@ python3 .claude/skills/figma-client/scripts/figma_client.py <figma_url> [options
 | Option | Default | Description |
 |---|---|---|
 | `--output-dir <dir>` | `.figma/screenshots` | Root output directory. Screenshots → `images/previews/`, fills → `images/fills/`. |
-| `--depth <n>` | `10` | Max traversal depth for instances, texts, layouts, fills, and interactions |
+| `--depth <n>` | `6` | Max traversal depth for instances, texts, layouts, fills, and interactions. Depth 6 captures all interactive nodes; use `--depth 10` only for components without master definitions (standalone FRAMEs deeply nested) |
 | `--screenshot true\|false` | `true` | Download root screenshot, per-instance screenshots, and icon SVGs |
 | `--format png\|svg` | `png` | Export format for root screenshot — `png` (@2x raster) or `svg` (vector) |
 | `--scale <n>` | `2` | PNG resolution multiplier. Ignored for SVG. |

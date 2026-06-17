@@ -2286,7 +2286,7 @@ def _build_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument("url", help="Figma URL (design, make, board, file)")
     parser.add_argument("--output-dir",  default=".figma/screenshots",
                         help="Directory for screenshots and image fills.")
-    parser.add_argument("--depth",       type=int,         default=10)
+    parser.add_argument("--depth",       type=int,         default=6)
     parser.add_argument("--screenshot",           type=str_to_bool, default=True,  metavar="true|false")
     parser.add_argument("--instance-screenshots", type=str_to_bool, default=True,  metavar="true|false",
                         help="Export one PNG per unique instance (used by figma-forge). "
