@@ -214,6 +214,7 @@ import urllib.error
 import argparse
 import subprocess
 from collections import Counter, defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 
@@ -1079,17 +1080,25 @@ def fetch_raw_image_fills(file_key: str, image_refs: list, token: str, output_di
         return {}
     output_dir.mkdir(parents=True, exist_ok=True)
     result: dict = {}
-    for ref in image_refs:
-        url = cdn_map.get(ref)
-        if not url:
-            continue
-        dest = output_dir / f"fill-{ref[:20]}.png"
-        try:
-            download_file(url, dest)
-            flatten_png_to_white(dest)
-            result[ref] = str(dest.resolve())
-        except Exception:
-            pass
+    downloads = [
+        (ref, cdn_map[ref], output_dir / f"fill-{ref[:20]}.png")
+        for ref in image_refs if cdn_map.get(ref)
+    ]
+
+    def _fetch_fill(item):
+        ref, url, dest = item
+        download_file(url, dest)
+        flatten_png_to_white(dest)
+        return ref, dest
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        futures = {pool.submit(_fetch_fill, item): item for item in downloads}
+        for fut in as_completed(futures):
+            try:
+                ref, dest = fut.result()
+                result[ref] = str(dest.resolve())
+            except Exception:
+                pass
     return result
 
 
@@ -1165,20 +1174,30 @@ def batch_fetch_instance_screenshots(
         except Exception:
             continue
 
+        # Build (nid, url, dest) tuples for parallel download
+        downloads = []
         for nid in to_download:
             url = images.get(nid) or images.get(nid.replace(":", "-"))
-            if not url:
-                continue
-            dest = output_dir / f"{nid.replace(':', '-')}.png"
-            try:
-                download_file(url, dest)
-                flatten_png_to_white(dest)
+            if url:
+                downloads.append((nid, url, output_dir / f"{nid.replace(':', '-')}.png"))
+
+        def _fetch(item):
+            nid, url, dest = item
+            download_file(url, dest)
+            flatten_png_to_white(dest)
+            return nid, dest
+
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            futures = {pool.submit(_fetch, item): item for item in downloads}
+            for fut in as_completed(futures):
                 try:
-                    result[nid] = str(dest.resolve().relative_to(json_dir))
-                except ValueError:
-                    result[nid] = str(dest.resolve())
-            except Exception:
-                pass
+                    nid, dest = fut.result()
+                    try:
+                        result[nid] = str(dest.resolve().relative_to(json_dir))
+                    except ValueError:
+                        result[nid] = str(dest.resolve())
+                except Exception:
+                    pass
 
     return result
 
@@ -1269,36 +1288,49 @@ def fetch_icon_svgs(
         import sys
         print(f"[figma-client] icon SVG export failed: {e}", file=sys.stderr)
 
-    results = []
+    # Build metadata and download list
+    items = []
     for inst in unique_icons:
-        nid       = inst.get("id") or inst.get("node_id", "")
-        category  = inst.get("component_name", "")
-        variant   = inst.get("variant") or inst.get("name", "").split("/")[-1].strip()
-        svg_url   = svg_urls.get(nid)
-
-        # Build a safe filename
+        nid          = inst.get("id") or inst.get("node_id", "")
+        category     = inst.get("component_name", "")
+        variant      = inst.get("variant") or inst.get("name", "").split("/")[-1].strip()
         variant_slug = variant.replace(" ", "-").replace("/", "-") if variant else nid[-8:]
-        filename = f"icon-{category}-{variant_slug}.svg"
-        local_path: str | None = None
+        filename     = f"icon-{category}-{variant_slug}.svg"
+        svg_url      = svg_urls.get(nid)
+        items.append((inst, nid, category, variant, filename, svg_url))
 
-        if svg_url:
-            dest = output_dir / filename
+    # Parallel SVG downloads
+    local_paths: dict = {}
+
+    def _fetch_svg(item):
+        _, nid, _, _, filename, svg_url = item
+        if not svg_url:
+            return nid, None
+        dest = output_dir / filename
+        download_file(svg_url, dest)
+        return nid, dest
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        futures = {pool.submit(_fetch_svg, item): item for item in items}
+        for fut in as_completed(futures):
             try:
-                download_file(svg_url, dest)
-                try:
-                    local_path = str(dest.relative_to(json_dir))
-                except ValueError:
-                    local_path = str(dest)
+                nid, dest = fut.result()
+                if dest:
+                    try:
+                        local_paths[nid] = str(dest.relative_to(json_dir))
+                    except ValueError:
+                        local_paths[nid] = str(dest)
             except Exception as e:
-                import sys
-                print(f"[figma-client] SVG download failed for {nid}: {e}", file=sys.stderr)
+                print(f"[figma-client] SVG download failed: {e}", file=sys.stderr)
 
+    results = []
+    for inst, nid, category, variant, filename, svg_url in items:
         results.append({
             "node_id":        nid,
             "path":           inst.get("path", ""),
             "category":       category,
-            "figma_variant":  variant,   # hint: e.g. "Arrows" → helps narrow to ArrowDefault*/ArrowTail*
-            "svg_local_path": local_path,
+            "figma_variant":  variant,
+            "svg_local_path": local_paths.get(nid),
             "dimensions":     inst.get("dimensions"),
         })
 
