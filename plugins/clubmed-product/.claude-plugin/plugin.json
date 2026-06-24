@@ -1,0 +1,16 @@
+{
+  "name": "clubmed-product",
+  "displayName": "Club Med — Product",
+  "version": "1.0.0",
+  "description": "Skills for product managers and product owners: spec generation from PRDs, user story enrichment, and developer-ready documentation.",
+  "author": {
+    "name": "Jeremy Wallez",
+    "email": "jeremy.wallez@clubmed.com"
+  },
+  "repository": "https://github.com/ClubMediterranee/ai-core",
+  "license": "MIT",
+  "keywords": ["product", "spec", "prd", "user-story", "documentation"],
+  "skills": [
+    "./skills/spec"
+  ]
+}

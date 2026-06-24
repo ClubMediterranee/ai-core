@@ -103,6 +103,21 @@
         "tracking-plan"
       ],
       "category": "data"
+    },
+    {
+      "name": "clubmed-product",
+      "displayName": "Club Med - Product",
+      "description": "Skills for product managers and product owners: spec generation from PRDs, user story enrichment, and developer-ready documentation.",
+      "version": "1.0.0",
+      "source": "./plugins/clubmed-product",
+      "keywords": [
+        "product",
+        "spec",
+        "prd",
+        "user-story",
+        "documentation"
+      ],
+      "category": "product"
     }
   ]
 }

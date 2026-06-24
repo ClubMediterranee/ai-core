@@ -29,7 +29,7 @@
 
 ## What's inside
 
-### [Plugins](plugins/README.md) — 6 available
+### [Plugins](plugins/README.md) — 7 available
 
 Role-based bundles that install a curated set of skills in one command.
 
@@ -44,6 +44,7 @@ claude plugin install clubmed-backend-python@clubmed --scope project  # Django /
 claude plugin install clubmed-backend-java@clubmed --scope project    # Java 21+ / Spring Boot
 claude plugin install clubmed-infra@clubmed --scope project           # Terraform / Kubernetes / Security
 claude plugin install clubmed-data@clubmed --scope project            # GA4 tracking plans / analytics
+claude plugin install clubmed-product@clubmed --scope project         # Spec generation / PRD / Product
 
 ```
 
@@ -55,8 +56,9 @@ claude plugin install clubmed-data@clubmed --scope project            # GA4 trac
 | `clubmed-backend-java` | Java 21+ · Spring Boot · API | 9 skills |
 | `clubmed-infra` | Terraform · Kubernetes · Container security | 7 skills |
 | `clubmed-data` | GA4 tracking plans · analytics · Figma | 3 skills |
+| `clubmed-product` | Spec generation · PRD · User stories | 1 skill |
 
-### [Skills](skills/README.md) — 40 available
+### [Skills](skills/README.md) — 41 available
 
 Individual slash commands that extend Claude Code for specific tasks. Install plugins above to get them pre-bundled, or pick skills individually.
 
@@ -70,6 +72,7 @@ Individual slash commands that extend Claude Code for specific tasks. Install pl
 | Database | `database-migration` · `postgresql-optimization` · `prisma-expert` |
 | Design | `excalidraw` · `figma-authentication` · `figma-client` · `trident-icons` · `trident-ui-install` |
 | Development | `git-commit` |
+| Product | `spec` |
 | Project Management | `jira-fetch` |
 | Error Handling | `error-handling-patterns` |
 | Infrastructure | `container-security-hardening` · `k8s-security-policies` · `terraform-specialist` |
