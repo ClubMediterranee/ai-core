@@ -19,6 +19,7 @@ claude plugin install clubmed-backend-python@clubmed --scope project  # Django /
 claude plugin install clubmed-backend-java@clubmed --scope project    # Java 21+ / Spring Boot
 claude plugin install clubmed-infra@clubmed --scope project           # Terraform / Kubernetes / Security
 claude plugin install clubmed-data@clubmed --scope project            # GA4 tracking plans / analytics
+claude plugin install clubmed-product@clubmed --scope project         # Spec generation / PRD / Product
 ```
 
 Skills become available immediately as slash commands in Claude Code.
@@ -40,6 +41,7 @@ claude plugin update clubmed-backend-python@clubmed --scope project
 claude plugin update clubmed-backend-java@clubmed --scope project
 claude plugin update clubmed-infra@clubmed --scope project
 claude plugin update clubmed-data@clubmed --scope project
+claude plugin update clubmed-product@clubmed --scope project
 ```
 
 ---
@@ -166,6 +168,18 @@ claude plugin update clubmed-data@clubmed --scope project
 | `tracking-plan` | GA4 tracking-plan engine. From a Figma link and/or a URL, infers the trackable moments (clicks, impressions, ecommerce, page views) and produces a validated, tool-agnostic `plan.json`. Rendering (Excel/Confluence/Markdown) and publishing are separate skills that consume the plan. |
 | `figma-client` | Figma REST client — fetches node metadata, interactions, instances, hidden layers, and semantic hints. Feeds the Figma inference path. |
 | `figma-authentication` | Manages the `FIGMA_TOKEN` lifecycle: detect, validate, auto-generate, and persist. Dependency of `figma-client`. |
+
+---
+
+### `clubmed-product` — Club Med Product
+
+> Skills for product managers and product owners: spec generation from PRDs, user story enrichment, and developer-ready documentation.
+
+**Keywords:** `product` · `spec` · `prd` · `user-story` · `documentation`
+
+| Skill | Description |
+|-------|-------------|
+| `spec` | Generates developer-ready specs (enriched user stories) from a PRD document. Reads `docs/specs/prd/`, cross-references `docs/specs/drd/` design files, and produces structured markdown specs in `docs/specs/`. Each spec covers one independently implementable unit sized for an AI developer to complete in under 2 hours. |
 
 ---
 
