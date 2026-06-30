@@ -1,6 +1,6 @@
 ---
 name: tracking-plan
-description: "GA4 tracking-plan engine. From a Figma link, infers trackable moments via the 13 interaction patterns, confirms each event candidate with the user, and emits a validated plan.json. Triggers: '/tracking-plan', 'create a tracking plan', 'plan de marquage', 'plan de tracking', 'GA4 plan for this figma', 'what should we track on this page', 'tracking plan for this figma'."
+description: "GA4 tracking-plan engine. From a Figma link, a DRD (Design Requirement Details), or a live URL, infers trackable moments via the 13 interaction patterns, auto-approves every event with a confidence score, and emits a validated plan.json plus a review markdown. Triggers: '/tracking-plan', 'create a tracking plan', 'plan de marquage', 'plan de tracking', 'GA4 plan for this figma', 'tracking plan from this DRD', 'plan de tracking depuis un DRD', 'what should we track on this page', 'tracking plan for this figma'."
 allowed-tools: Bash, Read, Write, Edit, Glob, Grep, Agent
 version: 2.0.0
 created-at: 2026-06-16
@@ -9,22 +9,26 @@ created-by: "Jeremy Wallez <jeremy.wallez@clubmed.com>"
 
 # Tracking Plan — GA4 measurement-plan engine
 
-From a **Figma link**, infer trackable moments via the **13 interaction patterns**,
-confirm each candidate with the user, and emit a **validated `plan.json`**.
+From a **Figma link**, a **DRD** (Design Requirement Details), or a **live URL**, infer
+trackable moments via the **13 interaction patterns**, auto-approve every event with a
+confidence score, and emit a **validated `plan.json`** plus a **review markdown** the user
+reads and adjusts afterwards.
 
-This skill stops at the validated plan. Rendering (Excel/Confluence/Markdown) is handled
-by separate renderer skills that consume `plan.json`.
+This is a fully automatic flow — no per-event confirmation. The source is pluggable: a
+Phase 2 resolver branches to the right adapter (figma / drd / url), and every adapter
+produces the same signal shape so inference is source-agnostic. Other renderers
+(Excel/Confluence/PDF) consume the same `plan.json`.
 
 ---
 
-## Architecture — 2 subagents + 2 inline phases + 1 inline validation
+## Architecture — 3 subagents + 2 inline phases + 1 inline validation
 
-The skill orchestrates 2 isolated subagents and 3 inline phases.
+**Fully automatic flow — no interactive confirmation.** The skill infers a complete,
+viable plan, auto-approves every entry (each carries its `confidence` score), validates
+it, and renders the review markdown. The user reviews the rendered `.md` afterwards and
+adjusts outside the skill.
+
 State is tracked in `meta.steps` and `meta.status` inside `plan.json` throughout.
-
-**Critical constraint:** `AskUserQuestion` is only available in the main orchestrator
-context — it cannot be called from inside a spawned `Agent()`. Phase 4 (confirm) MUST
-be inline.
 
 ```
 SKILL (orchestrator — owns meta.status and meta.steps transitions)
@@ -38,33 +42,32 @@ SKILL (orchestrator — owns meta.status and meta.steps transitions)
   │    steps/init.md
   │    → meta.status: "draft" · meta.steps all "pending"
   │
-  ├─ Phase 2 — SUBAGENT  [steps/figma/agent.md]
-  │    → figma/*.json per screen
-  │    → orchestrator sets meta.steps["extract-figma"]: "done"
+  ├─ Phase 2 — SUBAGENT  [source resolver, branches on meta.source_type]
+  │    ├─ figma → steps/figma/agent.md   (figma-client per URL)
+  │    ├─ drd   → steps/drd/agent.md      (copy DRD screens + extract drd-context.md)
+  │    └─ url   → steps/url/agent.md      (agent-browser: observe live + explore, then
+  │                                        scripts/url_to_signals.py normalises signals)
+  │    → all branches write OUTPUT_DIR/signals/*.json (figma-client shape)
+  │      (drd also writes OUTPUT_DIR/drd-context.md — human-validated, primary for infer)
+  │      (url also writes observed_events[] inside each signal — existing live tracking)
+  │    → orchestrator sets meta.steps["extract-source"]: "done"
   │
   ├─ Phase 3 — SUBAGENT  [steps/infer/agent.md]
   │    rules: steps/infer/rules/*.md
-  │    reads gtm-snapshot.json → confirmed events + validated param names
-  │    → entries[] with _status: "pending_approval"
-  │    → orchestrator sets meta.steps["infer"]: "done", meta.status: "inprogress"
+  │    reads signals/*.json + gtm-snapshot.json (+ drd-context.md if present)
+  │    → confirmed events + validated param names; DRD context PRIMES when present
+  │    → entries[] with _status: "approved" (best-effort viable payload + params)
+  │    → orchestrator sets meta.steps["infer"]: "done", meta.status: "ready"
   │
-  ├─ Phase 4 — INLINE (orchestrator) ← AskUserQuestion only works in main context
-  │    steps/confirm/agent.md + rules loaded as instructions
-  │    → AskUserQuestion per pending_approval entry, one call per entry
-  │    → _status: "approved" | "rejected" written after each answer
-  │    → orchestrator sets meta.steps["confirm"]: "done", meta.status: "ready"
-  │       only when 0 pending_approval remain
-  │
-  ├─ Phase 5 — INLINE BASH (guaranteed, no LLM)
+  ├─ Phase 4 — INLINE BASH (guaranteed, no LLM)
   │    python3 scripts/validate_schema.py plan.json
   │    Fix errors · retry max 3
   │    → meta.steps["validate-plan"]: "done"
   │
-  └─ Phase 6 — INLINE (orchestrator)  [steps/enrich/agent.md]
-       → Propose adding new event patterns to event-catalog.json
-       → Ask user for missing events not proposed by inference
-       → Manually added events written with origin: confirmed
-       → meta.steps["enrich"]: "done"
+  └─ Phase 5 — INLINE (orchestrator)  [render markdown]
+       → python3 ../tracking-plan-render/scripts/render_markdown.py plan.json OUTPUT_DIR
+       → writes OUTPUT_DIR/<plan-name>.md  (review document for the user)
+       → meta.steps["render"]: "done"
 ```
 
 **Ownership rule — strictly enforced:**
@@ -73,13 +76,15 @@ SKILL (orchestrator — owns meta.status and meta.steps transitions)
 - This prevents the retry loop from being short-circuited by an agent marking itself done.
 
 ### `meta.status` — global plan lifecycle
-- `draft`      — init done, inference not yet run
-- `inprogress` — inference ran, `pending_approval` entries exist (expected, not an error)
-- `ready`      — all entries confirmed/rejected, document finalized
+- `draft` — init done, inference not yet run
+- `ready` — inference ran, all entries auto-approved, plan ready to validate and render
 
-The validator gates on `meta.status`:
-- `draft | inprogress` → `pending_approval` entries = warning only
-- `ready`              → `pending_approval` entries = hard error (claimed done but isn't)
+`inprogress` remains in the schema enum for backward compatibility but is no longer an
+expected resting state — the flow goes `draft → ready` in one inference pass.
+
+The validator still gates on `meta.status`: any `pending_approval` entry when
+`meta.status = "ready"` is a hard error. In the automatic flow no entry should be
+`pending_approval`, so this is a safety net against manually-introduced ones.
 
 **`meta.status` must reach `ready` before the plan can be rendered.**
 
@@ -89,9 +94,9 @@ The validator gates on `meta.status`:
 - `done`       — completed successfully
 
 ### `_status` on entries
-- `pending_approval` — written by inference-agent, awaiting user confirmation
-- `approved`         — user confirmed in confirm-agent
-- `rejected`         — user skipped (kept in entries[] for audit, excluded by renderers)
+- `approved`         — written by inference-agent (the automatic flow's default)
+- `pending_approval` — legacy/manual only; flagged by the validator when status is ready
+- `rejected`         — manual only (kept in entries[] for audit, excluded by renderers)
 
 ---
 
@@ -149,33 +154,49 @@ json.dump(p,open('${PLAN_FILE}','w'),indent=2)
 
 Read and execute `steps/init.md`.
 
-### Phase 2 — Figma extraction (subagent)
+### Phase 2 — Source extraction (subagent, branches on source_type)
+
+Read `meta.source_type` from plan.json and pick the matching adapter. All adapters write
+`${OUTPUT_DIR}/signals/*.json` in the figma-client shape; the `drd` branch also writes
+`${OUTPUT_DIR}/drd-context.md`.
 
 ```bash
 # Mark inprogress before spawning
 python3 -c "
 import json; p=json.load(open('${PLAN_FILE}'))
-p['meta']['steps']['extract-figma']='inprogress'
+p['meta']['steps']['extract-source']='inprogress'
 json.dump(p,open('${PLAN_FILE}','w'),indent=2)
 "
+SOURCE_TYPE=$(python3 -c "import json;print(json.load(open('${PLAN_FILE}'))['meta'].get('source_type','figma'))")
 ```
 
-Read `steps/figma/agent.md` → `<FIGMA_AGENT>`, then spawn:
+Branch on `${SOURCE_TYPE}`:
 
-```
-Agent(prompt: "<FIGMA_AGENT>\n\nCONTEXT:\n  PLAN_FILE=${PLAN_FILE}\n  OUTPUT_DIR=${OUTPUT_DIR}\n  FIGMA_URLS=${FIGMA_URLS}\n  SKILL_DIR=${SKILL_DIR}\n  PROJECT_ROOT=${PROJECT_ROOT}\n  HINTS=${HINTS}")
-```
+- **`figma`** — read `steps/figma/agent.md` → `<SRC_AGENT>`, spawn:
+  ```
+  Agent(prompt: "<SRC_AGENT>\n\nCONTEXT:\n  PLAN_FILE=${PLAN_FILE}\n  OUTPUT_DIR=${OUTPUT_DIR}\n  FIGMA_URLS=${FIGMA_URLS}\n  SKILL_DIR=${SKILL_DIR}\n  PROJECT_ROOT=${PROJECT_ROOT}\n  HINTS=${HINTS}")
+  ```
+- **`drd`** — read `steps/drd/agent.md` → `<SRC_AGENT>`, spawn:
+  ```
+  Agent(prompt: "<SRC_AGENT>\n\nCONTEXT:\n  PLAN_FILE=${PLAN_FILE}\n  OUTPUT_DIR=${OUTPUT_DIR}\n  DRD_PATH=${DRD_PATH}\n  SKILL_DIR=${SKILL_DIR}\n  PROJECT_ROOT=${PROJECT_ROOT}\n  HINTS=${HINTS}")
+  ```
+- **`url`** — read `steps/url/agent.md` → `<SRC_AGENT>`, spawn:
+  ```
+  Agent(prompt: "<SRC_AGENT>\n\nCONTEXT:\n  PLAN_FILE=${PLAN_FILE}\n  OUTPUT_DIR=${OUTPUT_DIR}\n  URLS=${URLS}\n  SKILL_DIR=${SKILL_DIR}\n  PROJECT_ROOT=${PROJECT_ROOT}\n  HINTS=${HINTS}")
+  ```
+  The url agent observes live tracking (GA4 /collect + data layer) and explores the page,
+  then `scripts/url_to_signals.py` writes `signals/*.json` with an `observed_events[]` block.
 
-When the agent returns, verify `${OUTPUT_DIR}/figma/` contains at least one `.json`:
+When the agent returns, verify `${OUTPUT_DIR}/signals/` has at least one `.json`:
 ```bash
-ls "${OUTPUT_DIR}/figma/"*.json 2>/dev/null | wc -l
+ls "${OUTPUT_DIR}/signals/"*.json 2>/dev/null | wc -l
 ```
 
 Then set done:
 ```bash
 python3 -c "
 import json; p=json.load(open('${PLAN_FILE}'))
-p['meta']['steps']['extract-figma']='done'
+p['meta']['steps']['extract-source']='done'
 json.dump(p,open('${PLAN_FILE}','w'),indent=2)
 "
 ```
@@ -196,122 +217,78 @@ Read the following files:
 - `steps/infer/rules/double-push-pattern.md` → `<R2>`
 - `steps/infer/rules/confidence-and-origin.md` → `<R3>`
 - `steps/infer/rules/anchor-target.md` → `<R4>`
+- `steps/infer/rules/plan-language.md` → `<R5>`
 
-Then spawn:
+If `${OUTPUT_DIR}/drd-context.md` exists (DRD source), read it → `<DRD_CONTEXT>` and inject
+it. It is the **primary** event source — it primes over raw signals. If it does not exist
+(Figma/URL source), omit the DRD_CONTEXT block entirely.
+
+Then spawn (include the `DRD_CONTEXT:` line only when the file exists):
 ```
-Agent(prompt: "<INFER_AGENT>\n\nRULES:\n<R1>\n<R2>\n<R3>\n<R4>\n\nCONTEXT:\n  PLAN_FILE=${PLAN_FILE}\n  OUTPUT_DIR=${OUTPUT_DIR}\n  SKILL_DIR=${SKILL_DIR}\n  HINTS=${HINTS}")
+Agent(prompt: "<INFER_AGENT>\n\nRULES:\n<R1>\n<R2>\n<R3>\n<R4>\n<R5>\n\nDRD_CONTEXT:\n<DRD_CONTEXT>\n\nCONTEXT:\n  PLAN_FILE=${PLAN_FILE}\n  OUTPUT_DIR=${OUTPUT_DIR}\n  SKILL_DIR=${SKILL_DIR}\n  HINTS=${HINTS}")
 ```
 
-When the agent returns, verify entries with `pending_approval` exist:
+When the agent returns, verify entries were written and none are `pending_approval`
+(the automatic flow approves everything):
 ```bash
 python3 -c "
 import json; p=json.load(open('${PLAN_FILE}'))
-n=sum(1 for e in p['entries'] if e.get('_status')=='pending_approval')
-print(f'{n} pending_approval entries')
+total=len(p['entries'])
+approved=sum(1 for e in p['entries'] if e.get('_status')=='approved')
+pending=sum(1 for e in p['entries'] if e.get('_status')=='pending_approval')
+print(f'{total} entries · {approved} approved · {pending} pending')
 "
 ```
 
-Then set done:
+Then set done and mark the plan ready (all entries are auto-approved):
 ```bash
 python3 -c "
 import json; p=json.load(open('${PLAN_FILE}'))
 p['meta']['steps']['infer']='done'
-p['meta']['status']='inprogress'
-json.dump(p,open('${PLAN_FILE}','w'),indent=2)
-"
-```
-
-### Phase 4 — Confirmation (subagent, retry loop)
-
-Read the following files once (reuse across retries):
-- `steps/confirm/agent.md` → `<CONFIRM_AGENT>`
-- `steps/confirm/rules/ask-before-emit.md` → `<R1>`
-- `steps/confirm/rules/double-push-pattern.md` → `<R2>`
-- `steps/confirm/rules/plan-language.md` → `<R3>`
-
-```
-CONFIRM_PROMPT = "<CONFIRM_AGENT>\n\nRULES:\n<R1>\n<R2>\n<R3>\n\nCONTEXT:\n  PLAN_FILE=${PLAN_FILE}\n  OUTPUT_DIR=${OUTPUT_DIR}\n  HINTS=${HINTS}"
-```
-
-**Retry loop — max 3 attempts:**
-
-```python
-for attempt in 1..3:
-    set meta.steps["confirm"] = "inprogress"
-    Agent(prompt: CONFIRM_PROMPT)
-
-    pending_count = python3 -c "
-        import json; p=json.load(open('${PLAN_FILE}'))
-        print(sum(1 for e in p['entries'] if e.get('_status')=='pending_approval'))
-    "
-
-    if pending_count == 0:
-        break
-    else:
-        if attempt < 3:
-            print(f"⚠ {pending_count} entries still pending — retry {attempt+1}/3")
-        else:
-            AskUserQuestion(
-                question: f"{pending_count} events are still unconfirmed. What would you like to do?",
-                options: [
-                    "Continue later — save progress and stop",
-                    "Skip all remaining — mark them rejected",
-                    "Review them now — run confirmation again"
-                ]
-            )
-            # handle: stop | reject all | loop again
-```
-
-**When pending_count = 0, set done (orchestrator only):**
-```bash
-python3 -c "
-import json; p=json.load(open('${PLAN_FILE}'))
-p['meta']['steps']['confirm']='done'
 p['meta']['status']='ready'
 json.dump(p,open('${PLAN_FILE}','w'),indent=2)
 "
 ```
 
-### Phase 5 — Validation (inline Bash — guaranteed)
+### Phase 4 — Validation (inline Bash — guaranteed)
 
 ```bash
 python3 "${SKILL_DIR}/scripts/validate_schema.py" "${PLAN_FILE}"
 ```
 
-The validator will now enforce B1 as a hard error because `meta.status = "ready"`.
+`meta.status = "ready"`, so the validator enforces B1 (no `pending_approval` entries) as a
+hard error. In the automatic flow every entry is already `approved`, so this is a safety
+net — if it trips, an entry was left unapproved and must be fixed.
 
 On failure: read the error report, fix offending entries in plan.json, retry. Max 3 attempts.
-On success: set `meta.steps["validate-plan"] = "done"` and continue to Phase 6.
+On success: set `meta.steps["validate-plan"] = "done"` and continue to Phase 5.
 
-### Phase 6 — Enrichment (inline)
+### Phase 5 — Render markdown (inline)
 
-Read `steps/enrich/agent.md` → `<ENRICH_AGENT>` and execute inline.
+Render the review document the user will read. Reuse the existing markdown renderer from
+the `tracking-plan-render` skill (sibling directory). Language defaults to the user's
+language (`fr` or `en`).
 
-**Step 1 — New patterns:**
-Check if any approved entries use event names not already covered by the GTM snapshot (ga4_events_confirmed).
-If found, offer to add them to the catalog (persistent — benefits future runs).
+```bash
+python3 "${SKILL_DIR}/../tracking-plan-render/scripts/render_markdown.py" "${PLAN_FILE}" "${OUTPUT_DIR}" "${LANG:-en}"
+```
 
-**Step 2 — Missing events:**
-Always ask the user if there are interactions they know should be tracked but weren't proposed.
-Let them describe events in free text. Construct the payload, confirm with AskUserQuestion,
-write with `origin: "confirmed"`, `_status: "approved"`.
-
-When complete:
+This writes `${OUTPUT_DIR}/<plan-name>.md` with every approved event, each showing its
+confidence level (colour-coded bar). Set the step done:
 ```bash
 python3 -c "
 import json; p=json.load(open('${PLAN_FILE}'))
-p['meta']['steps']['enrich']='done'
+p['meta']['steps']['render']='done'
 json.dump(p,open('${PLAN_FILE}','w'),indent=2)
 "
 ```
 
 Print final summary:
 ```
-✓ <PLAN_NAME> — plan finalized
-  entries   : approved <a> · rejected <r>
+✓ <PLAN_NAME> — plan generated (auto-approved)
+  entries   : <a> approved
   events    : <distinct event names>
-  new catalog entries : <n> | none
-  open q's  : open-questions.md
+  review    : <output-dir>/<plan-name>.md  ← read & adjust here
   artifacts : <output-dir>/plan.json
 ```
 
@@ -323,9 +300,10 @@ Default: `docs/tracking/plans/<plan-name>/plan.json`
 
 ```
 <output-dir>/
-  plan.json          ← canonical validated plan
-  figma/             ← raw figma-client outputs (intermediary)
-  open-questions.md  ← rejected + uncertain entries (optional)
+  plan.json          ← canonical validated plan (all entries auto-approved)
+  <plan-name>.md     ← review document with per-event confidence (read & adjust here)
+  signals/           ← per-screen extraction in figma-client shape (any source) + images/
+  drd-context.md     ← condensed human-validated DRD context (DRD source only)
   gtm-snapshot.json  ← GTM variables + tags cache (24h)
 ```
 

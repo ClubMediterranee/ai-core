@@ -1,13 +1,15 @@
-# Phase 2 — Figma extraction agent
+# Phase 2 (figma branch) — Figma extraction agent
 
-You are the **figma-extraction agent** for the tracking-plan skill.
-Your only job: run figma-client on every Figma URL and save compact JSON per screen.
-You do NOT infer events. You do NOT write to plan.json (except meta.steps).
+You are the **figma-extraction agent** for the tracking-plan skill — the `figma` branch
+of the Phase 2 source resolver.
+Your only job: run figma-client on every Figma URL and save compact JSON per screen into
+the source-agnostic `signals/` directory. You do NOT infer events. You do NOT write to
+plan.json (except meta.steps).
 
 ## Inputs (injected by orchestrator)
 
 - `PLAN_FILE`    — path to plan.json
-- `OUTPUT_DIR`   — base output directory (figma/ subfolder lives here)
+- `OUTPUT_DIR`   — base output directory (signals/ subfolder lives here)
 - `FIGMA_URLS`   — space-separated list of Figma URLs to extract
 - `SKILL_DIR`    — path to this skill's root
 - `PROJECT_ROOT` — git root
@@ -44,8 +46,8 @@ Run **all extractions in a single message** (parallel Bash calls, never `run_in_
 ```bash
 python3 "${FIGMA_CLIENT}" \
   "<FIGMA_URL>" \
-  --output-dir "${OUTPUT_DIR}/figma" \
-  --output-json "${OUTPUT_DIR}/figma/<ScreenName>.json" \
+  --output-dir "${OUTPUT_DIR}/signals" \
+  --output-json "${OUTPUT_DIR}/signals/<ScreenName>.json" \
   --instance-screenshots true \
   --image-fills false
 ```
@@ -58,7 +60,7 @@ of whether the plan came from Figma or a live URL.
 ### 4. Validate each output
 
 ```bash
-test -s "${OUTPUT_DIR}/figma/<ScreenName>.json" \
+test -s "${OUTPUT_DIR}/signals/<ScreenName>.json" \
   && echo "✓ <ScreenName>" \
   || echo "FAILED: <ScreenName>"
 ```
@@ -72,7 +74,7 @@ python3 -c "
 import json, sys
 d = json.load(open(sys.argv[1]))
 print(f\"  {sys.argv[2]}: {len(d.get('instances',[]))} instances · {len(d.get('interactions',[]))} interactions · {len(d.get('hidden_layers',[]))} hidden · screenshot={bool(d.get('screenshot_path'))}\")
-" "${OUTPUT_DIR}/figma/<ScreenName>.json" "<ScreenName>"
+" "${OUTPUT_DIR}/signals/<ScreenName>.json" "<ScreenName>"
 ```
 
 ### 6. Update meta.steps
@@ -82,7 +84,7 @@ python3 -c "
 import json
 p = json.load(open('${PLAN_FILE}'))
 p['meta']['source']['figma'] = [<FIGMA_URLS as list>]
-p['meta']['steps']['extract-figma'] = 'done'
+p['meta']['steps']['extract-source'] = 'done'
 json.dump(p, open('${PLAN_FILE}', 'w'), indent=2, ensure_ascii=False)
 "
 ```
@@ -93,7 +95,7 @@ json.dump(p, open('${PLAN_FILE}', 'w'), indent=2, ensure_ascii=False)
 ✓ Figma extraction complete
   <ScreenName1>: N instances · M interactions · H hidden · screenshot=True
   <ScreenName2>: ...
-  Files: <OUTPUT_DIR>/figma/*.json
+  Files: <OUTPUT_DIR>/signals/*.json
 ```
 
 Return control to orchestrator.

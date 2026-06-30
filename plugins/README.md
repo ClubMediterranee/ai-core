@@ -18,7 +18,7 @@ claude plugin install clubmed-backend-node@clubmed --scope project    # Node.js 
 claude plugin install clubmed-backend-python@clubmed --scope project  # Django / FastAPI / Python
 claude plugin install clubmed-backend-java@clubmed --scope project    # Java 21+ / Spring Boot
 claude plugin install clubmed-infra@clubmed --scope project           # Terraform / Kubernetes / Security
-claude plugin install clubmed-data@clubmed --scope project            # GA4 tracking plans / analytics
+claude plugin install clubmed-tracking-data@clubmed --scope project   # GA4 tracking plans / analytics
 claude plugin install clubmed-product@clubmed --scope project         # Spec generation / PRD / Product
 ```
 
@@ -40,7 +40,7 @@ claude plugin update clubmed-backend-node@clubmed --scope project
 claude plugin update clubmed-backend-python@clubmed --scope project
 claude plugin update clubmed-backend-java@clubmed --scope project
 claude plugin update clubmed-infra@clubmed --scope project
-claude plugin update clubmed-data@clubmed --scope project
+claude plugin update clubmed-tracking-data@clubmed --scope project
 claude plugin update clubmed-product@clubmed --scope project
 ```
 
@@ -157,7 +157,7 @@ claude plugin update clubmed-product@clubmed --scope project
 
 ---
 
-### `clubmed-data` — Club Med Data & Tracking
+### `clubmed-tracking-data` — Club Med - Tracking & Analytics
 
 > Skills for the data / analytics team: build GA4 tracking plans from a Figma link or a URL, inspired by the existing Club Med plan.
 
@@ -165,9 +165,11 @@ claude plugin update clubmed-product@clubmed --scope project
 
 | Skill | Description |
 |-------|-------------|
-| `tracking-plan` | GA4 tracking-plan engine. From a Figma link and/or a URL, infers the trackable moments (clicks, impressions, ecommerce, page views) and produces a validated, tool-agnostic `plan.json`. Rendering (Excel/Confluence/Markdown) and publishing are separate skills that consume the plan. |
-| `figma-client` | Figma REST client — fetches node metadata, interactions, instances, hidden layers, and semantic hints. Feeds the Figma inference path. |
+| `agent-browser` | Drives a headless browser to capture live signals (DOM, dataLayer pushes, /collect hits) that back or correct Figma-inferred events. |
 | `figma-authentication` | Manages the `FIGMA_TOKEN` lifecycle: detect, validate, auto-generate, and persist. Dependency of `figma-client`. |
+| `figma-client` | Figma REST client — fetches node metadata, interactions, instances, hidden layers, and semantic hints. Feeds the Figma inference path. |
+| `tracking-plan` | GA4 tracking-plan engine. From a Figma link, a DRD (Design Requirement Details), or a live URL, infers the trackable moments (clicks, impressions, ecommerce, page views), auto-approves every event with a confidence score, and produces a validated, tool-agnostic `plan.json` plus a review markdown. Fully automatic — the user reviews and adjusts the rendered markdown afterwards. |
+| `tracking-plan-render` | Renders a validated `plan.json` to Excel, PDF or Markdown for sharing and review. The Markdown render shows each event's confidence level. |
 
 ---
 

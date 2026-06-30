@@ -8,28 +8,40 @@ initial `plan.json` with `meta` + empty `entries[]` + all `meta.steps` set to
 
 ## Actions
 
-### 1. Parse arguments
+### 1. Parse arguments and detect the source
 
-From the full skill invocation string, extract in order:
+The skill accepts **one of three source types**. Detect `SOURCE_TYPE` from the arguments
+by priority:
 
-1. **`FIGMA_URLS[]`** — all tokens matching `figma.com/(design|file|make|board)/`
-2. **`PLAN_NAME`** — first remaining token that is kebab-case or a single word (not a URL, not a sentence)
-3. **`HINTS`** — everything else after the name: free-text context the user provides to guide inference
+1. **`figma`** — any token matching `figma.com/(design|file|make|board)/`.
+   → `FIGMA_URLS[]` = all such tokens.
+2. **`drd`** — a token that is a path ending in `.drd.md`, OR a directory path that
+   contains a `<X>.drd.md` file together with a `screens/` subfolder.
+   → `DRD_PATH` = that path.
+3. **`url`** — any other `https?://` token (not figma.com).
+   → `URLS[]` = all such tokens.
+
+Then extract:
+- **`PLAN_NAME`** — first remaining token that is kebab-case or a single word (not a URL, not a path, not a sentence).
+- **`HINTS`** — everything else after the name: free-text context guiding inference.
 
 Examples:
 ```
 /tracking-plan https://figma.com/design/abc shopping-homepage
-  → FIGMA_URLS=["https://..."]  PLAN_NAME="shopping-homepage"  HINTS=""
+  → SOURCE_TYPE=figma  FIGMA_URLS=["https://..."]  PLAN_NAME="shopping-homepage"
 
-/tracking-plan https://figma.com/design/abc resort-pdp main CTA is the price widget, ignore the search bar
-  → FIGMA_URLS=["https://..."]  PLAN_NAME="resort-pdp"  HINTS="main CTA is the price widget, ignore the search bar"
+/tracking-plan /Volumes/Work/figma-live/docs/drd/Dashboard dashboard-be
+  → SOURCE_TYPE=drd  DRD_PATH="/Volumes/.../Dashboard"  PLAN_NAME="dashboard-be"
 
-/tracking-plan https://figma.com/design/abc this is the BE funnel step 2, focus on the bottom bar and upsells
-  → FIGMA_URLS=["https://..."]  PLAN_NAME="" (ask)  HINTS="this is the BE funnel step 2, focus on the bottom bar and upsells"
+/tracking-plan https://www.clubmed.fr/r/punta-cana resort-pdp focus on upsells
+  → SOURCE_TYPE=url  URLS=["https://..."]  PLAN_NAME="resort-pdp"  HINTS="focus on upsells"
 ```
 
-If `FIGMA_URLS` is empty → **stop**:
-> No Figma URL detected. Provide at least one `figma.com/…` URL.
+If **no recognised source** is found → **stop** (in the user's language):
+> No source detected. Provide one of:
+>   • a Figma link            (figma.com/design/…)
+>   • a DRD path              (a .drd.md file or its folder)
+>   • a live URL              (https://… — analyses the live page)
 
 If `PLAN_NAME` is empty → ask (in the user's language):
 ```
@@ -41,7 +53,8 @@ AskUserQuestion(
 
 ### 2. Detect site_section
 
-From explicit arg, or infer from URL path:
+From explicit arg, or infer from a Figma/live URL path, or (DRD) from the `.drd.md`
+frontmatter `figma-sources[].url`:
 - `/booking`, `/be/` → `booking_engine`
 - `/account`, `/ca/` → `customer_account`
 - `/d/`, `/o/`, `/r/`, `/s` → `shopping`
@@ -57,8 +70,11 @@ PROJECT_ROOT=$(git rev-parse --show-toplevel)
 SKILL_DIR="${CLAUDE_PLUGIN_ROOT:-${PROJECT_ROOT}/.claude/skills/tracking-plan}"
 OUTPUT_DIR="${PROJECT_ROOT}/docs/tracking/plans/${PLAN_NAME}"
 PLAN_FILE="${OUTPUT_DIR}/plan.json"
-mkdir -p "${OUTPUT_DIR}/figma"
+mkdir -p "${OUTPUT_DIR}/signals"
 ```
+
+`signals/` is the source-agnostic extraction directory — every source adapter (Figma,
+DRD, URL) writes its compact per-screen JSON here in the same figma-client shape.
 
 ### 4. Resume check
 
@@ -71,6 +87,11 @@ If `PLAN_FILE` already exists with a `meta.steps` block:
 
 Only if `PLAN_FILE` does not already exist:
 
+Fill `meta.source` and `meta.source_type` according to the detected `SOURCE_TYPE`:
+- `figma` → `"source": { "figma": ["<FIGMA_URL_1>", …], "url": [] }`
+- `drd`   → `"source": { "drd": "<DRD_PATH>", "figma": [], "url": [] }`
+- `url`   → `"source": { "url": ["<URL_1>", …], "figma": [] }`
+
 ```json
 {
   "meta": {
@@ -80,21 +101,18 @@ Only if `PLAN_FILE` does not already exist:
     "tms": "GTM",
     "analytics": "GA4",
     "data_layer": "clubMedLayer",
-    "source": {
-      "figma": ["<FIGMA_URL_1>"],
-      "url": []
-    },
+    "source": { "<see above per SOURCE_TYPE>": "…" },
+    "source_type": "<figma | drd | url>",
     "generated_at": "<TODAY_ISO_DATE>",
     "hints": "<HINTS or null>",
     "status": "draft",
     "steps": {
-      "validate":      "done",
-      "gtm-snapshot":  "pending",
-      "extract-figma": "pending",
-      "infer":         "pending",
-      "confirm":       "pending",
-      "validate-plan": "pending",
-      "enrich":        "pending"
+      "validate":       "done",
+      "gtm-snapshot":   "pending",
+      "extract-source": "pending",
+      "infer":          "pending",
+      "validate-plan":  "pending",
+      "render":         "pending"
     }
   },
   "entries": []
@@ -103,7 +121,7 @@ Only if `PLAN_FILE` does not already exist:
 
 Print:
 ```
-✓ plan: <PLAN_NAME> · section: <site_section> · figma: <n> URL(s)
+✓ plan: <PLAN_NAME> · section: <site_section> · source: <SOURCE_TYPE> (<n> screen(s)/URL(s) or DRD path)
   hints: <HINTS or "none">
   output: <output-dir>/plan.json
 ```

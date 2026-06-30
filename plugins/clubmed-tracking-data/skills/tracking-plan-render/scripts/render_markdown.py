@@ -2,7 +2,8 @@
 """
 Markdown renderer for plan.json. Zero dependencies.
 - Justification at the top of each event block
-- "Source: Inféré · X%" removed — irrelevant for final user
+- Per-event confidence line (colour-coded bar + tier emoji) — the user reviews the
+  rendered markdown and adjusts low-confidence events
 - "Rationale" → "Justification"
 """
 
@@ -21,6 +22,10 @@ LABELS = {
         "justification": "Description", "open_q": "Open Questions",
         "open_q_sub": "_Events proposed but not included in this run._",
         "event": "Event", "rationale_col": "Description",
+        "confidence": "Confidence",
+        "status_existing": "Existing", "status_existing_legacy": "Existing (legacy)",
+        "status_proposed": "Proposed", "verified": "Verified",
+        "recap_existing": "existing", "recap_proposed": "proposed",
     },
     "fr": {
         "title": "Plan de marquage", "approved": "Events approuvés",
@@ -31,6 +36,10 @@ LABELS = {
         "justification": "Description", "open_q": "Open Questions",
         "open_q_sub": "_Events proposés mais non inclus dans ce run._",
         "event": "Événement", "rationale_col": "Description",
+        "confidence": "Confiance",
+        "status_existing": "Existant", "status_existing_legacy": "Existant (legacy)",
+        "status_proposed": "Proposé", "verified": "Vérifié",
+        "recap_existing": "existant·s", "recap_proposed": "proposé·s",
     },
 }
 
@@ -55,6 +64,48 @@ def build_payload_md(entry):
         return f"```js\nclubMedLayer.push({json.dumps(p, ensure_ascii=False, indent=2)});\n```"
 
 
+def build_confidence_md(entry, label="Confidence"):
+    """Render the confidence line: tier emoji + proportional bar + percent + origin.
+
+    Tiers: 🟢 >= 80% · 🟡 60-79% · 🔴 < 60%. Confirmed/legacy entries (no confidence
+    field, or 1.0) show as 🟢 without a bar.
+    """
+    origin = entry.get("origin", "inferred")
+    conf   = entry.get("confidence")
+
+    if conf is None:
+        # confirmed / legacy entries carry no confidence score
+        return f"**{label} :** 🟢 · {origin}"
+
+    pct    = round(conf * 100)
+    emoji  = "🟢" if conf >= 0.80 else "🟡" if conf >= 0.60 else "🔴"
+    filled = round(conf * 10)
+    bar    = "■" * filled + "□" * (10 - filled)
+    return f"**{label} :** {emoji} {bar} {pct}% · {origin}"
+
+
+def is_existing(entry):
+    """An entry reflects tracking already in place (not a proposal)."""
+    return entry.get("origin") in ("confirmed", "legacy")
+
+
+def build_status_md(entry, L):
+    """Status badge distinguishing existing tracking from proposals.
+
+    confirmed → ✅ Existing (+ VERIFICATION note if present)
+    legacy    → 📋 Existing (legacy)
+    inferred  → 💡 Proposed
+    """
+    origin = entry.get("origin", "inferred")
+    if origin == "confirmed":
+        line = f"**✅ {L['status_existing']}**"
+        note = entry.get("VERIFICATION")
+        return f"{line} — _{note}_" if note else line
+    if origin == "legacy":
+        return f"**📋 {L['status_existing_legacy']}**"
+    return f"**💡 {L['status_proposed']}**"
+
+
 def render(plan_file: str, output_dir: str, lang: str = "en"):
     plan         = json.load(open(plan_file, encoding="utf-8"))
     meta         = plan["meta"]
@@ -62,6 +113,9 @@ def render(plan_file: str, output_dir: str, lang: str = "en"):
     L            = LABELS.get(lang, LABELS["en"])
     approved     = [e for e in plan["entries"] if e.get("_status") == "approved"]
     rejected     = [e for e in plan["entries"] if e.get("_status") == "rejected"]
+
+    n_existing = sum(1 for e in approved if is_existing(e))
+    n_proposed = len(approved) - n_existing
 
     lines = []
 
@@ -76,7 +130,7 @@ def render(plan_file: str, output_dir: str, lang: str = "en"):
         f"| {L['analytics']} | {meta.get('analytics', 'GA4')} |",
         f"| {L['data_layer']} | `{meta.get('data_layer', 'clubMedLayer')}` |",
         f"| {L['generated']} | {meta.get('generated_at', '')} |",
-        f"| {L['approved']} | {len(approved)} |",
+        f"| {L['approved']} | {len(approved)} — ✅ {n_existing} {L['recap_existing']} · 💡 {n_proposed} {L['recap_proposed']} |",
         "",
         "---",
         "",
@@ -97,7 +151,10 @@ def render(plan_file: str, output_dir: str, lang: str = "en"):
                 title += f" — {e['description']}"
             lines += [title, ""]
 
-            # Justification FIRST — before everything else
+            # Status badge FIRST — existing tracking vs proposal
+            lines += [build_status_md(e, L), ""]
+
+            # Justification — before everything else
             if e.get("rationale"):
                 lines += [
                     f"> **{L['justification']} :** {e['rationale']}",
@@ -105,6 +162,7 @@ def render(plan_file: str, output_dir: str, lang: str = "en"):
                 ]
 
             lines += [f"**{L['trigger']} :** {e.get('trigger', '')}  "]
+            lines += [build_confidence_md(e, L["confidence"]) + "  "]
 
             if e.get("screenshot"):
                 lines += [f"**{L['screenshot']} :** `{e['screenshot']}`  "]

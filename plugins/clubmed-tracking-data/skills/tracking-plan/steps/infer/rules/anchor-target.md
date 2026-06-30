@@ -5,8 +5,9 @@ knows exactly where to wire the `clubMedLayer.push` call.
 
 | Source                     | `kind`      | Fields to populate                                               |
 |----------------------------|-------------|------------------------------------------------------------------|
-| Figma ON_CLICK interaction | `figma`     | `figma_node_id`, `figma_path`, `component` (if known)           |
-| No Figma signal             | `component` | `component` name hint; `stability: "needs-selector"`            |
+| Figma / DRD ON_CLICK signal | `figma`     | `figma_node_id`, `figma_path`, `component` (if known)           |
+| Live URL / DOM element      | `dom`       | `role`, `accessible_name`, `selector` (if robust), `stability`  |
+| No structural signal        | `component` | `component` name hint; `stability: "needs-selector"`            |
 
 Set `stability`:
 - `stable` — node_id from a Figma interaction (reliable anchor).

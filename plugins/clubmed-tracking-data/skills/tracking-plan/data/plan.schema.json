@@ -33,8 +33,14 @@
           "properties": {
             "figma": { "type": "array", "items": { "type": "string" } },
             "url": { "type": "array", "items": { "type": "string" } },
+            "drd": { "type": "string", "description": "Path to the DRD folder or .drd.md file the plan was built from." },
             "legacy_sheet": { "type": "string" }
           }
+        },
+        "source_type": {
+          "type": "string",
+          "enum": ["figma", "drd", "url"],
+          "description": "Which source adapter produced the signals: figma (figma-client), drd (Design Requirement Details), or url (live page analysis)."
         },
         "generated_at": { "type": "string", "format": "date", "description": "ISO 8601 date (YYYY-MM-DD)." },
         "journeys": {
@@ -47,7 +53,7 @@
         "status": {
           "type": "string",
           "enum": ["draft", "inprogress", "ready"],
-          "description": "Lifecycle state of the plan. draft = init done, no entries yet. inprogress = inference ran, pending_approval entries exist. ready = all entries confirmed/rejected, safe to validate and render."
+          "description": "Lifecycle state of the plan. draft = init done, no entries yet. ready = inference ran and auto-approved every entry, safe to validate and render. The flow goes draft → ready in one inference pass; inprogress is retained for backward compatibility only."
         },
         "note": { "type": "string" }
       }
@@ -192,7 +198,7 @@
         "_status": {
           "type": "string",
           "enum": ["pending_approval", "approved", "rejected"],
-          "description": "Workflow state managed by the tracking-plan agents. pending_approval = written by inference-agent, awaiting user confirmation. approved = confirmed by user in confirm-agent. rejected = user skipped it (entry kept for audit, excluded from renderers). Validation blocks if any pending_approval remain."
+          "description": "Workflow state managed by the tracking-plan agents. approved = written by the inference-agent in the automatic flow (the default). pending_approval = legacy/manual only; the validator blocks it once meta.status is ready. rejected = manually excluded (entry kept for audit, excluded from renderers)."
         }
       },
       "allOf": [

@@ -43,7 +43,7 @@ claude plugin install clubmed-backend-node@clubmed --scope project    # Node.js 
 claude plugin install clubmed-backend-python@clubmed --scope project  # Django / FastAPI / Python
 claude plugin install clubmed-backend-java@clubmed --scope project    # Java 21+ / Spring Boot
 claude plugin install clubmed-infra@clubmed --scope project           # Terraform / Kubernetes / Security
-claude plugin install clubmed-data@clubmed --scope project            # GA4 tracking plans / analytics
+claude plugin install clubmed-tracking-data@clubmed --scope project   # GA4 tracking plans / analytics
 claude plugin install clubmed-product@clubmed --scope project         # Spec generation / PRD / Product
 
 ```
@@ -55,7 +55,7 @@ claude plugin install clubmed-product@clubmed --scope project         # Spec gen
 | `clubmed-backend-python` | Django · FastAPI · async Python | 11 skills |
 | `clubmed-backend-java` | Java 21+ · Spring Boot · API | 9 skills |
 | `clubmed-infra` | Terraform · Kubernetes · Container security | 7 skills |
-| `clubmed-data` | GA4 tracking plans · analytics · Figma | 3 skills |
+| `clubmed-tracking-data` | GA4 tracking plans · analytics · Figma | 5 skills |
 | `clubmed-product` | Spec generation · PRD · User stories | 1 skill |
 
 ### [Skills](skills/README.md) — 41 available
