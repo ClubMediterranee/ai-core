@@ -58,7 +58,7 @@ claude plugin install clubmed-product@clubmed --scope project         # Spec gen
 | `clubmed-tracking-data` | GA4 tracking plans · analytics · Figma | 5 skills |
 | `clubmed-product` | Spec generation · PRD · User stories | 1 skill |
 
-### [Skills](skills/README.md) — 41 available
+### [Skills](skills/README.md) — 46 available
 
 Individual slash commands that extend Claude Code for specific tasks. Install plugins above to get them pre-bundled, or pick skills individually.
 
@@ -71,7 +71,7 @@ Individual slash commands that extend Claude Code for specific tasks. Install pl
 | Config | `agent-creator` · `skill-creator` |
 | Database | `database-migration` · `postgresql-optimization` · `prisma-expert` |
 | Design | `excalidraw` · `figma-authentication` · `figma-client` · `trident-icons` · `trident-ui-install` |
-| Development | `git-commit` |
+| Development | `git-commit` · `git-push-branch` · `git-rebase-branch` · `github-authentication` · `github-open-pr` · `send-to-github` |
 | Product | `spec` |
 | Project Management | `jira-fetch` |
 | Error Handling | `error-handling-patterns` |
