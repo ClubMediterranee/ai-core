@@ -29,7 +29,7 @@
 
 ## What's inside
 
-### [Plugins](plugins/README.md) — 7 available
+### [Plugins](plugins/README.md) — 8 available
 
 Role-based bundles that install a curated set of skills in one command.
 
@@ -45,6 +45,7 @@ claude plugin install clubmed-backend-java@clubmed --scope project    # Java 21+
 claude plugin install clubmed-infra@clubmed --scope project           # Terraform / Kubernetes / Security
 claude plugin install clubmed-tracking-data@clubmed --scope project   # GA4 tracking plans / analytics
 claude plugin install clubmed-product@clubmed --scope project         # Spec generation / PRD / Product
+claude plugin install clubmed-docs@clubmed --scope project            # GitHub access / MCP / Documentation
 
 ```
 
@@ -57,6 +58,7 @@ claude plugin install clubmed-product@clubmed --scope project         # Spec gen
 | `clubmed-infra` | Terraform · Kubernetes · Container security | 7 skills |
 | `clubmed-tracking-data` | GA4 tracking plans · analytics · Figma | 5 skills |
 | `clubmed-product` | Spec generation · PRD · User stories | 1 skill |
+| `clubmed-docs` | GitHub access · MCP · PR workflow | 6 skills |
 
 ### [Skills](skills/README.md) — 46 available
 
@@ -85,7 +87,7 @@ Individual slash commands that extend Claude Code for specific tasks. Install pl
 | Testing | `e2e-testing` · `testing-patterns` |
 | TypeScript | `typescript-advanced-types` · `typescript-expert` |
 
-### [MCP Servers](mcps/README.md) — 5 available
+### [MCP Servers](mcps/README.md) — 6 available
 
 Curated MCP servers to connect Claude to external tools.
 
@@ -93,6 +95,7 @@ Curated MCP servers to connect Claude to external tools.
 |--------|----------|
 | `context7` | Development |
 | `figma` | Design |
+| `github` | Development |
 | `gtm` | Analytics |
 | `playwright` | Testing / Automation |
 | `trident-icons` | Design |

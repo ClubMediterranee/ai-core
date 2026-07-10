@@ -16,6 +16,13 @@
       "command": "claude mcp add --transport http figma https://mcp.figma.com/mcp"
     },
     {
+      "name": "github",
+      "description": "Access GitHub repositories, issues, and pull requests. Implement features from issues and open PRs directly.",
+      "category": "Development",
+      "auth": "PAT via Bearer header — run the github-authentication skill to generate and store GITHUB_TOKEN",
+      "command": "claude mcp add --transport http github https://api.githubcopilot.com/mcp/ --header \"Authorization: Bearer ${GITHUB_TOKEN}\""
+    },
+    {
       "name": "gtm",
       "description": "Google Tag Manager - read containers, tags, triggers and variables. Used by tracking-plan to confirm which events have a GA4 tag and to validate parameter names against declared Data Layer variables.",
       "category": "Analytics",
