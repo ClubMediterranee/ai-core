@@ -118,6 +118,23 @@
         "documentation"
       ],
       "category": "product"
+    },
+    {
+      "name": "clubmed-docs",
+      "displayName": "Club Med - Docs",
+      "description": "GitHub tooling: access lifecycle (PAT generation and persistence), the GitHub MCP server to read repositories, issues, and pull requests, and an end-to-end commit → rebase → push → PR workflow.",
+      "version": "1.0.0",
+      "source": "./plugins/clubmed-docs",
+      "keywords": [
+        "docs",
+        "documentation",
+        "github",
+        "pat",
+        "mcp",
+        "pull-request",
+        "git"
+      ],
+      "category": "documentation"
     }
   ]
 }

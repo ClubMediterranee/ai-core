@@ -1,0 +1,22 @@
+{
+  "name": "clubmed-docs",
+  "displayName": "Club Med — Docs",
+  "version": "1.0.0",
+  "description": "GitHub tooling: access lifecycle (PAT generation and persistence), the GitHub MCP server to read repositories, issues, and pull requests, and an end-to-end commit → rebase → push → PR workflow.",
+  "author": {
+    "name": "Jeremy Wallez",
+    "email": "jeremy.wallez@clubmed.com"
+  },
+  "repository": "https://github.com/ClubMediterranee/ai-core",
+  "license": "MIT",
+  "keywords": ["docs", "documentation", "github", "pat", "mcp", "pull-request", "git"],
+  "skills": [
+    "./skills/github-authentication",
+    "./skills/git-commit",
+    "./skills/git-rebase-branch",
+    "./skills/git-push-branch",
+    "./skills/github-open-pr",
+    "./skills/send-to-github"
+  ],
+  "mcpServers": "./.mcp.json"
+}

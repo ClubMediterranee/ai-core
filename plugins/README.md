@@ -20,6 +20,7 @@ claude plugin install clubmed-backend-java@clubmed --scope project    # Java 21+
 claude plugin install clubmed-infra@clubmed --scope project           # Terraform / Kubernetes / Security
 claude plugin install clubmed-tracking-data@clubmed --scope project   # GA4 tracking plans / analytics
 claude plugin install clubmed-product@clubmed --scope project         # Spec generation / PRD / Product
+claude plugin install clubmed-docs@clubmed --scope project            # GitHub access / MCP / Documentation
 ```
 
 Skills become available immediately as slash commands in Claude Code.
@@ -42,6 +43,7 @@ claude plugin update clubmed-backend-java@clubmed --scope project
 claude plugin update clubmed-infra@clubmed --scope project
 claude plugin update clubmed-tracking-data@clubmed --scope project
 claude plugin update clubmed-product@clubmed --scope project
+claude plugin update clubmed-docs@clubmed --scope project
 ```
 
 ---
@@ -182,6 +184,20 @@ claude plugin update clubmed-product@clubmed --scope project
 | Skill | Description |
 |-------|-------------|
 | `spec` | Generates developer-ready specs (enriched user stories) from a PRD document. Reads `docs/specs/prd/`, cross-references `docs/specs/drd/` design files, and produces structured markdown specs in `docs/specs/`. Each spec covers one independently implementable unit sized for an AI developer to complete in under 2 hours. |
+
+---
+
+### `clubmed-docs` — Club Med - Docs
+
+> Documentation tooling: manage GitHub access and connect the GitHub MCP server to read repositories, issues, and pull requests.
+
+**Keywords:** `docs` · `documentation` · `github` · `pat` · `mcp`
+
+| Skill | Description |
+|-------|-------------|
+| `github-authentication` | Manages the complete lifecycle of `GITHUB_TOKEN`: detect, validate, auto-generate a classic PAT via browser (manual login primary, best-effort auto-login), and persist to `.claude/settings.local.json`. Unblocks the GitHub MCP server. Uses the Playwright MCP. |
+
+**MCP servers:** `github` (HTTP, `https://api.githubcopilot.com/mcp/`) — authenticated with the `GITHUB_TOKEN` produced by `github-authentication`.
 
 ---
 
