@@ -21,6 +21,7 @@ claude plugin install clubmed-infra@clubmed --scope project           # Terrafor
 claude plugin install clubmed-tracking-data@clubmed --scope project   # GA4 tracking plans / analytics
 claude plugin install clubmed-product@clubmed --scope project         # Spec generation / PRD / Product
 claude plugin install clubmed-docs@clubmed --scope project            # GitHub access / MCP / Documentation
+claude plugin install clubmed-qa@clubmed --scope project              # Playwright E2E test generation
 ```
 
 Skills become available immediately as slash commands in Claude Code.
@@ -44,6 +45,7 @@ claude plugin update clubmed-infra@clubmed --scope project
 claude plugin update clubmed-tracking-data@clubmed --scope project
 claude plugin update clubmed-product@clubmed --scope project
 claude plugin update clubmed-docs@clubmed --scope project
+claude plugin update clubmed-qa@clubmed --scope project
 ```
 
 ---
@@ -199,6 +201,16 @@ claude plugin update clubmed-docs@clubmed --scope project
 
 **MCP servers:** `github` (HTTP, `https://api.githubcopilot.com/mcp/`) — authenticated with the `GITHUB_TOKEN` produced by `github-authentication`.
 
+### `clubmed-qa` — Club Med - QA
+
+> Skills for QA automation engineers: robust Playwright/TypeScript E2E test generation with live-site selector grounding, repeated cross-browser flake proofing, and independent multi-lens review.
+
+**Keywords:** `qa` · `e2e` · `playwright` · `testing` · `automation` · `cross-browser`
+
+| Skill | Description |
+|-------|-------------|
+| `e2e-test-generator` | Orchestrates E2E test generation via 5 scoped subagents (ground/plan/author/harden/review): grounds selectors on the live site, plans scenarios, authors from the grounded contract, proves non-flakiness by repeated cross-browser runs, and reviews with independent critics. |
+
 ---
 
 ## Plugin vs Skill
@@ -209,4 +221,4 @@ claude plugin update clubmed-docs@clubmed --scope project
 | **Install** | `claude plugin install <name>@clubmed` | Install individually |
 | **Best for** | Onboarding a team or setting up a project | Adding one specific capability |
 
-You can mix both: install a plugin for your core stack, then add individual skills for cross-cutting concerns (e.g. `a11y-web`, `e2e-testing`).
+You can mix both: install a plugin for your core stack, then add individual skills for cross-cutting concerns (e.g. `a11y-web`, `e2e-test-generator`).

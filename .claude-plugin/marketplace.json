@@ -135,6 +135,22 @@
         "git"
       ],
       "category": "documentation"
+    },
+    {
+      "name": "clubmed-qa",
+      "displayName": "Club Med - QA",
+      "description": "Robust Playwright/TypeScript E2E test generation: qualify the intent (reads docs/ PRDs and glossary), ground selectors on the live site, plan, write reusing existing code, prove non-flakiness by repeated cross-browser runs, and review with independent critics.",
+      "version": "1.0.0",
+      "source": "./plugins/clubmed-qa",
+      "keywords": [
+        "qa",
+        "e2e",
+        "playwright",
+        "testing",
+        "automation",
+        "cross-browser"
+      ],
+      "category": "testing"
     }
   ]
 }
