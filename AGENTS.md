@@ -20,7 +20,9 @@ After creating an agent:
 
 ## Committing changes
 
-Always use the `git-commit` skill to create commits. It analyzes the diff, detects type and scope, and generates a Conventional Commits message. Never commit manually without it.
+**Never commit without explicit user authorization.** Do not run `git commit` (or any commit-creating command) unless the user has explicitly asked for a commit in the current request. Prepare and stage changes, then wait for the user to authorize before committing.
+
+Once authorized, always use the `git-commit` skill to create commits. It analyzes the diff, detects type and scope, and generates a Conventional Commits message. Never commit manually without it.
 
 ## Adding an MCP server
 

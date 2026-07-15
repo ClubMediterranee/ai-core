@@ -1,0 +1,16 @@
+{
+  "name": "clubmed-qa",
+  "displayName": "Club Med — QA",
+  "version": "1.0.0",
+  "description": "Skills for QA automation engineers: robust Playwright/TypeScript E2E test generation with live-site selector grounding, repeated cross-browser flake proofing, and independent multi-lens review.",
+  "author": {
+    "name": "Jeremy Wallez",
+    "email": "jeremy.wallez@clubmed.com"
+  },
+  "repository": "https://github.com/ClubMediterranee/ai-core",
+  "license": "MIT",
+  "keywords": ["qa", "e2e", "playwright", "testing", "automation", "cross-browser"],
+  "skills": [
+    "./skills/e2e-test-generator"
+  ]
+}

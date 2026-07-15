@@ -29,7 +29,7 @@
 
 ## What's inside
 
-### [Plugins](plugins/README.md) — 8 available
+### [Plugins](plugins/README.md) — 9 available
 
 Role-based bundles that install a curated set of skills in one command.
 
@@ -46,6 +46,7 @@ claude plugin install clubmed-infra@clubmed --scope project           # Terrafor
 claude plugin install clubmed-tracking-data@clubmed --scope project   # GA4 tracking plans / analytics
 claude plugin install clubmed-product@clubmed --scope project         # Spec generation / PRD / Product
 claude plugin install clubmed-docs@clubmed --scope project            # GitHub access / MCP / Documentation
+claude plugin install clubmed-qa@clubmed --scope project              # Playwright E2E test generation
 
 ```
 
@@ -59,6 +60,7 @@ claude plugin install clubmed-docs@clubmed --scope project            # GitHub a
 | `clubmed-tracking-data` | GA4 tracking plans · analytics · Figma | 5 skills |
 | `clubmed-product` | Spec generation · PRD · User stories | 1 skill |
 | `clubmed-docs` | GitHub access · MCP · PR workflow | 6 skills |
+| `clubmed-qa` | Playwright · E2E · cross-browser testing | 1 skill |
 
 ### [Skills](skills/README.md) — 46 available
 
@@ -84,7 +86,7 @@ Individual slash commands that extend Claude Code for specific tasks. Install pl
 | Python | `async-python-patterns` · `django-pro` · `fastapi-pro` |
 | React / Next.js | `nextjs-best-practices` · `react-best-practices` · `react-component-performance` · `react-patterns` |
 | Security | `backend-security-coder` · `security-scanning-security-hardening` · `security-scanning-security-sast` |
-| Testing | `e2e-testing` · `testing-patterns` |
+| Testing | `e2e-test-generator` · `testing-patterns` |
 | TypeScript | `typescript-advanced-types` · `typescript-expert` |
 
 ### [MCP Servers](mcps/README.md) — 6 available
