@@ -1,6 +1,6 @@
 ---
-name: send-to-github
-description: 'End-to-end "send my work to GitHub": commit the current changes as a Conventional Commit, rebase onto the default branch, push under a speaking branch name, and open a GitHub pull request — in one flow. Use when the user wants to ship their work, send changes to GitHub, open a PR from their current changes, "commit push and PR", finalize a feature, or go from dirty working tree to an open PR. Composes the git-commit, git-rebase-branch, git-push-branch, and github-open-pr skills. Absolute invariant: NEVER pushes to the default branch (main, develop, etc.) — always a feature branch and a PR. Triggers on: "send to github", "ship it", "ship this", "open a PR for my changes", "commit push and open a PR", "finalize this feature", "create a PR from my work", "/send-to-github".'
+name: github-publish
+description: 'End-to-end "send my work to GitHub": commit the current changes as a Conventional Commit, rebase onto the default branch, push under a speaking branch name, and open a GitHub pull request — in one flow. Use when the user wants to ship their work, send changes to GitHub, open a PR from their current changes, "commit push and PR", finalize a feature, or go from dirty working tree to an open PR. Composes the git-commit, git-rebase-branch, git-push-branch, and github-open-pr skills. Absolute invariant: NEVER pushes to the default branch (main, develop, etc.) — always a feature branch and a PR. Triggers on: "send to github", "ship it", "ship this", "open a PR for my changes", "commit push and open a PR", "finalize this feature", "create a PR from my work", "/github-publish".'
 allowed-tools: Bash, Skill, AskUserQuestion
 version: 1.0.0
 changelog:

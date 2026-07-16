@@ -1,5 +1,5 @@
 ---
-name: git-pull-rebase
+name: github-update
 description: 'Update the current branch with its remote counterpart using a rebase (git pull --rebase), keeping history linear and avoiding merge commits. Fetches the branch upstream, replays local commits on top, and handles conflicts (safe automatic resolution for trivial overlaps, asks the user to arbitrate genuine logic conflicts). Use when the user asks to pull with rebase, get the latest remote commits on their branch, update/sync the current branch with its remote, resolve a "your branch is behind" state without a merge commit, or catch up before continuing work. Refuses to run on a dirty working tree (stops and asks to commit or stash first), never force-pushes, never touches git config, and prefers `git rebase --abort` over leaving a broken state. Triggers on: "pull rebase", "git pull --rebase", "get the latest commits", "update my branch from remote", "sync with the remote", "my branch is behind origin", "catch up before I continue".'
 allowed-tools: Bash, AskUserQuestion
 version: 1.0.0
