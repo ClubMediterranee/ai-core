@@ -59,10 +59,10 @@ claude plugin install clubmed-qa@clubmed --scope project              # Playwrig
 | `clubmed-infra` | Terraform · Kubernetes · Container security | 7 skills |
 | `clubmed-tracking-data` | GA4 tracking plans · analytics · Figma | 5 skills |
 | `clubmed-product` | Spec generation · PRD · User stories | 1 skill |
-| `clubmed-docs` | GitHub access · MCP · PR workflow | 6 skills |
+| `clubmed-docs` | GitHub access · MCP · PR workflow | 7 skills |
 | `clubmed-qa` | Playwright · E2E · cross-browser testing | 1 skill |
 
-### [Skills](skills/README.md) — 46 available
+### [Skills](skills/README.md) — 47 available
 
 Individual slash commands that extend Claude Code for specific tasks. Install plugins above to get them pre-bundled, or pick skills individually.
 
@@ -75,7 +75,7 @@ Individual slash commands that extend Claude Code for specific tasks. Install pl
 | Config | `agent-creator` · `skill-creator` |
 | Database | `database-migration` · `postgresql-optimization` · `prisma-expert` |
 | Design | `excalidraw` · `figma-authentication` · `figma-client` · `trident-icons` · `trident-ui-install` |
-| Development | `git-commit` · `git-push-branch` · `git-rebase-branch` · `github-authentication` · `github-open-pr` · `send-to-github` |
+| Development | `git-commit` · `git-pull-rebase` · `git-push-branch` · `git-rebase-branch` · `github-authentication` · `github-open-pr` · `send-to-github` |
 | Product | `spec` |
 | Project Management | `jira-fetch` |
 | Error Handling | `error-handling-patterns` |
