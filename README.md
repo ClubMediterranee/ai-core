@@ -75,7 +75,7 @@ Individual slash commands that extend Claude Code for specific tasks. Install pl
 | Config | `agent-creator` · `skill-creator` |
 | Database | `database-migration` · `postgresql-optimization` · `prisma-expert` |
 | Design | `excalidraw` · `figma-authentication` · `figma-client` · `trident-icons` · `trident-ui-install` |
-| Development | `git-commit` · `git-pull-rebase` · `git-push-branch` · `git-rebase-branch` · `github-authentication` · `github-open-pr` · `send-to-github` |
+| Development | `git-commit` · `git-push-branch` · `git-rebase-branch` · `github-authentication` · `github-open-pr` · `github-publish` · `github-update` |
 | Product | `spec` |
 | Project Management | `jira-fetch` |
 | Error Handling | `error-handling-patterns` |

@@ -20,7 +20,7 @@ Push the current branch to `origin` under a human-readable name derived from the
 
 ## Branch Naming Rule (canonical)
 
-This is the single source of truth for the speaking branch name, referenced by `git-rebase-branch` and `send-to-github`.
+This is the single source of truth for the speaking branch name, referenced by `git-rebase-branch` and `github-publish`.
 
 Read the last commit subject:
 
