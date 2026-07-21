@@ -46,8 +46,8 @@ Which PRD would you like to turn into specs?
 Read the full PRD. Build a mental model of:
 - The product scope and user goals
 - All functional specifications (FUNC-xxx) and the user outcomes they serve
-- All business rules (BR-xxx) — including which FUNCs they constrain
-- All error scenarios (ERR-xxx) — including which FUNCs they apply to
+- All business rules (BR-xxx)
+- All error scenarios (ERR-xxx)
 - The acceptance criteria
 - Any open questions or constraints already noted in the PRD
 - Any feature flags or toggle names mentioned
@@ -71,8 +71,8 @@ Read every relevant DRD fully. Extract:
 - Viewport descriptions (Desktop / Mobile)
 - Interaction tables — extract only what describes what the user does and what they observe, not component names or layout positions
 - Component composition tables
-- Content contract fields (CMS keys)
-- Data sources (API endpoints)
+- Content contract fields
+- Data sources
 
 **If no DRD is found for a feature:** do not block. Note it clearly in the spec — the developer AI will need to propose its own interface design.
 
