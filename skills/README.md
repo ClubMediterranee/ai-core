@@ -56,7 +56,7 @@ Skills are added to your Claude Code configuration and become available immediat
 | `react-patterns` | React / Next.js | Modern React patterns and principles. Hooks, composition, performance, TypeScript best practices. |
 | `security-scanning-security-hardening` | Security | Coordinate multi-layer security scanning and hardening across application, infrastructure, and compliance controls. |
 | `security-scanning-security-sast` | Security | Static Application Security Testing (SAST) for code vulnerability analysis across multiple languages and frameworks. |
-| `spec` | Product | Generates developer-ready specs from a PRD. Reads docs/specs/prd/, cross-references DRDs, and produces structured markdown specs with user stories, business rules, Figma links, feature flags, and data contract placeholders. |
+| `spec` | Product | Generates developer-ready specs from a PRD. Reads docs/specs/prd/, cross-references DRDs, and produces structured markdown specs with user stories, business rules, Figma links, feature flags, a live-resolved §8 Data Contract (real endpoints, field paths, per-entry confidence, points to clarify, Developer Handoff) resolved via the clubmed_api MCP, and §9 standard-Gherkin acceptance tests traceable to FUNC/BR/ERR. |
 | `skill-creator` | Config | Guides the full lifecycle of a skill: draft, eval, iterate, and optimize trigger description. Includes a browser-based reviewer and quantitative benchmarking. |
 | `terraform-specialist` | Infrastructure | Expert Terraform/OpenTofu specialist mastering advanced IaC automation, state management, and enterprise infrastructure patterns. |
 | `testing-patterns` | Testing | Jest testing patterns, factory functions, mocking strategies, and TDD workflow. |

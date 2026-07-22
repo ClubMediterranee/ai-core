@@ -1,9 +1,21 @@
 ---
 name: spec
-description: 'Generate developer-ready specs (US enrichies) from a PRD document. Reads docs/specs/prd/ and cross-references docs/specs/drd/ design files to produce structured markdown specs in docs/specs/. Each spec is sized for an AI developer to implement in under 2 hours and contains: description, context & objectives, user story (AS A / I WANT / IN ORDER TO), exhaustive business rules, Figma links + screenshots, feature flag, data contract placeholder, and open questions. Use this skill whenever the user says: "/spec", "generate specs", "create specs from PRD", "découper en specs", "créer des specs", "générer des specs", "spec from PRD", or starts work on a PRD file. Also triggers when the user mentions a specific PRD by name or number (e.g. "PRD01", "le PRD des activités") and wants to turn it into actionable developer specs.'
-allowed-tools: Read, Write, Bash
-version: 1.0.0
+description: 'Turn a PRD into developer-ready specs (enriched user stories). Reads the PRD sources (docs/prd/) and cross-references DRD design files (docs/drd/) — or any analysis document, generating a requirement id scheme when the source has none — to produce structured markdown specs in docs/specs/<prd-slug>/ with an index.md manifest, each spec sized for an AI developer to implement in under 2 hours. Every spec carries a §8 Data Contract — API endpoints resolved live through the clubmed_api MCP (which must be connected) plus the Directus CMS translation keys the feature needs — and a §9 of standard Gherkin acceptance tests traceable to FUNC/BR/ERR. Each generated spec is validated by a deterministic script. Use this skill when the user says "/spec", "generate specs", "create specs from PRD", "spec from PRD", "découper en specs", "générer des specs", or names a PRD to turn into developer specs (e.g. "PRD01", "le PRD des activités").'
+allowed-tools: Read, Write, Bash, Glob, Grep, Task, mcp__clubmed_api__*
+version: 2.0.0
 changelog:
+  - version: 2.0.0
+    date: 2026-07-22
+    changes:
+      - "Step-based pipeline (steps/ + references/), SKILL.md as orchestrator, MCP hard gate"
+      - "§8 Data Contract resolved live against the API with per-entry evidence and confidence"
+      - "§9 Gherkin acceptance tests, traced to FUNC/BR/ERR, with mandatory ERR failure coverage"
+      - "§5 business rules copied verbatim from the PRD; spec written in the user's language"
+      - "Deterministic validator (scripts/validate_specs.py) over structure, §8, §9 and assets"
+      - "Per-PRD output folders ({DOCS_ROOT}/specs/<prd-slug>/) with an index.md manifest (order, dependencies, out-of-scope); sources under {DOCS_ROOT}/prd|drd"
+      - "Re-run policy — existing specs are diffed and never overwritten without confirmation"
+      - "Unstructured sources supported: generated ids (BR-G1…) with verbatim quotes when the document has no id scheme; partial design sources (bare Figma link, screenshots) accepted"
+      - "Id-coverage gate at the Step 4 breakdown; §9 finalized after API resolution to harvest real error cases"
   - version: 1.0.0
     date: 2026-06-23
     changes:
@@ -14,288 +26,105 @@ created-by: "Jeremy Wallez <jeremy.wallez@clubmed.com>"
 
 # spec
 
-You transform a PRD into one or more detailed, developer-ready specs. The specs are "super user stories" — rich enough for an AI developer to work completely autonomously.
+You transform a PRD into one or more detailed, developer-ready specs. The specs are "super user stories" — rich enough for an AI developer to work completely autonomously, and structured so a human can review them fast.
 
-**Golden rule:** the `docs/` tree is read-only. Never modify any file in `docs/specs/prd/`, `docs/specs/drd/`, or any other `docs/` subdirectory.
+Each spec includes a **live-resolved §8 Data Contract**: rather than inferring API endpoints, you resolve them against the real product API through the `clubmed_api` MCP and document them with evidence, a confidence level per entry, ranked "Points to clarify", and a Developer Handoff for anything you cannot confirm.
 
----
+**Two things the MCP serves — and what belongs in a spec:**
+- The **product API** (OpenAPI routes) → resolved live; this is the bulk of §8.
+- The **API team's scenarios**, written to document that API and make the MCP searchable → a **route-discovery aid only**. They tell you *which* endpoints matter and *in what order* to call them. **Nothing about a scenario is ever written into a spec** — no scenario id, no "business journey" section, no channel gating — and a scenario is never evidence for a confidence tier.
 
-## Step 1 — Identify the PRD
+**Directus** is the editorial CMS. It is **not** served by the MCP and appears in exactly one place in a spec: the §8 **CMS Keys** table, listing the **translation keys** the feature needs (label text grounded in the DRD Content Contract, key name proposed).
 
-**If the user provided a path:** read that file directly.
-
-**If no path was given:** list all `.md` files in `docs/specs/prd/` and ask the user which one to process. Example output:
-
-```
-Available PRDs:
-1. docs/specs/prd/PRD00 - Booking engine Foundations.md
-2. docs/specs/prd/PRD01 - All-inclusive details in Ticket price.md
-...
-Which PRD would you like to turn into specs?
-```
-
-**Ask once at the start:** "What is your name? (It will be used as the `author` field in all specs)" — unless the user's identity is already clear from context.
+**Golden rules:**
+- **Resolve `{DOCS_ROOT}` first** (Step 1.0) — the docs tree may live in a sibling repo, not under the cwd. Every path in the pipeline hangs off `{DOCS_ROOT}`, never a bare relative path.
+- The **source** trees `{DOCS_ROOT}/prd/` and `{DOCS_ROOT}/drd/` are **read-only**. `{DOCS_ROOT}/specs/` is **output-only**: everything you create goes to `{DOCS_ROOT}/specs/<prd-slug>/` (the specs + the `index.md` manifest), one folder per PRD.
+- **Never overwrite an existing spec silently.** If the PRD's folder already exists, this run is an update — diff and ask before writing (Step 6.8).
+- **Never assert a guess as fact** in §8. Every resolved entry carries evidence; everything you cannot confirm goes to the Developer Handoff, clearly labeled as a best-guess. Confidence is a bucket (`🟢 high` / `🟡 medium` / `🔴 low`) plus an evidence string — never a fabricated percentage.
+- **Never leak secrets or PII into a spec.** Specs are committed to the docs repo. API keys are always placeholders (`YOUR_API_KEY` / `process.env.*`); example values are synthetic — never copy a real value from a live MCP response that could be customer data (booking ids, emails, names, account-bound prices).
 
 ---
 
-## Step 2 — Read and understand the PRD deeply
+## Language — one global rule for the whole skill
 
-Read the full PRD. Build a mental model of:
-- The product scope and user goals
-- All functional specifications (FUNC-xxx)
-- All business rules (BR-xxx)
-- The acceptance criteria
-- Any open questions or constraints already noted in the PRD
-- Any feature flags or toggle names mentioned
+**You answer in the user's language, and you write the spec in the user's language.** The user
+writes to you in French → the specs are French. In English → the specs are English. This is decided
+once, at the start, and holds for every step, every section and every generated file. (The PRD's own
+language is only a hint when the user's is ambiguous — it never overrides it.)
 
-Also explore the `docs/` folder freely to find any supporting files that seem relevant — context documents, glossaries, other PRDs, briefs, or any other reference. Read whatever helps build a complete understanding of the domain, the terminology, and the broader product context.
+**Everything a human reads is translated**, with no exception carved out for "technical-sounding"
+terms: section titles ("UI Contract" → "Contrat UI", "Data Contract" → "Contrat de données",
+"User Story" → "Récit utilisateur", "Feature Flag" → "Indicateur de fonctionnalité"), sub-section
+labels, table headers, prose, and the acceptance-test wording. The English forms used throughout
+these instructions are the **canonical reference**, not the output.
 
----
+**Machine tokens are never translated** — tools read them, people don't:
 
-## Step 3 — Find and read the relevant DRDs
+| Never translate | Why |
+|---|---|
+| Anchors `<!-- dc:clarify -->`, `<!-- dc:index -->`, `<!-- dc:handoff -->`, `<!-- at:tests -->` | the validator finds §8/§9 sub-sections by these — that is exactly what lets the visible labels be translated |
+| Gherkin tags `@nominal-passing`, `@edge`, `@FUNC-001`, `@BR-007`, `@ERR-002` | parsed by the validator and downstream tooling |
+| Frontmatter keys and enum values (`confidence: high`, `data_contract_sources: [api, directus]`) | schema, not prose |
+| Identifiers: endpoint paths, response field paths, operation ids, CMS key names, code | they are the contract itself |
 
-DRDs live in `docs/specs/drd/`. Each DRD is a subdirectory named after a component (organism or molecule), containing a `<ComponentName>.drd.md` file and a `screens/` folder with preview images.
-
-**Your job:** identify which DRDs are relevant to this PRD. Do this by matching:
-- Component names mentioned in the PRD (e.g. `Dashboard`, `ProductHeader`, `BasketTicketLayout`)
-- Section names that map to DRD directories (e.g. "SectionLayoutActivities")
-- Feature names that suggest a visual component
-
-Read every relevant DRD fully. Extract:
-- Figma source URLs (from the `figma-sources` frontmatter)
-- Screenshot paths (e.g. `screens/images/previews/Desktop.png`, `Mobile.png`)
-- Viewport descriptions (Desktop / Mobile)
-- Interaction tables
-- Component composition tables
-- Content contract fields
-- Data sources
-
-**If no DRD is found for a feature:** do not block. Note it clearly in the spec — the developer AI will need to propose its own interface design.
+Gherkin **keywords** are prose-side: they follow the spec's language through Gherkin's own
+localization (`# language: fr` + `Fonctionnalité/Scénario/Étant donné/Quand/Alors/Et`), see
+`references/acceptance-tests-template.md`.
 
 ---
 
-## Step 4 — Propose the spec breakdown
-
-Before writing anything, present your proposed breakdown to the user and wait for their confirmation.
-
-A spec should cover one coherent, independently implementable unit — a screen, a user flow step, or a self-contained feature. The target: an AI developer should be able to implement it in under 2 hours.
-
-Signs a spec is too big: it covers multiple screens, multiple user journeys, or has many independent business rules that don't share state. Split it.
-
-Signs a spec is too small: it describes a pure sub-component with no user-facing value on its own. Merge it with its parent.
-
-Present the breakdown like this:
-
-```
-Proposed spec breakdown for PRD00:
-1. **cart-layer-structure** — Layer panier : ouverture, fermeture, ticket price vide (FUNC-001, FUNC-002)
-2. **dashboard-structure** — Dashboard : shell, header, remote sticky, sections conditionnelles (FUNC-003, FUNC-004)
-3. **participants-payment-navigation** — Navigation Participants ↔ Paiement via la remote (FUNC-005, FUNC-006, FUNC-007, FUNC-008)
-4. **header-navigation** — Header : retour arrière, homepage, menu contacts/compte (FUNC-009, FUNC-010)
-
-Dependencies: spec 2 depends on spec 1. Specs 3 and 4 depend on spec 2.
-
-Does this breakdown look right? Any adjustments?
-```
-
-Only proceed once the user confirms (or adjusts the breakdown).
-
----
-
-## Step 5 — HITL: ask questions one at a time
-
-As you analyse each spec, you will encounter ambiguities, missing information, or decisions that only the product owner can make. Ask these questions **one at a time**, not as a batch. Wait for the answer before continuing.
-
-Topics that require user input:
-- **Unclear business rules** — if a BR is contradictory or underspecified, surface it
-- **Missing acceptance criteria** — if a functional spec has no clear "done" condition
-- **Scope ambiguity** — if you're unsure whether something is in or out of scope
-
-Mark everything you cannot resolve with `[OPEN]` in the spec's "Open Questions" section.
-
----
-
-## Step 6 — Generate the specs
-
-For each spec in the confirmed breakdown, create a file in `docs/specs/` with a descriptive kebab-case name (e.g. `docs/specs/cart-layer-structure.md`).
-
-### Frontmatter
-
-```yaml
----
-title: "Short human-readable title"
-author: "<name provided by user>"
-date: "<today's date, YYYY-MM-DD>"
-status: draft
-confidence: high | medium | low
-related_specs:
-  - other-spec-filename.md   # list sibling specs this one depends on or relates to
-prd_source: "docs/specs/prd/<filename>.md"
----
-```
-
-**`confidence` calculation rules:**
-- `high` — all DRDs present + Figma URLs resolved + no attention points
-- `medium` — ≥1 DRD missing OR ≥1 open question OR ≥1 assumption
-- `low` — DRDs missing on critical surfaces OR contradictory/incomplete BRs OR PRD itself incomplete
-
-### Spec body
-
-Write the spec in the **same language as the PRD** (French PRD → French spec, English PRD → English spec).
-
-Use this exact section order:
-
----
-
-#### 1. Description
-
-One short paragraph. What does this spec cover? What does the user see or do?
-
----
-
-#### 2. Points d'attention
-
-This section is always the second section — it appears immediately after Description so the reader can assess quality before diving in.
-
-If there are no attention points:
-```markdown
-> ✅ Aucun point d'attention. Niveau de confiance : HIGH
-```
-
-Otherwise, open with the confidence level, then a table with one row per issue:
-
-```markdown
-> Niveau de confiance : **MEDIUM**
-
-| # | Type | Description | Section impactée |
-|---|------|-------------|-----------------|
-| 1 | ⚠️ DRD manquant | Pas de DRD pour le layer Détail F&D — l'AI devra proposer l'interface | §5 Figma & UI |
-| 2 | 🔴 Incohérence | BR-007 ne précise pas le comportement sur mobile — en contradiction avec le DRD | §4 Business Rules |
-```
-
-**Four entry types — use exactly these labels:**
-- `🔴 Incohérence` — contradiction or anomaly between sources (PRD vs DRD, BR vs BR, PRD vs glossary)
-- `⚠️ DRD manquant` — UI surface with no design reference; the developer AI will have to invent the interface
-- `❓ Question ouverte` — a decision only the PO can make; blocks or significantly risks the implementation
-- `ℹ️ Hypothèse` — an assumption made in the absence of information; should be validated before dev starts
-
-**Inline markers in the body:** wherever an attention point applies, add a lightweight reference back to the table:
-```markdown
-> ⚠️ Point d'attention #1 — Pas de DRD disponible pour ce layer.
-```
-This avoids duplicating the full explanation; the table in section 2 has the detail.
-
----
-
-#### 3. Contexte & Objectifs
-
-- Why does this feature exist?
-- What problem does it solve for the user?
-- What business goal does it serve?
-
-#### 4. User Story
-
-```
-EN TANT QUE <type d'utilisateur>
-JE VEUX <action ou capacité>
-AFIN DE <bénéfice ou objectif>
-```
-
-(Use "AS A / I WANT / IN ORDER TO" for English PRDs.)
-
-#### 5. Business Rules
-
-Numbered list. Be exhaustive — copy and adapt every relevant BR from the PRD. Add any rules implied by the DRD that are not stated explicitly in the PRD.
-
-```
-1. BR-001 — ...
-2. BR-007 — ...
-3. (implied by DRD) — ...
-```
-
-#### 6. Figma & UI
-
-If DRD(s) found:
-
-```markdown
-### Desktop
-**Figma:** [Desktop](<url>)
-**Screenshot:** ![Desktop](<relative path to preview image>)
-<one paragraph describing the layout and key UI decisions from the DRD viewport section>
-
-### Mobile
-**Figma:** [Mobile](<url>)
-**Screenshot:** ![Mobile](<relative path to preview image>)
-<one paragraph describing the mobile-specific differences>
-
-### Interactions
-<copy the interaction table from the DRD, filtered to what's relevant to this spec>
-
-### Component composition
-<copy the component table from the DRD, filtered to what's relevant>
-```
-
-If no DRD found:
-
-```markdown
-> ⚠️ Point d'attention #N — Aucun DRD trouvé pour cette fonctionnalité. L'AI en charge du développement devra proposer une interface.
-```
-
-#### 7. Feature Flag
-
-If the PRD contains a feature flag name, use it directly. Otherwise, propose a name derived from the PRD scope (e.g. `nbe_food_drinks`, `nbe_activities_booking`) and ask the user at the end of the spec generation — after all files are written — whether the feature should be feature-flagged and, if so, to confirm or adjust the proposed name.
-
-```markdown
-- **Nom du flag :** `<flag_name>` _(proposé — à confirmer)_
-- **Valeur par défaut :** enabled | disabled
-- **Comportement si désactivé :** <describe what the user sees or what fallback applies>
-```
-
-#### 8. Data Contract
-
-> ℹ️ Les data contracts ne sont pas encore disponibles. Cette section sera complétée ultérieurement.
-
-##### CMS Keys
-
-| Clé | Description | Exemple de valeur |
-|-----|-------------|-------------------|
-| `<key>` | <what this content key controls> | `<example>` |
-
-Infer likely CMS keys from the Content Contract section of the DRD (labels, button text, translated strings).
-
-##### API Endpoints
-
-| Méthode | Endpoint | Rôle |
-|---------|----------|------|
-| `GET` | `/api/...` | <purpose> |
-
-Infer likely endpoints from the Data Sources section of the DRD and the functional specs in the PRD.
-
----
-
-## Quality checklist before writing each file
-
-Before writing a spec file, mentally verify:
-- [ ] Every FUNC-xxx from the PRD that belongs to this spec is represented in the Business Rules
-- [ ] The Figma links are real URLs from the DRD frontmatter (not invented)
-- [ ] Screenshot paths are relative to the spec file location or use the correct path from the DRD
-- [ ] `related_specs` lists all sibling specs that this one depends on or that depend on it
-- [ ] The feature flag section has a proposed name (even if not yet confirmed by the PO)
-- [ ] Every gap, assumption, inconsistency, and open question is captured in the "Points d'attention" table
-- [ ] Every attention point has an inline `> ⚠️ Point d'attention #N` marker at the relevant spot in the body
-- [ ] The `confidence` frontmatter field reflects the overall quality of sources
-- [ ] The language matches the PRD throughout — including section titles, user story, and all body text
+## How this skill runs — the pipeline
+
+The skill runs as an ordered pipeline. Each step has a dedicated file under `steps/` with the full instructions. **Read the step file before running that step — do not skip it, and do not run a later step before an earlier one.**
+
+| Step | Purpose | Full instructions |
+|------|---------|-------------------|
+| **0** | **Hard gate** — the `clubmed_api` MCP must respond to a liveness probe, else stop and print the connect message | `steps/step-0-mcp-gate.md` |
+| **1** | Resolve `{DOCS_ROOT}`; identify the PRD and its slug; ask the author's name once — 🙋 *asks the user if either is ambiguous* | `steps/step-1-identify-prd.md` |
+| **2** | Read & understand the PRD deeply; **Explore subagent** digests the supporting material | `steps/step-2-read-prd.md` |
+| **3** | Find & read the relevant DRDs (Figma, screenshots, Content Contract, Data Sources) — **parallel subagents** when several | `steps/step-3-drds.md` |
+| **4** | Propose the spec breakdown with a mechanical **id-coverage gate**, raise blocking questions one at a time — 🙋 **waits for user confirmation** | `steps/step-4-breakdown.md` |
+| **5** | Compose the spec body §1–§7 **and a §9 draft** — parked in the scratchpad, **not written to docs yet** | `steps/step-5-compose-body.md` |
+| **6** | Resolve §8 live via the MCP (once, by data family), finalize §9 with the harvested API error cases, then write each file (§1–§9, single Write) + the `index.md` manifest — 🙋 *asks before touching an existing folder* | `steps/step-6-data-contract.md` |
+| **7** | Validate (deterministic script) + **independent reviewer subagent**; confirm the feature flag — 🙋 *asks the user* | `steps/step-7-validate.md` |
+
+🙋 marks a step that talks to the user. Step 4 is the true gate — nothing is composed until the breakdown is confirmed.
+
+**Shared references (read when a step points to them):**
+- `references/data-contract-template.md` — the §8 structure (labels render in the spec's language).
+- `references/acceptance-tests-template.md` — the §9 standard-Gherkin structure, scenario types, and trace tags.
+- `references/confidence-rubric.md` — the three confidence buckets and the evidence each requires.
+- `scripts/validate_specs.py` — the deterministic output validator run in Step 7.
+
+**Subagents (via `Task`).** Four phases delegate to subagents; the main agent stays the single writer of the specs.
+- **Step 2 — Explore subagent** sweeps `{DOCS_ROOT}/specs/` for loosely-referenced supporting material and returns a structured, cited digest (read-only; no invariant at risk).
+- **Step 3 — one subagent per DRD** (when several are relevant) returns a structured extract, keeping the main context lean.
+- **Step 6 — one MCP-resolution subagent per data family** (e.g. transport, transfer+price) runs the large `search_openapi` / scenario calls out of the main context and returns only distilled endpoint blocks. This is why MCP resolution never overflows the main agent.
+- **Step 7 — an independent reviewer subagent** re-reads each spec against the PRD/DRD and re-checks a sample of 🟢 evidence via the MCP — an adversarial second opinion the author cannot give itself.
+
+User interactions and the file Write (Step 6.8) always stay on the main agent — never delegate a question or the resolve-once §8 assembly to a subagent.
+
+The spec carries two confidences, surfaced together in §2 under their canonical labels:
+**source confidence (PRD/DRD)** (`confidence`) rates the quality of the *input* material, and
+**data-contract confidence** (`data_contract_confidence`) rates the §8 *resolution*. They move
+independently — so a §8 doubt echoed into §2 counts for `data_contract_confidence` only and must
+**not** drag `confidence` down. Their rules live in `steps/step-5-compose-body.md` (sources) and
+`references/confidence-rubric.md` (§8).
 
 ---
 
 ## Handling edge cases
 
-**PRD with no DRD at all:** proceed normally, mark every UI section with the ⚠️ warning.
+Only the cases no step file owns. Everything about DRDs is in Step 3, the breakdown in Step 4, §8 in Step 6.
+
+**MCP not connected:** stop at Step 0 with the actionable message. Never generate a spec with a guessed §8.
 
 **One DRD covers multiple specs:** extract only the relevant parts of the DRD for each spec. Don't dump the entire DRD into each spec.
 
-**PRD mentions a component not in `docs/specs/drd/`:** note it as an open question — the DRD may not have been written yet.
+**Ambiguous scope between two PRDs:** surface it in §2 Attention points as an `❓ Open question` in each affected spec, naming the other PRD.
 
-**Ambiguous scope between two PRDs:** surface it as an `[OPEN]` question and tag both specs.
+**PRD already contains a feature flag name:** use it directly, no need to propose one or ask.
 
-**PRD already contains a feature flag name:** use it directly, no need to ask.
+**A need spans both families:** a slot card needs a price (API) and a label (editorial) — resolve each part in its own source and list both.
+
+**An endpoint inferred from the PRD/DRD:** treat it as a hypothesis to confirm or replace against the API — never ship it unverified.
