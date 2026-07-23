@@ -11,6 +11,7 @@
   "license": "MIT",
   "keywords": ["product", "spec", "prd", "user-story", "documentation"],
   "skills": [
+    "./skills/prd",
     "./skills/spec"
   ]
 }
