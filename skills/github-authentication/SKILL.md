@@ -2,9 +2,12 @@
 name: github-authentication
 description: 'Generates, validates, and persists a GitHub personal access token (PAT) to the user-global ~/.claude/settings.json, so it is created once and valid in every repository. Use this skill whenever a GitHub token is needed, missing, expired, or must be refreshed — before any task that calls the GitHub API or connects the GitHub MCP server. Triggers on: "generate github token", "create github token", "set up github token", "update github token", "GITHUB_TOKEN missing", "GITHUB_TOKEN not set", "GITHUB_TOKEN expired", "github token invalid", "github authentication", "connect github mcp", "configure github access", or any task that requires GitHub API access and the token is absent or invalid. Works by checking for an existing valid token first, then manual browser login (the primary path — GitHub enforces 2FA), with optional best-effort auto-login if GITHUB_USERNAME/GITHUB_PASSWORD are available. Token is stored in ~/.claude/settings.json and auto-injected by Claude Code into every shell session; a legacy project-level .claude/settings.local.json is still read and takes precedence when present. Browser automation uses the Playwright MCP.'
 allowed-tools: Bash, mcp__playwright__*
-user-invocable: false
-version: 1.2.0
+version: 1.3.0
 changelog:
+  - version: 1.3.0
+    date: 2026-07-23
+    changes:
+      - Back in the slash-command menu (user-invocable restored) — refreshing an expired token is something the user needs to trigger themselves, not only a side effect of another skill failing
   - version: 1.2.0
     date: 2026-07-23
     changes:
