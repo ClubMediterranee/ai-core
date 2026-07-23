@@ -2,12 +2,14 @@
 """
 manage-token.py — Manages the complete lifecycle of GITHUB_TOKEN.
 
-Reads from / writes to .claude/settings.local.json (Claude Code local settings).
+Writes to ~/.claude/settings.json (user-global Claude Code settings), so the token
+is generated once and valid in every repository. Reading also honours a legacy
+project-level .claude/settings.local.json, which takes precedence when present.
 The token is injected into the shell environment automatically by Claude Code.
 
 Usage:
   python3 manage-token.py                    # Detect, validate or guide generation
-  python3 manage-token.py --save "ghp_xxx"   # Persist a token to settings.local.json
+  python3 manage-token.py --save "ghp_xxx"   # Persist a token to ~/.claude/settings.json
   python3 manage-token.py --check-only       # Validate only, do not generate
   python3 manage-token.py --generate         # Force generation even if token exists
 
@@ -48,12 +50,16 @@ TOKEN_ENV_NAMES      = ["GITHUB_TOKEN"]
 USERNAME_ENV_NAMES   = ["GITHUB_USERNAME", "GITHUB_EMAIL"]
 PASSWORD_ENV_NAMES   = ["GITHUB_PASSWORD"]
 ENV_FILES_PRIORITY   = [".env.local", ".env", ".env.development.local", ".env.development"]
-SETTINGS_FILE        = ".claude/settings.local.json"
-SETTINGS_GITIGNORE_PATTERNS = [
-    ".claude/settings.local.json",
-    "settings.local.json",
-    ".claude/settings.local*",
-]
+# The token is a user credential, not a project asset, so it lives in the
+# user-global settings: generated once, valid in every repository, and never
+# inside a git work tree (no .gitignore to get right, no way to commit it).
+#
+# There is no user-level settings.local.json — that is a project-only concept, and
+# ~/.claude/settings.json is the user scope. It is also the LOWEST precedence, so a
+# leftover project-level token wins over it; the project file is therefore still
+# read, but never written.
+USER_SETTINGS_FILE    = Path.home() / ".claude" / "settings.json"
+PROJECT_SETTINGS_FILE = ".claude/settings.local.json"
 
 # GitHub PAT prefixes: classic = ghp_, fine-grained = github_pat_
 TOKEN_PREFIXES = ("ghp_", "github_pat_")
@@ -117,19 +123,40 @@ def find_token_in_env() -> tuple[str, str]:
     return "", ""
 
 
-def find_token_in_settings() -> tuple[str, str]:
-    """Read GITHUB_TOKEN from .claude/settings.local.json → env block."""
-    filepath = Path.cwd() / SETTINGS_FILE
+def _read_token_from(filepath: Path) -> str:
+    """Read GITHUB_TOKEN from one settings file's env block. Never raises."""
     if not filepath.exists():
-        return "", ""
+        return ""
     try:
         data = json.loads(filepath.read_text(encoding="utf-8"))
-        for name in TOKEN_ENV_NAMES:
-            val = data.get("env", {}).get(name, "").strip()
-            if val:
-                return val, f"{SETTINGS_FILE} (env.{name})"
     except Exception as e:
-        eprint(f"  Warning: cannot read {SETTINGS_FILE}: {e}")
+        eprint(f"  Warning: cannot read {filepath}: {e}")
+        return ""
+    if not isinstance(data, dict) or not isinstance(data.get("env"), dict):
+        return ""
+    for name in TOKEN_ENV_NAMES:
+        val = str(data["env"].get(name, "")).strip()
+        if val:
+            return val
+    return ""
+
+
+def find_token_in_settings() -> tuple[str, str]:
+    """
+    Resolve GITHUB_TOKEN from the settings files, in Claude Code precedence order:
+    a project-level settings.local.json wins over the user-global settings.json.
+
+    The project file is only read, never written — it is the legacy location and
+    may still hold a token on machines set up before the move to user scope.
+    """
+    project = _read_token_from(Path.cwd() / PROJECT_SETTINGS_FILE)
+    if project:
+        return project, f"{PROJECT_SETTINGS_FILE} (env.GITHUB_TOKEN)"
+
+    user = _read_token_from(USER_SETTINGS_FILE)
+    if user:
+        return user, f"{USER_SETTINGS_FILE} (env.GITHUB_TOKEN)"
+
     return "", ""
 
 
@@ -223,63 +250,35 @@ def validate_token(token: str) -> tuple[bool, str, dict]:
     return False, "Failed after 3 attempts", {}
 
 
-# ── 4. Gitignore Guard ─────────────────────────────────────────────────────────
-
-def is_settings_gitignored() -> bool:
-    """Check whether .claude/settings.local.json is covered by .gitignore."""
-    gitignore = Path.cwd() / ".gitignore"
-    if not gitignore.exists():
-        return False
-    for line in gitignore.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or line.startswith("!"):
-            continue
-        if line in SETTINGS_GITIGNORE_PATTERNS:
-            return True
-        if line in ("*.local.json", "*.local*", ".claude/", ".claude/*"):
-            return True
-    return False
-
-
-def ensure_settings_gitignored() -> tuple[bool, str]:
-    """Add .claude/settings.local.json to .gitignore if not already present."""
-    if is_settings_gitignored():
-        return False, "already gitignored"
-
-    gitignore = Path.cwd() / ".gitignore"
-    entry = ".claude/settings.local.json"
-    block = f"\n# Claude Code local settings — contains secrets, never commit\n{entry}\n"
-
-    if gitignore.exists():
-        gitignore.write_text(gitignore.read_text(encoding="utf-8") + block, encoding="utf-8")
-    else:
-        gitignore.write_text(block.lstrip(), encoding="utf-8")
-
-    return True, f"added '{entry}' to .gitignore"
-
-
-# ── 5. Persistence ─────────────────────────────────────────────────────────────
+# ── 4. Persistence ─────────────────────────────────────────────────────────────
 
 def save_token_to_settings(token: str) -> tuple[bool, str]:
     """
-    Write GITHUB_TOKEN into .claude/settings.local.json → env block.
-    Creates the file if it does not exist. Merges with existing content.
-    Enforces gitignore protection before writing.
+    Write GITHUB_TOKEN into the user-global ~/.claude/settings.json env block.
+
+    Generated once, valid in every repository. No .gitignore handling is needed —
+    the file lives outside every git work tree, so it cannot be committed.
+
+    The write merges into the existing document instead of rebuilding it: this file
+    holds the user's whole Claude Code configuration (model, hooks, permissions,
+    statusline), and a malformed one aborts the save rather than being replaced by a
+    fresh document, which would delete that configuration silently.
     """
-    filepath = Path.cwd() / SETTINGS_FILE
+    filepath = USER_SETTINGS_FILE
     filepath.parent.mkdir(parents=True, exist_ok=True)
 
-    added, gi_msg = ensure_settings_gitignored()
-    if added:
-        eprint(f"  Gitignore: {gi_msg}")
-
-    existed = filepath.exists()  # check BEFORE writing
+    existed = filepath.exists()
     data = {}
     if existed:
-        try:
-            data = json.loads(filepath.read_text(encoding="utf-8"))
-        except Exception:
-            data = {}
+        raw = filepath.read_text(encoding="utf-8")
+        if raw.strip():
+            try:
+                data = json.loads(raw)
+            except json.JSONDecodeError as e:
+                return False, (f"{filepath} contains invalid JSON ({e}) — refusing to "
+                               "overwrite it. Fix the file, then run --save again.")
+            if not isinstance(data, dict):
+                return False, f"{filepath} is not a JSON object — refusing to overwrite it."
 
     if not isinstance(data.get("env"), dict):
         data["env"] = {}
@@ -288,15 +287,14 @@ def save_token_to_settings(token: str) -> tuple[bool, str]:
     filepath.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     os.chmod(filepath, stat.S_IRUSR | stat.S_IWUSR)
 
-    action = "updated" if existed else "created"
-    return True, f"{SETTINGS_FILE} {action}"
+    return True, f"{filepath} {'updated' if existed else 'created'}"
 
 
 # ── Main ───────────────────────────────────────────────────────────────────────
 
 def main():
     parser = argparse.ArgumentParser(description="GITHUB_TOKEN lifecycle manager")
-    parser.add_argument("--save",       metavar="TOKEN", help="Persist token to .claude/settings.local.json")
+    parser.add_argument("--save",       metavar="TOKEN", help="Persist token to ~/.claude/settings.json")
     parser.add_argument("--check-only", action="store_true", help="Validate only, do not generate")
     parser.add_argument("--generate",   action="store_true", help="Force generation even if a valid token exists")
     args = parser.parse_args()
@@ -333,7 +331,7 @@ def main():
         eprint(f"  Found    : {source}")
         eprint(f"  Token    : {mask(token)}")
     else:
-        eprint("  No token found in environment or .claude/settings.local.json.")
+        eprint("  No token found in environment or Claude Code settings.")
 
     # ── Validate if found ─────────────────────────────────────────────────────
     if token and not args.generate:

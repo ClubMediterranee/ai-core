@@ -1,10 +1,17 @@
 ---
 name: github-authentication
-description: 'Generates, validates, and persists a GitHub personal access token (PAT) to .claude/settings.local.json (Claude Code local settings). Use this skill whenever a GitHub token is needed, missing, expired, or must be refreshed — before any task that calls the GitHub API or connects the GitHub MCP server. Triggers on: "generate github token", "create github token", "set up github token", "update github token", "GITHUB_TOKEN missing", "GITHUB_TOKEN not set", "GITHUB_TOKEN expired", "github token invalid", "github authentication", "connect github mcp", "configure github access", or any task that requires GitHub API access and the token is absent or invalid. Works by checking for an existing valid token first, then manual browser login (the primary path — GitHub enforces 2FA), with optional best-effort auto-login if GITHUB_USERNAME/GITHUB_PASSWORD are available. Token is stored in .claude/settings.local.json and auto-injected by Claude Code into every shell session. Browser automation uses the Playwright MCP.'
+description: 'Generates, validates, and persists a GitHub personal access token (PAT) to the user-global ~/.claude/settings.json, so it is created once and valid in every repository. Use this skill whenever a GitHub token is needed, missing, expired, or must be refreshed — before any task that calls the GitHub API or connects the GitHub MCP server. Triggers on: "generate github token", "create github token", "set up github token", "update github token", "GITHUB_TOKEN missing", "GITHUB_TOKEN not set", "GITHUB_TOKEN expired", "github token invalid", "github authentication", "connect github mcp", "configure github access", or any task that requires GitHub API access and the token is absent or invalid. Works by checking for an existing valid token first, then manual browser login (the primary path — GitHub enforces 2FA), with optional best-effort auto-login if GITHUB_USERNAME/GITHUB_PASSWORD are available. Token is stored in ~/.claude/settings.json and auto-injected by Claude Code into every shell session; a legacy project-level .claude/settings.local.json is still read and takes precedence when present. Browser automation uses the Playwright MCP.'
 allowed-tools: Bash, mcp__playwright__*
 user-invocable: false
-version: 1.1.0
+version: 1.2.0
 changelog:
+  - version: 1.2.0
+    date: 2026-07-23
+    changes:
+      - Persist the token to the user-global ~/.claude/settings.json instead of the project .claude/settings.local.json — generated once, valid in every repository, and outside every git work tree
+      - Merge into the existing settings document and abort on a malformed one, instead of rebuilding it (the previous "reset to an empty object on parse error" would have wiped the user's whole configuration at this scope)
+      - Drop the .gitignore guard and its side effect on the user's repository — no longer needed now that the file lives outside every work tree
+      - Still read a legacy project-level token and prefer it, matching Claude Code precedence; document how to clear one that shadows the global token
   - version: 1.1.0
     date: 2026-07-23
     changes:
@@ -16,9 +23,9 @@ created-by: "Jeremy Wallez <jeremy.wallez@clubmed.com>"
 
 # github-authentication
 
-Manages the complete lifecycle of `GITHUB_TOKEN`: detection, validation, automated generation of a **classic** Personal Access Token via browser, and persistence to `.claude/settings.local.json`.
+Manages the complete lifecycle of `GITHUB_TOKEN`: detection, validation, automated generation of a **classic** Personal Access Token via browser, and persistence to the user-global `~/.claude/settings.json`.
 
-The token is stored in the `env` block of `.claude/settings.local.json` — Claude Code injects it automatically into every shell session. No `export` or `.env` sourcing required. This is exactly what the GitHub MCP server needs:
+The token is stored in the `env` block of `~/.claude/settings.json` — Claude Code injects it automatically into every shell session, in every repository, so the browser flow runs once rather than per clone. No `export` or `.env` sourcing required. This is exactly what the GitHub MCP server needs:
 
 ```bash
 claude mcp add --transport http github https://api.githubcopilot.com/mcp/ \
@@ -203,7 +210,7 @@ Save via the script, which re-validates against the GitHub API before writing:
 python3 .claude/skills/github-authentication/scripts/manage-token.py --save "$TOKEN_VALUE"
 ```
 
-On success the token is written to `.claude/settings.local.json` → `env.GITHUB_TOKEN`, the file is `chmod 600`, and the gitignore guard runs.
+On success the token is written to `~/.claude/settings.json` → `env.GITHUB_TOKEN` and the file is `chmod 600`. The write merges into the existing document, so the rest of the user's configuration is untouched; a malformed file aborts the save instead of being replaced.
 
 ---
 
@@ -222,7 +229,7 @@ claude mcp add --transport http github https://api.githubcopilot.com/mcp/ \
   --header "Authorization: Bearer ${GITHUB_TOKEN}"
 ```
 
-Tell the user to **restart the Claude Code session** so `GITHUB_TOKEN` from `.claude/settings.local.json` is injected into the environment, then verify:
+Tell the user to **restart the Claude Code session** so `GITHUB_TOKEN` from `~/.claude/settings.json` is injected into the environment, then verify:
 
 ```bash
 claude mcp list   # expect: github ... ✔ Connected
@@ -230,9 +237,9 @@ claude mcp list   # expect: github ... ✔ Connected
 
 ---
 
-## Storage — `.claude/settings.local.json`
+## Storage — `~/.claude/settings.json` (user-global)
 
-The token is stored in the `env` block:
+The token is stored in the `env` block of the **user-global** settings:
 
 ```json
 {
@@ -244,7 +251,11 @@ The token is stored in the `env` block:
 
 Claude Code automatically injects all `env` entries into the shell environment for every session — **no manual `export` or `source` needed**.
 
-The script enforces gitignore protection before every write: if `.claude/settings.local.json` is not already in `.gitignore`, it is added automatically.
+**Why user-global rather than per-project.** A PAT belongs to the person, not to a repository. Storing it once means it is generated once and works in every repository, instead of repeating the browser flow for each new clone. It also removes a whole class of risk: the file lives outside every git work tree, so it cannot be committed, and no `.gitignore` entry has to be correct for the secret to stay safe.
+
+**Writing is a merge, never a rebuild.** This file usually holds the user's entire Claude Code configuration — `model`, `hooks`, `permissions`, `statusLine`, `enabledPlugins`. Only `env.GITHUB_TOKEN` is touched; everything else, including other `env` variables such as `FIGMA_TOKEN`, is carried over verbatim. If the file cannot be parsed, the save **aborts** and reports the error rather than replacing it with a fresh document, which would silently delete that configuration.
+
+**Precedence.** User settings are the *lowest* precedence in Claude Code. A project-level `.claude/settings.local.json` containing `env.GITHUB_TOKEN` therefore overrides the global one. The script still reads that legacy location — and prefers it, matching what Claude Code itself will inject — but never writes to it. If a stale project token is shadowing a valid global one, remove `env.GITHUB_TOKEN` from the project file. The same mechanism is what makes a deliberate per-project override possible, for someone who needs a different GitHub identity on a given repository.
 
 ## Variables read (credentials — optional, best-effort auto-login only)
 
@@ -261,8 +272,10 @@ Because GitHub enforces 2FA, credentials only get you past the first login scree
 
 - Token is never logged in plaintext (masked: `ghp_W86...zjyM`)
 - Password is **never written to stdout, a file, or any shell variable** — it stays in the process environment (`$GITHUB_PASSWORD`)
-- `.claude/settings.local.json` is protected with `chmod 600` on creation
-- Gitignore guard runs **before every write** — the file can never be committed accidentally
+- `~/.claude/settings.json` is set to `chmod 600` on every write
+- The file sits outside every git work tree, so the token cannot be committed — no `.gitignore` entry has to be right for it to stay safe
+- One copy instead of one per repository: fewer places for the secret to leak from
+- A malformed settings file aborts the save — the script never replaces a configuration it could not read
 - The Playwright MCP working directory `.playwright-mcp/` is already gitignored in ai-core
 - Never commit `GITHUB_USERNAME` or `GITHUB_PASSWORD` in a non-gitignored `.env` file
 
@@ -275,7 +288,10 @@ Because GitHub enforces 2FA, credentials only get you past the first login scree
 
 **"GITHUB_TOKEN not set even after saving"**
 → The token is injected by Claude Code at session start. Restart the Claude Code session, or run:
-→ `export GITHUB_TOKEN=$(python3 -c "import json; print(json.load(open('.claude/settings.local.json'))['env']['GITHUB_TOKEN'])")`
+→ `export GITHUB_TOKEN=$(python3 -c "import json,pathlib; print(json.load(open(pathlib.Path.home()/'.claude/settings.json'))['env']['GITHUB_TOKEN'])")`
+
+**"A valid token is saved but the MCP still reports it invalid"**
+→ A project-level `.claude/settings.local.json` is probably shadowing it — project settings outrank user settings. Remove `env.GITHUB_TOKEN` from that file and restart the session.
 
 **"Token read returns empty even though it's visible on screen"**
 → Re-snapshot and confirm the generation succeeded (URL should be `/settings/tokens`). Widen the DOM query to include `code`/`span` elements (already in the Step 5 selector). Do not save an empty value.
@@ -292,5 +308,5 @@ Because GitHub enforces 2FA, credentials only get you past the first login scree
 **"Token generated but immediately invalid"**
 → GitHub may have a short propagation delay. The `--save` step retries validation up to 3 times with a 2s interval.
 
-**"Permission denied on settings.local.json"**
-→ `chmod 644 .claude/settings.local.json` then retry.
+**"Permission denied on settings.json"**
+→ `chmod 600 ~/.claude/settings.json` then retry.
