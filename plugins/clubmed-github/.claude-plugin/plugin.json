@@ -1,0 +1,26 @@
+{
+  "name": "clubmed-github",
+  "displayName": "Club Med — GitHub",
+  "description": "Send work to GitHub without knowing git: five commands (publish, update, new, cancel, my-prs) that cover the whole loop from local changes to a merged pull request. Includes the GitHub MCP server, PAT lifecycle, and the reusable git building blocks used underneath.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Jeremy Wallez",
+    "email": "jeremy.wallez@clubmed.com"
+  },
+  "repository": "https://github.com/ClubMediterranee/ai-core",
+  "license": "MIT",
+  "keywords": ["github", "git", "pull-request", "pat", "mcp", "workflow"],
+  "skills": [
+    "./skills/github-publish",
+    "./skills/github-update",
+    "./skills/github-new",
+    "./skills/github-cancel",
+    "./skills/github-my-prs",
+    "./skills/git-commit",
+    "./skills/git-rebase-branch",
+    "./skills/git-push-branch",
+    "./skills/github-open-pr",
+    "./skills/github-authentication"
+  ],
+  "mcpServers": "./.mcp.json"
+}

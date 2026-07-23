@@ -2,8 +2,13 @@
 name: git-push-branch
 description: 'Push the current branch to the remote under a speaking branch name derived from the last conventional commit (<type>/<scope>-<description>). Use when the user asks to push their branch, publish their work, push before opening a PR, or push with a meaningful branch name. Hard guard: NEVER pushes the default branch (detected dynamically from origin/HEAD — main, develop, etc.) — if HEAD is on it, a speaking feature branch is carved and switched to first. Sets upstream with -u. Triggers on: "push", "push my branch", "push this", "publish my branch", "push with a good branch name", "push before PR".'
 allowed-tools: Bash
-version: 1.0.0
+user-invocable: false
+version: 1.1.0
 changelog:
+  - version: 1.1.0
+    date: 2026-07-23
+    changes:
+      - Hidden from the slash-command menu (user-invocable false) — a sub-step of github-publish, still invoked by Claude and still triggered by natural language
   - version: 1.0.0
     date: 2026-07-09
     changes:

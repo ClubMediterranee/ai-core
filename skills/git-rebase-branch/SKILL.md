@@ -1,9 +1,14 @@
 ---
 name: git-rebase-branch
-description: 'Rebase the current branch onto the latest default branch (detected dynamically from the remote — main, develop, or whatever origin/HEAD points to), safely. Use when the user asks to rebase, update their branch with the default branch, sync with the default branch, resolve a "branch is behind" state, or before pushing/opening a PR. Protects the default branch: if HEAD is on it, it carves a speaking feature branch from the last commit FIRST and never rebases the default branch itself. Attempts safe automatic conflict resolution and only asks the user to arbitrate genuine conflicts. Triggers on: "rebase", "rebase on main", "update my branch", "sync with main", "my branch is behind", "rebase before pushing".'
+description: 'Rebase the current branch onto the latest default branch (detected dynamically from the remote — main, develop, or whatever origin/HEAD points to), safely. Use when the user asks to rebase, update their branch with the default branch, sync with the default branch, resolve a "branch is behind" state, or before pushing/opening a PR. Protects the default branch: if HEAD is on it, it carves a speaking feature branch from the last commit FIRST and never rebases the default branch itself. Attempts safe automatic conflict resolution and only asks the user to arbitrate genuine conflicts. Sub-step of github-publish and github-update — for the general "bring me up to date" intent, prefer github-update, which picks the right method for the situation and never rewrites already-published history. Triggers on the explicit git vocabulary only: "rebase", "rebase on main", "rebase onto the default branch", "rebase before pushing".'
 allowed-tools: Bash, AskUserQuestion
-version: 1.0.0
+user-invocable: false
+version: 1.1.0
 changelog:
+  - version: 1.1.0
+    date: 2026-07-23
+    changes:
+      - Hidden from the slash-command menu (user-invocable false) — a sub-step of github-publish and github-update, still invoked by Claude and still triggered by natural language
   - version: 1.0.0
     date: 2026-07-09
     changes:

@@ -20,7 +20,7 @@ claude plugin install clubmed-backend-java@clubmed --scope project    # Java 21+
 claude plugin install clubmed-infra@clubmed --scope project           # Terraform / Kubernetes / Security
 claude plugin install clubmed-tracking-data@clubmed --scope project   # GA4 tracking plans / analytics
 claude plugin install clubmed-product@clubmed --scope project         # Spec generation / PRD / Product
-claude plugin install clubmed-docs@clubmed --scope project            # GitHub access / MCP / Documentation
+claude plugin install clubmed-github@clubmed --scope project          # GitHub workflow / PR / MCP
 claude plugin install clubmed-qa@clubmed --scope project              # Playwright E2E test generation
 ```
 
@@ -44,7 +44,7 @@ claude plugin update clubmed-backend-java@clubmed --scope project
 claude plugin update clubmed-infra@clubmed --scope project
 claude plugin update clubmed-tracking-data@clubmed --scope project
 claude plugin update clubmed-product@clubmed --scope project
-claude plugin update clubmed-docs@clubmed --scope project
+claude plugin update clubmed-github@clubmed --scope project
 claude plugin update clubmed-qa@clubmed --scope project
 ```
 
@@ -189,15 +189,31 @@ claude plugin update clubmed-qa@clubmed --scope project
 
 ---
 
-### `clubmed-docs` — Club Med - Docs
+### `clubmed-github` — Club Med - GitHub
 
-> Documentation tooling: manage GitHub access and connect the GitHub MCP server to read repositories, issues, and pull requests.
+> Send work to GitHub without knowing git. Five commands cover the whole loop from local changes to a merged pull request; the git building blocks underneath stay available to developers but are hidden from the command menu.
 
-**Keywords:** `docs` · `documentation` · `github` · `pat` · `mcp`
+**Keywords:** `github` · `git` · `pull-request` · `pat` · `mcp` · `workflow`
+
+**The five commands**
+
+| Skill | What the user understands |
+|-------|---------------------------|
+| `github-publish` | *I send my work.* Commits, then opens a pull request — or adds to the one already open for this work — and asks whether to keep going or move on. |
+| `github-update` | *I get the latest version.* Picks the right method for the situation: pull on a clean base, rebase for work never sent, GitHub-side update for work already sent (so published history is never rewritten). |
+| `github-new` | *I move on to something else.* Returns to a clean, up-to-date base, after asking what to do with anything unpublished. |
+| `github-cancel` | *I abandon this work.* Closes its pull request (or turns it into a draft), always confirming what is lost first. Never deletes the remote branch, so a closed PR stays reopenable. |
+| `github-my-prs` | *Where do I stand?* Current work, open pull requests, review comments inline, and the way back into work that was left behind. |
+
+**Building blocks** — invoked by the commands above and by natural language, but not listed as slash commands (`user-invocable: false`), except `git-commit`.
 
 | Skill | Description |
 |-------|-------------|
-| `github-authentication` | Manages the complete lifecycle of `GITHUB_TOKEN`: detect, validate, auto-generate a classic PAT via browser (manual login primary, best-effort auto-login), and persist to `.claude/settings.local.json`. Unblocks the GitHub MCP server. Uses the Playwright MCP. |
+| `git-commit` | Analyses the diff and generates a Conventional Commits message. Handles staging, type/scope detection, and commit execution. |
+| `git-rebase-branch` | Rebases the current branch onto the latest default branch, resolving safe conflicts and asking to arbitrate genuine ones. Never rebases the default branch. |
+| `git-push-branch` | Pushes under a speaking name derived from the last conventional commit. Refuses to push the default branch — carves a feature branch first. |
+| `github-open-pr` | Opens a pull request via the GitHub MCP, deriving owner/repo/base/head and building title and body from the commits. |
+| `github-authentication` | Manages the complete lifecycle of `GITHUB_TOKEN`: detect, validate, auto-generate a classic PAT via browser, and persist to `.claude/settings.local.json`. Unblocks the GitHub MCP server. Uses the Playwright MCP. |
 
 **MCP servers:** `github` (HTTP, `https://api.githubcopilot.com/mcp/`) — authenticated with the `GITHUB_TOKEN` produced by `github-authentication`.
 
