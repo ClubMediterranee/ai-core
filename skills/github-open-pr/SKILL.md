@@ -1,9 +1,15 @@
 ---
 name: github-open-pr
 description: 'Open a GitHub pull request for the current branch via the GitHub MCP server (mcp__github__create_pull_request). Use when the user asks to open a PR, create a pull request, or submit their branch for review. Derives owner/repo from the git remote, uses the current branch as head and the default branch as base, and builds a title/body from the last commit. If GITHUB_TOKEN is missing or the GitHub MCP is not connected, it invokes the github-authentication skill first, then retries. Never targets main as head. Triggers on: "open a PR", "create a pull request", "open pull request", "submit for review", "PR this branch", "raise a PR".'
-allowed-tools: Bash
-version: 1.0.0
+allowed-tools: Bash, mcp__github__*, mcp__plugin_clubmed-github_github__*
+user-invocable: false
+version: 1.1.0
 changelog:
+  - version: 1.1.0
+    date: 2026-07-23
+    changes:
+      - Hidden from the slash-command menu (user-invocable false) — a sub-step of github-publish, still invoked by Claude and still triggered by natural language
+      - Declare the GitHub MCP tools in allowed-tools (both the bare and the plugin-scoped server names) — they were called without being pre-approved, so every call prompted for permission
   - version: 1.0.0
     date: 2026-07-09
     changes:
