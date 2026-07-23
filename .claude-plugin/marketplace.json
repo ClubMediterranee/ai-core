@@ -122,8 +122,8 @@
     {
       "name": "clubmed-github",
       "displayName": "Club Med - GitHub",
-      "description": "Send work to GitHub without knowing git: five commands (publish, update, new, cancel, my-prs) covering the whole loop from local changes to a merged pull request. Includes the GitHub MCP server, PAT lifecycle, and the reusable git building blocks used underneath.",
-      "version": "1.0.0",
+      "description": "Send work to GitHub without knowing git: five commands (publish, update, new, cancel, my-prs) covering the whole loop from local changes to a merged pull request. Bundles the GitHub and Playwright MCP servers, PAT lifecycle, and the reusable git building blocks used underneath.",
+      "version": "1.1.0",
       "source": "./plugins/clubmed-github",
       "keywords": [
         "github",

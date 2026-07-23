@@ -1,9 +1,14 @@
 ---
 name: github-authentication
 description: 'Generates, validates, and persists a GitHub personal access token (PAT) to the user-global ~/.claude/settings.json, so it is created once and valid in every repository. Use this skill whenever a GitHub token is needed, missing, expired, or must be refreshed — before any task that calls the GitHub API or connects the GitHub MCP server. Triggers on: "generate github token", "create github token", "set up github token", "update github token", "GITHUB_TOKEN missing", "GITHUB_TOKEN not set", "GITHUB_TOKEN expired", "github token invalid", "github authentication", "connect github mcp", "configure github access", or any task that requires GitHub API access and the token is absent or invalid. Works by checking for an existing valid token first, then manual browser login (the primary path — GitHub enforces 2FA), with optional best-effort auto-login if GITHUB_USERNAME/GITHUB_PASSWORD are available. Token is stored in ~/.claude/settings.json and auto-injected by Claude Code into every shell session; a legacy project-level .claude/settings.local.json is still read and takes precedence when present. Browser automation uses the Playwright MCP.'
-allowed-tools: Bash, mcp__playwright__*
-version: 1.3.0
+allowed-tools: Bash, mcp__playwright__*, mcp__plugin_clubmed-github_playwright__*
+version: 1.4.0
 changelog:
+  - version: 1.4.0
+    date: 2026-07-23
+    changes:
+      - Playwright MCP is now bundled in the clubmed-github plugin — no manual `claude mcp add` before the first run, the browser flow works out of the box after installing the plugin
+      - Declare the plugin-scoped Playwright tools in allowed-tools (`mcp__plugin_clubmed-github_playwright__*`) alongside the bare names — a matcher on the bare server key never fires for a plugin-provided server, so every browser call prompted for permission on a plugin install
   - version: 1.3.0
     date: 2026-07-23
     changes:
@@ -39,13 +44,7 @@ claude mcp add --transport http github https://api.githubcopilot.com/mcp/ \
 
 ## Prerequisite — Playwright MCP
 
-Browser automation uses the **Playwright MCP** (`mcp__playwright__browser_*` tools). If it is not installed:
-
-```bash
-claude mcp add playwright -- npx -y @playwright/mcp@latest
-```
-
-Confirm with `claude mcp list` → `playwright ... ✔ Connected`. Then continue.
+Browser automation uses the **Playwright MCP** (`mcp__playwright__browser_*` tools).
 
 ---
 
@@ -303,7 +302,7 @@ Because GitHub enforces 2FA, credentials only get you past the first login scree
 → Re-snapshot to read the exact option values available, then pass the longest one to `browser_select_option`. GitHub's expiration is a native `<select>`, so `browser_select_option` is correct (unlike figma's custom combobox).
 
 **"Playwright MCP tools are not available"**
-→ Install it: `claude mcp add playwright -- npx -y @playwright/mcp@latest`, confirm with `claude mcp list`, then retry.
+→ MCP servers load at session start — **restart Claude Code** and retry. Confirm with `claude mcp list`.
 
 **"Login page keeps returning after sign-in"**
 → GitHub may require device verification or 2FA. Let the user complete the flow in the visible browser, then re-snapshot to confirm the URL left `/login`.
