@@ -213,7 +213,7 @@ claude plugin update clubmed-qa@clubmed --scope project
 | `git-rebase-branch` | Rebases the current branch onto the latest default branch, resolving safe conflicts and asking to arbitrate genuine ones. Never rebases the default branch. |
 | `git-push-branch` | Pushes under a speaking name derived from the last conventional commit. Refuses to push the default branch — carves a feature branch first. |
 | `github-open-pr` | Opens a pull request via the GitHub MCP, deriving owner/repo/base/head and building title and body from the commits. |
-| `github-authentication` | Manages the complete lifecycle of `GITHUB_TOKEN`: detect, validate, auto-generate a classic PAT via browser, and persist to `.claude/settings.local.json`. Unblocks the GitHub MCP server. Uses the Playwright MCP. |
+| `github-authentication` | Manages the complete lifecycle of `GITHUB_TOKEN`: detect, validate, auto-generate a classic PAT via browser, and persist to the user-global `~/.claude/settings.json` — generated once, valid in every repository. Unblocks the GitHub MCP server. Uses the Playwright MCP. |
 
 **MCP servers:** `github` (HTTP, `https://api.githubcopilot.com/mcp/`) — authenticated with the `GITHUB_TOKEN` produced by `github-authentication`.
 
