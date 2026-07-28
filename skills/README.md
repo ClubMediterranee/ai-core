@@ -53,13 +53,13 @@ Skills are added to your Claude Code configuration and become available immediat
 | `nodejs-best-practices` | Node.js | Node.js development principles and decision-making. Framework selection, async patterns, security, and architecture. |
 | `observability-patterns` | Observability | Build production-ready monitoring, logging, and tracing systems. Implements comprehensive observability strategies, SLI/SLO management, and incident response workflows. |
 | `postgresql-optimization` | Database | PostgreSQL database optimization workflow for query tuning, indexing strategies, performance analysis, and production database management. |
+| `prd` | Product | Guides a PM through writing a PRD from a validated brief. Sequential steps (scope, journeys, FUNCs, ACs, metrics, complexity) with step gates, challenge pass, advanced elicitation, and a 12-check quality gate whose structural half is enforced by a deterministic validator. |
 | `prisma-expert` | Database | Expert in Prisma ORM with deep knowledge of schema design, migrations, query optimization, relations modeling, and database operations. |
 | `react-best-practices` | React / Next.js | 64 React and Next.js performance rules from Vercel Engineering, covering rendering, re-renders, server-side patterns, bundle optimization, and more. |
 | `react-component-performance` | React / Next.js | Diagnose slow React components and suggest targeted performance fixes. |
 | `react-patterns` | React / Next.js | Modern React patterns and principles. Hooks, composition, performance, TypeScript best practices. |
 | `security-scanning-security-hardening` | Security | Coordinate multi-layer security scanning and hardening across application, infrastructure, and compliance controls. |
 | `security-scanning-security-sast` | Security | Static Application Security Testing (SAST) for code vulnerability analysis across multiple languages and frameworks. |
-| `prd` | Product | Guides a PM through writing a PRD from a validated brief. Sequential steps (scope, journeys, FUNCs, ACs, metrics, complexity) with step gates, challenge pass, advanced elicitation, and a 12-check quality gate before saving. |
 | `spec` | Product | Generates developer-ready specs from a PRD. Reads docs/specs/prd/, cross-references DRDs, and produces structured markdown specs with user stories, business rules, Figma links, feature flags, a live-resolved §8 Data Contract (real endpoints, field paths, per-entry confidence, points to clarify, Developer Handoff) resolved via the clubmed_api MCP, and §9 standard-Gherkin acceptance tests traceable to FUNC/BR/ERR. |
 | `skill-creator` | Config | Guides the full lifecycle of a skill: draft, eval, iterate, and optimize trigger description. Includes a browser-based reviewer and quantitative benchmarking. |
 | `terraform-specialist` | Infrastructure | Expert Terraform/OpenTofu specialist mastering advanced IaC automation, state management, and enterprise infrastructure patterns. |

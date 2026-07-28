@@ -107,8 +107,8 @@
     {
       "name": "clubmed-product",
       "displayName": "Club Med - Product",
-      "description": "Skills for product managers and product owners: spec generation from PRDs with a live-resolved data contract and Gherkin acceptance tests, user story enrichment, and developer-ready documentation.",
-      "version": "1.1.0",
+      "description": "Skills for product managers and product owners: PRD authoring from a validated brief, spec generation from PRDs with a live-resolved data contract and Gherkin acceptance tests, user story enrichment, and developer-ready documentation.",
+      "version": "1.2.0",
       "source": "./plugins/clubmed-product",
       "keywords": [
         "product",
