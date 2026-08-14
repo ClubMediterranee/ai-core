@@ -194,7 +194,7 @@ def resolve_brief(path: Path, ref: str) -> Path | None:
             return p
     stem = re.escape(Path(ref).stem)
     pattern = re.compile(stem, re.I)
-    for folder in (path.parent.parent / "brief", path.parent, path.parent.parent):
+    for folder in (path.parent.parent / "brief", path.parent.parent / "briefs", path.parent, path.parent.parent):
         if folder.is_dir():
             for p in sorted(folder.glob("*.md")):
                 if pattern.search(p.stem):
