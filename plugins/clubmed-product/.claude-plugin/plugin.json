@@ -1,8 +1,8 @@
 {
   "name": "clubmed-product",
   "displayName": "Club Med — Product",
-  "version": "1.1.0",
-  "description": "Skills for product managers and product owners: spec generation from PRDs with a live-resolved data contract and Gherkin acceptance tests, user story enrichment, and developer-ready documentation.",
+  "version": "1.2.0",
+  "description": "Skills for product managers and product owners: spec generation from PRDs with a live-resolved data contract and Gherkin acceptance tests, user story enrichment, developer-ready documentation, and inter-spec synchronisation detection across PRDs.",
   "author": {
     "name": "Jeremy Wallez",
     "email": "jeremy.wallez@clubmed.com"
@@ -11,6 +11,7 @@
   "license": "MIT",
   "keywords": ["product", "spec", "prd", "user-story", "documentation"],
   "skills": [
-    "./skills/spec"
+    "./skills/spec",
+    "./skills/sync-specs"
   ]
 }
