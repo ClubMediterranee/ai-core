@@ -78,18 +78,18 @@ three §7 subsections are present, and an absent section is indistinguishable fr
 
 ### Journey 1 — [Scenario name]
 
-1. [Step 1 — entry point]
+1. [Step 1 — entry point / trigger]
 2. [Step 2 — main action]
-3. [Step 3 — variation or edge case]
+3. [Step 3 — optional variation, prefixed "Variation:" — flat numbering, no 2a/2b branches]
 4. [Step 4 — outcome]
 
 *Capabilities revealed:* FUNC-001, FUNC-002
 
 ### Journey 2 — [Scenario name]
 
-1. [Step 1 — entry point]
+1. [Step 1 — entry point / trigger]
 2. [Step 2 — main action]
-3. [Step 3 — variation or edge case]
+3. [Step 3 — optional variation, prefixed "Variation:" — flat numbering, no 2a/2b branches]
 4. [Step 4 — outcome]
 
 *Capabilities revealed:* FUNC-003

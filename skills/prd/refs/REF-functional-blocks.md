@@ -11,6 +11,8 @@ type: reference
 
 A **FUNC** is a distinct user capability — an action a user initiates that produces an observable outcome. It is not a system behavior, not a display, not an isolated UI interaction.
 
+A FUNC's observable outcome sits at the **same altitude as a journey step outcome** — by design: this is what lets journey steps reveal capabilities. The journey outcome (a goal accomplished) sits one level above and never becomes a FUNC.
+
 **Required format:** `"Users can [verb] [object]"`
 **Never:** `"The system displays"` / `"The API returns"` / `"The page renders"`
 

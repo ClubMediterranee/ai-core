@@ -59,6 +59,12 @@ _Created: YYYY-MM-DD | Status: in-progress | current_step: Step 1_
 
 *(none yet)*
 
+### ERR candidates
+
+<!-- Failure responses spotted during Step 2 journey derivation — consumed at Step 4, where each becomes an ERR-XXX or is discarded with a reason. -->
+
+*(none yet)*
+
 ### Open questions
 
 *(none yet)*

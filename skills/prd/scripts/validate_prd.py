@@ -24,8 +24,9 @@ Checks, per PRD:
                       "None identified." / "None defined."; every DC row has a numeric threshold.
   QG-12 AC coverage : every BR/ST/PERM/ERR id referenced in §4 is defined in §5.
   Structure         : the 9 sections present, in order, not duplicated.
-  Leftovers         : the template's instantiation comment removed (ERROR); no `[placeholder]`
-                      or `XXX` token left behind (WARN).
+  Leftovers         : the template's instantiation comment removed (ERROR); no `[ASSUMPTION: ...]`
+                      marker surviving the step gate (ERROR); no `[placeholder]` or `XXX` token
+                      left behind (WARN).
 
 Headings are detected outside fenced code blocks only, so a PRD may quote a template or a payload
 without shadowing its own sections.
@@ -68,6 +69,8 @@ ID_FIELD_RE = re.compile(r"^PRD-?(\d+)$", re.I)
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 # a bracketed span that is not a markdown link — i.e. a leftover template placeholder
 PLACEHOLDER_RE = re.compile(r"\[[^\]\n]{2,}\](?!\()")
+# a speculative-derivation marker from Step 2 — none may survive into a validated PRD
+ASSUMPTION_RE = re.compile(r"\[ASSUMPTION:")
 
 
 @dataclass
@@ -348,12 +351,21 @@ def check_leftovers(path: Path, text: str, lines: list[str], start: int,
                          "the template's instantiation comment block was not deleted"))
 
     masked = fence_mask(lines)
+    assumption_lines = [i + 1 for i in range(start, len(lines))
+                        if not masked[i] and ASSUMPTION_RE.search(lines[i])]
+    if assumption_lines:
+        f.append(Finding("ERROR", name,
+                         f"{len(assumption_lines)} `[ASSUMPTION: ...]` marker(s) survived the step "
+                         f"gate — confirm or convert each to an OQ-XXX "
+                         f"(first at line {assumption_lines[0]})"))
+
     placeholders: list[str] = []
     for i in range(start, len(lines)):
         if masked[i] or lines[i].lstrip().startswith(("<!--", "|--", "> ")):
             continue
         placeholders += PLACEHOLDER_RE.findall(lines[i])
-    placeholders = [p for p in placeholders if not re.fullmatch(r"\[[ x]\]", p)]
+    placeholders = [p for p in placeholders
+                    if not re.fullmatch(r"\[[ x]\]", p) and not p.startswith("[ASSUMPTION:")]
     if placeholders:
         sample = ", ".join(dict.fromkeys(placeholders[:3]))
         f.append(Finding("WARN", name,

@@ -27,6 +27,9 @@ The Challenge Pass is an **automatic filter**, not a dialogue step. It applies b
 | Design HOW | The step describes a layout position, a scroll mechanic, or a named UI component. A journey step is no longer true if the mockup changes. | Rewrite as: [user action] → [observable outcome], without the UI detail. |
 | Technical HOW | The step names a technical mechanism (API call, data load, endpoint, protocol) | Rewrite as a user action + observable outcome for the user. |
 | System as subject | The step uses "The system displays / loads / renders" as the subject | Rewrite with the user as the subject. |
+| Macro step | The step bundles several distinct user actions ("picks destination, dates and family composition") | Split into one step per user action. |
+| Bi-goal journey | Two distinct final outcomes coexist in the same flow | Split into two journeys — one goal accomplished per journey. |
+| Error path as step | The step describes the product's response to a failure | Remove from the journey; park in the canonical memory as an ERR candidate for Step 4. |
 
 ---
 

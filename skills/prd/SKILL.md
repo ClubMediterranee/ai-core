@@ -9,9 +9,16 @@ description: >
   into a PRD — even if they only say "let's spec out this opportunity" while pointing at a brief.
   Requires a validated brief as input. NOT for turning an existing PRD into developer specs or
   user stories — that is the `spec` skill.
-allowed-tools: Read, Write, Edit, Glob, Grep, Bash
-version: 1.0.0
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion
+version: 1.1.0
 changelog:
+  - version: 1.1.0
+    date: 2026-08-15
+    changes:
+      - "Step 2: skeleton-based sufficiency check with three routes (direct / annotated speculative / bootstrap canvas via one AskUserQuestion call)"
+      - "Step 2: journey granularity rules, two outcome altitudes, variation and orphan-action routing, ERR candidates parked for Step 4"
+      - "Challenge Pass journeys: Macro step, Bi-goal journey, Error path as step"
+      - "HITL rule: documented exception for the grouped journey bootstrap canvas"
   - version: 1.0.0
     date: 2026-07-28
     changes:
@@ -56,7 +63,7 @@ PRD runs in **sequential steps**. Each step ends with a **Step Gate**. Wait for 
 | **Step 0 — Context** | Explore the context, resolve the docs root, frame the brief | [C] |
 | **Step 1 — Scope** | Select the single opportunity this PRD addresses | [C] |
 | **Step 2 — User journeys** | Derive end-to-end flows anchored on the selected opportunity | [A] [C] |
-| **Step 3 — Functional blocks** | Derive FUNCs from validated journeys and ACs | [A] [C] |
+| **Step 3 — Functional blocks** | Derive FUNCs from validated journeys | [A] [C] |
 | **Step 4 — Acceptance criteria** | Derive BR, ST, PERM, ERR from journeys and user input | [A] [C] |
 | **Step 5 — Leading Metrics** | Identify observable user behaviors that predict adoption | [A] [C] |
 | **Step 6 — Complexity** | Size the PRD before drafting | [C] |
@@ -72,7 +79,7 @@ After the PM chooses `[C]`, before continuing : run a backward check to ensure c
 | Step validated | Fill in the PRD | Canonical memory |
 |---------------|-------------|------------------|
 | Step 1 | Create the PRD from the full skeleton — frontmatter + Section 1 Executive Summary | OPP selected, scope confirmed |
-| Step 2 | Section 3 — User Journeys *(Capabilities revealed: TBD — filled at Step 3)* | Journeys validated, OQs opened |
+| Step 2 | Section 3 — User Journeys *(Capabilities revealed: TBD — filled at Step 3)* | Journeys validated, OQs opened, ERR candidates parked |
 | Step 3 | Section 4 — FUNCs + update Section 3 (Capabilities revealed) | FUNCs validated, OQs opened/resolved |
 | Step 4 | Section 5 — Acceptance Criteria | ACs validated, OQs opened/resolved |
 | Step 5 | Section 7 — Metrics | Metrics validated |
@@ -86,7 +93,11 @@ After the PM chooses `[C]`, before continuing : run a backward check to ensure c
 
 ### Human-In-The-Loop
 
-As you analyse, you will encounter ambiguities, missing information, or decisions that only the product owner can make. Ask one question at a time. Exception: up to 2 questions may be grouped if they are (a) clearly independent and (b) factual with no structural impact on scope or journeys. Wait for the answer before surfacing the step gate.
+As you analyse, you will encounter ambiguities, missing information, or decisions that only the product owner can make. Ask one question at a time. Exceptions:
+- Up to 2 questions may be grouped if they are (a) clearly independent and (b) factual with no structural impact on scope or journeys.
+- The **journey bootstrap canvas** (Step 2) — full, or reduced to the empty skeleton fields — is ONE AskUserQuestion call grouping up to 4 fields; never decompose it into sequential questions. See `refs/REF-user-journeys.md`.
+
+Wait for the answer before surfacing the step gate.
 
 ### Step Confirmation
 
@@ -96,7 +107,7 @@ No passive progression. The user must explicitly choose to validate and move to 
 
 Detect the PM's language from their first message. Apply it consistently to all agent messages, canonical memory content, and PRD file content. Do not switch language mid-session unless the PM explicitly does so.
 
-**What does not translate.** Section titles, id prefixes (`FUNC-`, `BR-`, `ST-`, `PERM-`, `ERR-`, `LGM-`, `DC-`, `LDM-`, `NG-`, `OQ-`), frontmatter keys, the scenario keywords `WHEN` / `THEN` / `AND`, the label `*Capabilities revealed:*` and the structural markers `None identified.` / `None defined.` stay exactly as the template writes them, in English. They are machine tokens: `scripts/validate_prd.py` matches on them, and the downstream `spec` skill parses the same structure. Only the prose adapts — a French PRD has French journeys under an English `## 3. User Journeys` heading.
+**What does not translate.** Section titles, id prefixes (`FUNC-`, `BR-`, `ST-`, `PERM-`, `ERR-`, `LGM-`, `DC-`, `LDM-`, `NG-`, `OQ-`), frontmatter keys, the scenario keywords `WHEN` / `THEN` / `AND`, the label `*Capabilities revealed:*`, the structural markers `None identified.` / `None defined.`, the journey variation prefix `Variation:` and the draft marker `[ASSUMPTION: ...]` stay exactly as written here, in English. They are machine tokens: `scripts/validate_prd.py` matches on some of them, and the downstream `spec` skill parses the same structure. Only the prose adapts — a French PRD has French journeys under an English `## 3. User Journeys` heading.
 
 ### Challenge Pass
 
@@ -211,13 +222,19 @@ Execute in this order before continuing
 ## Step 2 — User journeys
 
 **Methodology:** Read `refs/REF-user-journeys.md`
-Derive user journey when you have enough information.
+
+1. Run the **skeleton-based sufficiency check** and follow its routing: direct derivation (assumed elements marked `[ASSUMPTION: ...]`), partial derivation plus ONE grouped AskUserQuestion call for the empty fields, or full bootstrap canvas.
+2. Run the **coverage check** — a confirmed single-journey scope is acceptable, log it.
+3. Apply the granularity and routing rules — variations, orphan actions, ERR candidates parked in the canonical memory for Step 4.
+4. Challenge Pass, then present for the user check.
 
 **Step Gate:**
 ```
 [A] Advanced Elicitation
 [C] Continue to Step 3 — Functional blocks
 ```
+
+At the gate: every remaining `[ASSUMPTION]` marker is confirmed by the PM or converted to an OQ-XXX — none survives into Section 3.
 
 **After [C]:** backward check, fill the PRD section, update the canonical memory
 
@@ -241,7 +258,7 @@ Derive functional blocks when you have enough information.
 ## Step 4 — Acceptance criteria
 
 **Methodology:** Read `refs/REF-acceptance-criteria.md`
-Derive acceptance criteria when you have enough information.
+Derive acceptance criteria when you have enough information. Start from the **ERR candidates** parked in the canonical memory at Step 2.
 
 **Step Gate:**
 ```
@@ -311,7 +328,7 @@ output only on failure.
 
 | # | Check | Pass | Fail |
 |---|-------|------|------|
-| QG-1 | **Userflow vs Wireflow** | Every journey step: user action + observable result, true if mockup changes | Step describes layout, scroll, UI component, or names a tech mechanism |
+| QG-1 | **Userflow vs Wireflow** | Every journey step: one user action + observable result, true if mockup changes | Step describes layout, scroll, UI component, names a tech mechanism, bundles several actions, or describes a failure response |
 | QG-2 | **FUNC altitude** | Every FUNC: user capability (WHAT), not implementation (HOW) | FUNC contains framework, endpoint, SQL type, UI component, or layout detail |
 | QG-3 | **BR altitude** | Every BR: observable product behavior, no tech mechanism or design detail | BR names API, endpoint, UI component, or prescribes layout |
 | QG-5 | **Journey → FUNC** | Every journey step implying a capability has a matching FUNC | A journey step describes a capability with no FUNC |
