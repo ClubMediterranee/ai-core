@@ -51,3 +51,13 @@ The Challenge Pass is an **automatic filter**, not a dialogue step. It applies b
 | Design HOW in a BR | The BR prescribes a layout, alignment, named UI component, or interaction mechanic | Flag it. If a product rule is recoverable: propose it without the design detail. If design-only: mark as a design spec, remove from BR. |
 | Non-testable BR | The BR uses subjective language ("clear", "sufficient", "appropriate") with no measurable condition | Flag it. Propose a rewrite with a precise, binary-testable condition. |
 | AC that formalizes an ambiguity | The AC encodes an unvalidated answer to an open question — the "rule" hides a business decision that has not been made | Flag it. If the answer is known: keep as AC. If uncertain: remove the AC, create an OQ-XXX open question instead. |
+| BR referencing a BR | The body of a BR cites another BR ("see BR-XXX", "aligned with BR-XXX") | Flag it. Rewrite the rule so it stands alone. If an object's state is involved, cite ST-XXX instead. |
+| State re-enumeration | A BR lists an object's states while an ST-XXX is defined for that object | Flag it. Point the BR to ST-XXX rather than repeating the states — one source of truth. |
+| Out-of-scope leak | A clause can only be violated in a scenario an NG-XXX already excludes | Flag it. Remove the clause. Test: if the NG disappeared, would the clause become necessary again? Yes → it deserves its own BR. No → drop it. |
+| Perimeter leak | A clause describes an outcome for logic that no FUNC, BR or ST of *this* PRD governs — it says what happens without this PRD saying why or under which rule | Flag it. Ask the PM which perimeter owns it, then remove the clause and record an NG-XXX naming that perimeter. |
+
+**Applying the last two.** These are signals, not verdicts. A perimeter leak is the likeliest false
+positive when the knowledge base is thin — a redesign starting from little. Ask the PM where the
+logic belongs; open an `OQ-XXX` only when they cannot say or choose to defer. Guessing a
+destination, or silently logging an open question instead of asking, produces a document that looks
+resolved while encoding an unvalidated assumption.

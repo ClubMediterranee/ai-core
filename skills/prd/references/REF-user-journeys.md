@@ -50,7 +50,10 @@ Leave `*Capabilities revealed:*` as TBD in Section 3 — it is filled at Step 3.
 
 Before deriving, attempt to fill this skeleton for each candidate journey, from OPP-XXX + the brief only:
 
-- **Persona** — who goes through this journey
+- **Persona** — who goes through this journey. "Every user going through this flow" is a full,
+  valid answer, not an empty field: a PRD covering a cross-cutting step (a checkout form, a
+  confirmation page, an error page) documents the population of that flow rather than inventing
+  a persona for it. Section 2 then states that population, and no fictional persona is created.
 - **Trigger** — what makes the user start
 - **Successful outcome** — what the user came to accomplish, stated as a goal achieved, not a product action (test: asking "why?" on it exits the product scope)
 - **Known variations** — cases that produce a different path or outcome
@@ -80,6 +83,18 @@ Ask the user to confirm, complete, modify or delete journeys.
 ### At the step gate
 
 Every remaining `[ASSUMPTION]` marker is either confirmed by the PM or converted to an `OQ-XXX` (with the journey in the *Blocks* column). No marker survives into the validated Section 3.
+
+**Freeze the behavioural vocabulary before continuing.** The journeys are where the words that
+will propagate into the FUNCs, BRs and ERRs are chosen. Pick out the terms that carry an
+**implementation implication** — "validation on keystroke" and "validation on field exit" are two
+different behaviours, with different costs and different accessibility consequences — and put the
+exact wording in front of the PM in **one** message: here are the two to four terms I will use,
+confirm or correct them. Record what comes back in the *Project glossary* section of the canonical
+memory as frozen vocabulary.
+
+A term corrected here costs one exchange. The same term corrected after Step 4 has to be replaced
+across the journeys, the FUNCs, the BRs, the ERRs and the glossary at once. Only include terms
+that are load-bearing: confirming ordinary words is friction with no return.
 
 ---
 

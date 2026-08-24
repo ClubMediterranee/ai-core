@@ -53,6 +53,7 @@ three §7 subsections are present, and an absent section is indistinguishable fr
 7. [Metrics](#7-metrics)
 8. [Glossary](#8-glossary)
 9. [Open Questions](#9-open-questions)
+10. [Constraints](#10-constraints)
 
 ---
 
@@ -68,7 +69,9 @@ three §7 subsections are present, and an absent section is indistinguishable fr
 
 ## 2. Personas
 
-[One short paragraph describing the persona, from the information in the brief.]
+[One short paragraph describing the persona, from the information in the brief. If this PRD covers
+a cross-cutting step that every user of the flow goes through, say so and describe that
+population — do not invent a persona for it.]
 
 ---
 
@@ -100,13 +103,23 @@ three §7 subsections are present, and an absent section is indistinguishable fr
 
 *Capabilities focus on WHAT exists and WHAT the user can do.*
 
-### FUNC-001 — [Capability — "Users can [verb] [object]"]
+*Order follows the first appearance of each capability in the journeys, cross-cutting ones last.
+Ids are identifiers, not ranks: never renumber. A merged FUNC leaves its id retired and the gap
+stays — reading order is the position below, not the number.*
+
+### FUNC-001 — [Capability — "Users can [verb] [object]", or "Users benefit from [X] when [condition]" for a system-triggered one]
 
 **Actor:** [persona — if relevant]
+
 **Capability:** [1 sentence: what the user can do.]
-**Acceptance criteria:** [ids defined in §5 — e.g. BR-001, ERR-001]
+
+**Acceptance criteria:**
+
+- **BR-001** — [the `Rule` cell of BR-001, copied verbatim from §5]
+- **ERR-001** — [the `Failure mode` cell of ERR-001, copied verbatim from §5]
 
 **Nominal scenario:**
+- **GIVEN** [prerequisite state — keep this line only when it is not obvious from the WHEN]
 - **WHEN** [triggering condition]
 - **THEN** [observable result]
 - **AND** [additional result if needed]
@@ -114,8 +127,12 @@ three §7 subsections are present, and an absent section is indistinguishable fr
 ### FUNC-002 — [Capability — "Users can [verb] [object]"]
 
 **Actor:** [persona — if relevant]
+
 **Capability:** [1 sentence: what the user can do.]
-**Acceptance criteria:** [ids defined in §5]
+
+**Acceptance criteria:**
+
+- **BR-002** — [the `Rule` cell of BR-002, copied verbatim from §5]
 
 **Nominal scenario:**
 - **WHEN** [triggering condition]
@@ -128,9 +145,12 @@ three §7 subsections are present, and an absent section is indistinguishable fr
 
 ### Business Rules
 
+*Each rule opens with a short bold recap naming the case handled. Past ~10 rules, group them into
+`#### ` thematic sub-sections by business domain — never by FUNC, and never at `###` or `##`.*
+
 | ID | Rule | Applies to |
 |----|------|-----------|
-| BR-001 | [Condition] → [Expected behavior] | FUNC-001, FUNC-002 |
+| BR-001 | **[Recap — the case handled]:** [condition] → [expected behavior] | FUNC-001, FUNC-002 |
 
 ### States & Transitions
 
@@ -214,3 +234,19 @@ three §7 subsections are present, and an absent section is indistinguishable fr
 | ID     | Question | Impact if unresolved | Blocks | Source |
 |--------|----------|---------------------|--------|--------|
 | OQ-001 | [Question] | [What changes depending on the answer] | [FUNC / section] | [FUNC-XXX / BR-XXX / Journey — name] |
+
+---
+
+## 10. Constraints
+
+*Conditions this PRD inherits rather than defines — a BR is a rule this PRD decides, a constraint
+is a boundary it accepts. Keep only the constraints that actually shape a FUNC or a BR here.
+Delete this section and its Table of Contents entry if the PRD inherits none.*
+
+### Business
+
+- **CB-001** [Dependency on another PRD, an existing platform behaviour, or an entry point owned elsewhere]
+
+### Legal / Compliance
+
+- **CL-001** [What a locale or a regulation imposes]

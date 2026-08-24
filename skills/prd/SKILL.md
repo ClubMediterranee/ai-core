@@ -10,8 +10,23 @@ description: >
   Requires a validated brief as input. NOT for turning an existing PRD into developer specs or
   user stories — that is the `spec` skill.
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion
-version: 1.1.0
+version: 1.2.0
 changelog:
+  - version: 1.2.0
+    date: 2026-08-24
+    changes:
+      - "FUNCs: one boundary discriminant (autonomous observable outcome) replacing the format constraint, the upper/lower bounds and the multi-surface rule"
+      - "Step 3: derivation output is each journey's *Capabilities revealed:* line, filled in"
+      - "FUNC ids are identifiers, not ordinals — order fixed at derivation, never renumbered"
+      - "Nominal scenario: optional GIVEN prerequisite"
+      - "Step 2 gate: behavioural vocabulary frozen in one grouped confirmation"
+      - "Journeys: a cross-cutting population is a valid persona answer"
+      - "BR hygiene: atomicity, one-rule-one-BR, state adequacy, out-of-scope and perimeter leaks"
+      - "ACs referenced from a FUNC with their description; section 5 stays the source of truth"
+      - "Business Rules grouped into #### thematic sub-sections past ~10 rules"
+      - "Optional section 10 Constraints (CB/CL)"
+      - "Validator: referential integrity, AC bullet fidelity, author guard"
+      - "Layout aligned on the standard skill anatomy: refs/ renamed references/, canonical memory template moved into assets/"
   - version: 1.1.0
     date: 2026-08-15
     changes:
@@ -41,15 +56,15 @@ cache, project `.claude/skills/`, or the repository itself).
 | File | Read it when |
 |------|--------------|
 | `assets/TEMPLATE-prd.md` | Step 1 — instantiate the PRD skeleton |
-| `TEMPLATE-canonical-memory.md` | Step 0 — bootstrap the project's canonical memory if absent |
-| `refs/REF-brief-contract.md` | Step 0 — what the PRD consumes from the brief, and how to degrade |
-| `refs/REF-challenge-pass.md` | Before every artifact presentation |
-| `refs/REF-advanced-elicitation.md` | Whenever the PM chooses `[A]` |
-| `refs/REF-user-journeys.md` | Step 2 |
-| `refs/REF-functional-blocks.md` | Step 3 |
-| `refs/REF-acceptance-criteria.md` | Step 4 |
-| `refs/REF-metrics.md` | Step 5 |
-| `refs/REF-complexity-sizing.md` | Step 6 |
+| `assets/TEMPLATE-canonical-memory.md` | Step 0 — bootstrap the project's canonical memory if absent |
+| `references/REF-brief-contract.md` | Step 0 — what the PRD consumes from the brief, and how to degrade |
+| `references/REF-challenge-pass.md` | Before every artifact presentation |
+| `references/REF-advanced-elicitation.md` | Whenever the PM chooses `[A]` |
+| `references/REF-user-journeys.md` | Step 2 |
+| `references/REF-functional-blocks.md` | Step 3 |
+| `references/REF-acceptance-criteria.md` | Step 4 |
+| `references/REF-metrics.md` | Step 5 |
+| `references/REF-complexity-sizing.md` | Step 6 |
 | `scripts/validate_prd.py` | Quality gate — the structural checks |
 
 ---
@@ -85,7 +100,8 @@ After the PM chooses `[C]`, before continuing : run a backward check to ensure c
 | Step 5 | Section 7 — Metrics | Metrics validated |
 | Step 6 | Frontmatter (complexity) + Sections 2, 6, 8, 9 | Final complexity |
 
-> Sections 6 (Out of Scope), 8 (Glossary), and 9 (Open Questions) are filled incrementally at each step as new items emerge.
+> Sections 6 (Out of Scope), 8 (Glossary), 9 (Open Questions) — and 10 (Constraints) when the PRD
+> inherits any — are filled incrementally at each step as new items emerge.
 
 ---
 
@@ -95,7 +111,7 @@ After the PM chooses `[C]`, before continuing : run a backward check to ensure c
 
 As you analyse, you will encounter ambiguities, missing information, or decisions that only the product owner can make. Ask one question at a time. Exceptions:
 - Up to 2 questions may be grouped if they are (a) clearly independent and (b) factual with no structural impact on scope or journeys.
-- The **journey bootstrap canvas** (Step 2) — full, or reduced to the empty skeleton fields — is ONE AskUserQuestion call grouping up to 4 fields; never decompose it into sequential questions. See `refs/REF-user-journeys.md`.
+- The **journey bootstrap canvas** (Step 2) — full, or reduced to the empty skeleton fields — is ONE AskUserQuestion call grouping up to 4 fields; never decompose it into sequential questions. See `references/REF-user-journeys.md`.
 
 Wait for the answer before surfacing the step gate.
 
@@ -107,15 +123,15 @@ No passive progression. The user must explicitly choose to validate and move to 
 
 Detect the PM's language from their first message. Apply it consistently to all agent messages, canonical memory content, and PRD file content. Do not switch language mid-session unless the PM explicitly does so.
 
-**What does not translate.** Section titles, id prefixes (`FUNC-`, `BR-`, `ST-`, `PERM-`, `ERR-`, `LGM-`, `DC-`, `LDM-`, `NG-`, `OQ-`), frontmatter keys, the scenario keywords `WHEN` / `THEN` / `AND`, the label `*Capabilities revealed:*`, the structural markers `None identified.` / `None defined.`, the journey variation prefix `Variation:` and the draft marker `[ASSUMPTION: ...]` stay exactly as written here, in English. They are machine tokens: `scripts/validate_prd.py` matches on some of them, and the downstream `spec` skill parses the same structure. Only the prose adapts — a French PRD has French journeys under an English `## 3. User Journeys` heading.
+**What does not translate.** Section titles, id prefixes (`FUNC-`, `BR-`, `ST-`, `PERM-`, `ERR-`, `CB-`, `CL-`, `LGM-`, `DC-`, `LDM-`, `NG-`, `OQ-`), frontmatter keys, the scenario keywords `GIVEN` / `WHEN` / `THEN` / `AND`, the labels `*Capabilities revealed:*` and `**Acceptance criteria:**`, the structural markers `None identified.` / `None defined.`, the journey variation prefix `Variation:` and the draft marker `[ASSUMPTION: ...]` stay exactly as written here, in English. They are machine tokens: `scripts/validate_prd.py` matches on some of them, and the downstream `spec` skill parses the same structure. Only the prose adapts — a French PRD has French journeys under an English `## 3. User Journeys` heading.
 
 ### Challenge Pass
 
-Read `refs/REF-challenge-pass.md`, apply the protocol and surface the result.
+Read `references/REF-challenge-pass.md`, apply the protocol and surface the result.
 
 ### Advanced Elicitation
 
-Read `refs/REF-advanced-elicitation.md` and apply the protocol whenever the user chooses Advanced Elicitation.
+Read `references/REF-advanced-elicitation.md` and apply the protocol whenever the user chooses Advanced Elicitation.
 
 ### Progressive File Writing
 
@@ -152,7 +168,7 @@ The docs tree is **not** assumed to live under the current working directory —
 
 ### Bootstrap the canonical memory
 
-If `{DOCS_ROOT}/prd/canonical-memory.md` does not exist, create it by copying `TEMPLATE-canonical-memory.md` from this skill's directory. Every later update targets that **project** file — never the template, which ships inside the skill, is shared by all projects, and may live in a read-only plugin cache.
+If `{DOCS_ROOT}/prd/canonical-memory.md` does not exist, create it by copying `assets/TEMPLATE-canonical-memory.md` from this skill's directory. Every later update targets that **project** file — never the template, which ships inside the skill, is shared by all projects, and may live in a read-only plugin cache.
 
 If it already exists, read it. If it holds a PRD whose `current_step` is not `Step 6`, that work was interrupted: name it, and offer to resume at that step rather than starting a new PRD.
 
@@ -162,7 +178,7 @@ Explore `{DOCS_ROOT}` freely to find any supporting files that seem relevant —
 
 ### Identify and sum up the Brief
 
-Read `refs/REF-brief-contract.md` first — it states which fields the PRD consumes and how to proceed when the brief does not carry them.
+Read `references/REF-brief-contract.md` first — it states which fields the PRD consumes and how to proceed when the brief does not carry them.
 
 **If the user provided a path:** read that file directly.
 **If no path was given:** list all `.md` files in `{DOCS_ROOT}/brief/` and ask the user which one to process.
@@ -221,12 +237,13 @@ Execute in this order before continuing
 
 ## Step 2 — User journeys
 
-**Methodology:** Read `refs/REF-user-journeys.md`
+**Methodology:** Read `references/REF-user-journeys.md`
 
 1. Run the **skeleton-based sufficiency check** and follow its routing: direct derivation (assumed elements marked `[ASSUMPTION: ...]`), partial derivation plus ONE grouped AskUserQuestion call for the empty fields, or full bootstrap canvas.
 2. Run the **coverage check** — a confirmed single-journey scope is acceptable, log it.
 3. Apply the granularity and routing rules — variations, orphan actions, ERR candidates parked in the canonical memory for Step 4.
 4. Challenge Pass, then present for the user check.
+5. Before the gate, **freeze the behavioural vocabulary** — the 2 to 4 terms carrying an implementation implication, confirmed in one message and recorded in the canonical memory's *Project glossary*.
 
 **Step Gate:**
 ```
@@ -242,8 +259,11 @@ At the gate: every remaining `[ASSUMPTION]` marker is confirmed by the PM or con
 
 ## Step 3 — Functional blocks
 
-**Methodology:** Read `refs/REF-functional-blocks.md`
-Derive functional blocks when you have enough information.
+**Methodology:** Read `references/REF-functional-blocks.md`
+Derive functional blocks when you have enough information. **The output of this step is each
+journey's `*Capabilities revealed:*` line, filled in** — a journey step carrying an observable
+outcome that appears in no line is a missing FUNC, or a step to name explicitly as covered by a
+cross-cutting FUNC. Fix the FUNC order before the gate; the ids are frozen once assigned.
 
 **Step Gate:**
 ```
@@ -257,7 +277,7 @@ Derive functional blocks when you have enough information.
 
 ## Step 4 — Acceptance criteria
 
-**Methodology:** Read `refs/REF-acceptance-criteria.md`
+**Methodology:** Read `references/REF-acceptance-criteria.md`
 Derive acceptance criteria when you have enough information. Start from the **ERR candidates** parked in the canonical memory at Step 2.
 
 **Step Gate:**
@@ -272,7 +292,7 @@ Derive acceptance criteria when you have enough information. Start from the **ER
 
 ## Step 5 — Leading Metrics
 
-**Methodology:** Read `refs/REF-metrics.md`
+**Methodology:** Read `references/REF-metrics.md`
 Derive leading metrics when you have enough information.
 
 **Step Gate:**
@@ -287,7 +307,7 @@ Derive leading metrics when you have enough information.
 
 ## Step 6 — Complexity
 
-**Methodology:** Read `refs/REF-complexity-sizing.md`
+**Methodology:** Read `references/REF-complexity-sizing.md`
 Count FUNCs and personas. Apply grid. Propose result with justification. If PM disagrees: make the case, then defer to PM's final call.
 
 **Step Gate:**
@@ -309,7 +329,9 @@ Run all 12 checks before saving. Fix any failure first.
 python3 <skill-dir>/scripts/validate_prd.py {DOCS_ROOT}/prd/prd<NN>-<short-name>.md
 ```
 
-It covers QG-4, QG-6, QG-8, QG-9, QG-10, QG-11 and QG-12 — everything a machine can decide. This
+It covers QG-4, QG-6, QG-8, QG-9, QG-10, QG-11 and QG-12 — everything a machine can decide,
+including the PRD's referential integrity (duplicate ids, orphan criteria, the FUNC ↔ AC mirror)
+and the fidelity of each acceptance-criteria bullet to its section 5 definition. This
 matters because the remaining checks are judged by the same model that just wrote the PRD, and a
 self-graded gate drifts. Exit `0` = clean, `1` = at least one error, `2` = bad path. Display the
 output only on failure.
@@ -322,7 +344,7 @@ output only on failure.
 | QG-9 | **Frontmatter fields** | The 8 required fields present and valid: `id`, `title`, `version`, `status`, `complexity`, `date`, `author`, `brief` | A required field missing, misspelled, or invalid value |
 | QG-10 | **Document title** | First content line after `---` is a H1 matching `title` exactly | H1 absent — OR — H1 text differs from `title` field |
 | QG-11 | **Brief traceability** | Referenced brief exists with `status: validated`; every LGM/DC traces to brief | `brief` references non-existent or non-validated file — OR — LGM/DC introduced without brief anchor without tension |
-| QG-12 | **AC completeness** | Every BR/ST/PERM/ERR referenced in a FUNC is defined in Section 5 | A FUNC references an ID not defined in Section 5 |
+| QG-12 | **AC integrity** | Every id referenced in a FUNC is defined in Section 5, every id is defined once, every journey reveals a FUNC, every FUNC carries criteria, and Section 5's *Applies to* mirrors the FUNCs' lists | A dangling or duplicated id — OR — a journey revealing nothing — OR — a FUNC with no criteria — OR — the two directions disagreeing |
 
 **Content block** — semantic checks, no script can decide these. Judge each one and display the result.
 

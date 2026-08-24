@@ -65,4 +65,4 @@ they belong to the brief. If the work reveals a metric the brief does not carry,
 it — add it and log the divergence, so the brief can be updated. QG-11 checks exactly this.
 
 Leading metrics (`LDM-XXX`) are the exception: they are *derived* in the PRD at Step 5 and have no
-brief anchor by design. See `refs/REF-metrics.md`.
+brief anchor by design. See `references/REF-metrics.md`.

@@ -12,21 +12,40 @@ compliant while no longer being so.
 Checks, per PRD:
   QG-9  Frontmatter : the 8 required fields present and non-empty; `id` shaped `PRD<NN>` and
                       matching the number in the filename; `status` and `complexity` in their
-                      enumerations; `date` in ISO form.
+                      enumerations; `date` in ISO form; `author` a human name — neither an email
+                      nor the AI that drafted the PRD.
   QG-10 Title       : the first content line after the frontmatter is an H1 equal to `title`.
   QG-11 Brief       : the referenced brief resolves on disk (ERROR if not) and carries
                       `status: validated` (WARN otherwise — an unvalidated brief is a logged
-                      tension, not a wall; see refs/REF-brief-contract.md).
+                      tension, not a wall; see references/REF-brief-contract.md).
   QG-4  Scenarios   : every `### FUNC-xxx` block carries a WHEN and a THEN.
-  QG-6  FUNC→Journey: every FUNC defined in §4 appears in at least one §3 *Capabilities revealed:*
-                      list.
+  QG-6  FUNC<->Journey: every FUNC defined in §4 appears in at least one §3
+                      *Capabilities revealed:* list, every id revealed by a journey is defined, and
+                      every journey reveals at least one FUNC — a journey still carrying the Step 2
+                      `TBD` placeholder reveals nothing and is reported.
   QG-8  Metrics     : §7 carries its three subsections; each is populated or explicitly marked
                       "None identified." / "None defined."; every DC row has a numeric threshold.
-  QG-12 AC coverage : every BR/ST/PERM/ERR id referenced in §4 is defined in §5.
-  Structure         : the 9 sections present, in order, not duplicated.
+  QG-12 AC integrity: referential integrity between §4 and §5. Every id referenced in §4 is
+                      defined; every id is defined exactly once; every FUNC carries criteria; the
+                      `Applies to` column points at capabilities that exist and mirrors what each
+                      FUNC declares; each `- **ID** — text` bullet matches its §5 definition
+                      (verbatim for BR and ERR, by containment for the deliberately reduced ST and
+                      PERM forms); business rules open with a recap and do not reference one
+                      another; ids owned by other sections resolve there.
+  Structure         : the 9 sections present, in order, not duplicated; the optional §10
+                      Constraints checked only when present; no stray `## ` sub-heading.
   Leftovers         : the template's instantiation comment removed (ERROR); no `[ASSUMPTION: ...]`
                       marker surviving the step gate (ERROR); no `[placeholder]` or `XXX` token
                       left behind (WARN).
+
+Deliberately NOT checked: gaps in the numbering. An id is an identifier, not a rank — a merged
+FUNC retires its id and the gap is the expected trace of that merge. Flagging gaps would push
+authors back into renumbering, and the renumbering cascade through §3, §5, the scenario clauses and
+the PERM conditions is precisely what retiring ids exists to avoid. Do not add that check.
+
+A check that cannot see its evidence does not accuse: where a section is absent, or carries a title
+that says the document is misnumbered, the checks that depend on it stay silent rather than emit one
+warning per id and bury the structural finding that explains them all.
 
 Headings are detected outside fenced code blocks only, so a PRD may quote a template or a payload
 without shadowing its own sections.
@@ -56,9 +75,31 @@ SECTIONS = [
     "Acceptance Criteria", "Out of Scope", "Metrics", "Glossary", "Open Questions",
 ]
 METRIC_SUBSECTIONS = ["Lagging Metrics", "Damage Control", "Leading Metrics"]
+# section 10 is optional: a PRD that inherits no constraint simply does not carry it. Present, it
+# is checked like the other nine; absent, it is not an error.
+OPTIONAL_SECTIONS = {10: "Constraints"}
+# which level-3 heading each criterion type belongs under, for the type/table coherence check
+KIND_HEADING = {"BR": "business rules", "ST": "states & transitions",
+                "PERM": "permissions", "ERR": "error scenarios"}
+# ids that live outside section 5, keyed by the section that defines them
+FOREIGN_PREFIX_HOME = {"NG": 6, "OQ": 9, "LGM": 7, "DC": 7, "LDM": 7}
+FOREIGN_ID_RE = re.compile(r"\b(NG|OQ|LGM|DC|LDM)-\d+[a-z]?\b")
 EMPTY_MARKERS = ("None identified.", "None defined.")
 
-ID_RE = re.compile(r"\b(BR|ST|PERM|ERR)-\d+[a-z]?\b")
+ID_RE = re.compile(r"\b(BR|ST|PERM|ERR|CB|CL)-\d+[a-z]?\b")
+# a criterion is *defined* by sitting in the first cell of a table row (or, for CB/CL, by being
+# the leading bold id of a Constraints bullet) — never merely by being mentioned somewhere in §5
+TABLE_ROW_ID_RE = re.compile(r"^\s*\|\s*\*{0,2}((?:BR|ST|PERM|ERR)-\d+[a-z]?)\*{0,2}\s*\|")
+BULLET_ID_RE = re.compile(r"^\s*[-*]\s+\*\*((?:BR|ST|PERM|ERR|CB|CL)-\d+[a-z]?)\*\*\s*(.*)$")
+AC_BLOCK_RE = re.compile(r"^\s*\*\*Acceptance criteria:?\*\*\s*(.*)$", re.I)
+# split a markdown table row on unescaped pipes only: a `States` cell legitimately holds `\|`,
+# and a naive split truncates it silently — the file stays valid and the check goes blind
+PIPE_SPLIT_RE = re.compile(r"(?<!\\)\|")
+SUBHEAD_RE = re.compile(r"^(#{3,4})\s+(.+?)\s*$")
+LOOSE_CAPABILITIES_RE = re.compile(r"^\s*\*?Capabilit(?:y|ies) revealed:", re.I)
+# the AI listing itself as author means the PM never took ownership; the convention also forbids
+# an email in this field (SKILL.md Step 1: "The name alone")
+AI_AUTHOR_RE = re.compile(r"anthropic|noreply|copilot", re.I)
 FUNC_RE = re.compile(r"\bFUNC-\d+[a-z]?\b")
 FUNC_HEADING_RE = re.compile(r"^###\s+(FUNC-\d+[a-z]?)\b")
 SECTION_RE = re.compile(r"^##\s+(\d+)\.\s+(.+?)\s*$")
@@ -135,6 +176,147 @@ def body(lines: list[str], span: tuple[str, int, int] | None) -> list[str]:
     return [] if span is None else lines[span[1] + 1:span[2]]
 
 
+
+def split_cells(line: str) -> list[str]:
+    """Cells of a markdown table row, split on unescaped pipes and unescaped afterwards."""
+    parts = PIPE_SPLIT_RE.split(line.strip())
+    if parts and not parts[0].strip():
+        parts = parts[1:]
+    if parts and not parts[-1].strip():
+        parts = parts[:-1]
+    return [c.strip().replace("\\|", "|") for c in parts]
+
+
+def norm(s: str) -> str:
+    """Comparison form: collapsed whitespace, no surrounding dash or space."""
+    return re.sub(r"\s+", " ", s).strip().strip("—–-").strip()
+
+
+@dataclass
+class ACDef:
+    cid: str
+    kind: str
+    line: int
+    heading: str                 # the level-3 heading this row sits under
+    text: str | None             # exact expected description (BR, ERR, CB, CL)
+    parts: list[str]             # substrings that must all appear (ST, PERM)
+    applies: set[str]            # FUNC ids read from the `Applies to` column
+
+
+@dataclass
+class FuncBlock:
+    fid: str
+    line: int
+    body: list[str]
+
+
+def index_criteria(lines: list[str], sections: dict,
+                   f: list[Finding], name: str) -> dict[str, ACDef]:
+    """Column-aware index of §5 (plus §10 Constraints).
+
+    A criterion is recognised by the **id prefix in its first cell**, never by which table it sits
+    in: §5 groups business rules into `####` thematic sub-tables, so table membership says nothing.
+    Duplicate definitions are reported here — two rows sharing an id is the failure that retiring
+    ids (rather than renumbering them) makes possible.
+    """
+    defs: dict[str, ACDef] = {}
+    for sec in (5, 10):
+        span = sections.get(sec)
+        if span is None:
+            continue
+        heading = ""
+        for i in range(span[1] + 1, span[2]):
+            line = lines[i]
+            m = SUBHEAD_RE.match(line)
+            if m:
+                if len(m.group(1)) == 3:
+                    heading = m.group(2).strip()
+                continue
+
+            row = TABLE_ROW_ID_RE.match(line)
+            bullet = BULLET_ID_RE.match(line)
+            if row:
+                cells = split_cells(line)
+                cid = row.group(1)
+                kind = cid.split("-")[0]
+                text, parts, applies = None, [], set()
+                if kind in ("BR", "ERR"):
+                    text = cells[1] if len(cells) > 1 else ""
+                elif kind == "ST":
+                    parts = [cells[1]] if len(cells) > 1 else []
+                    if len(cells) > 2:
+                        parts += [s for s in re.split(r"[|/]", cells[2]) if s.strip()]
+                elif kind == "PERM":
+                    parts = [c for c in cells[1:3] if c]
+                if kind == "BR" and len(cells) > 2:
+                    applies = set(FUNC_RE.findall(cells[-1]))
+            elif bullet and sec == 10:
+                cid = bullet.group(1)
+                kind = cid.split("-")[0]
+                text, parts, applies = norm(bullet.group(2)), [], set()
+            else:
+                continue
+
+            if cid in defs:
+                f.append(Finding("ERROR", name,
+                                 f"QG-12: {cid} is defined twice (lines {defs[cid].line} and "
+                                 f"{i + 1}) — an id identifies one criterion and is never reused"))
+                continue
+            defs[cid] = ACDef(cid, kind, i + 1, heading, text, [x.strip() for x in parts], applies)
+    return defs
+
+
+def collect_funcs(lines: list[str], sections: dict,
+                  f: list[Finding], name: str) -> list[FuncBlock]:
+    """FUNC blocks of §4, in document order. Duplicate headings are reported, not silently merged."""
+    blocks: list[FuncBlock] = []
+    span = sections.get(4)
+    if span is None:
+        return blocks
+    current: FuncBlock | None = None
+    for i in range(span[1] + 1, span[2]):
+        m = FUNC_HEADING_RE.match(lines[i])
+        if m:
+            current = FuncBlock(m.group(1), i + 1, [])
+            blocks.append(current)
+        elif current:
+            current.body.append(lines[i])
+    seen: dict[str, int] = {}
+    for b in blocks:
+        if b.fid in seen:
+            f.append(Finding("ERROR", name,
+                             f"QG-12: {b.fid} is defined twice (lines {seen[b.fid]} and {b.line}) "
+                             "— a retired id is never re-used for another capability"))
+        else:
+            seen[b.fid] = b.line
+    return blocks
+
+
+def func_criteria(block: FuncBlock) -> tuple[list[tuple[str, str]], str | None]:
+    """The `- **ID** — text` bullets of a FUNC, and the inline remainder of its header line.
+
+    The inline remainder is non-empty only when the block still lists bare identifiers on the
+    `**Acceptance criteria:**` line itself, which the readability convention replaced with bullets.
+    """
+    bullets: list[tuple[str, str]] = []
+    inline: str | None = None
+    inside = False
+    for line in block.body:
+        head = AC_BLOCK_RE.match(line)
+        if head:
+            inside = True
+            inline = head.group(1).strip()
+            continue
+        if not inside:
+            continue
+        m = BULLET_ID_RE.match(line)
+        if m:
+            bullets.append((m.group(1), norm(m.group(2))))
+        elif line.strip() and not line.lstrip().startswith(("-", "*")):
+            inside = False
+    return bullets, inline
+
+
 # --------------------------------------------------------------------------- checks
 
 
@@ -171,6 +353,15 @@ def check_frontmatter(path: Path, fm: dict[str, str], f: list[Finding]) -> None:
     date = fm.get("date", "").strip()
     if date and not DATE_RE.match(date):
         f.append(Finding("ERROR", name, f"QG-9: `date` must be YYYY-MM-DD, found {date!r}"))
+
+    author = fm.get("author", "").strip()
+    if "@" in author:
+        f.append(Finding("ERROR", name,
+                         "QG-9: `author` carries an email — the field takes the name alone"))
+    if AI_AUTHOR_RE.search(author):
+        f.append(Finding("ERROR", name,
+                         "QG-9: `author` names the AI that drafted the PRD — put the "
+                         "human owner's name here"))
 
 
 def check_title(path: Path, lines: list[str], start: int, fm: dict[str, str],
@@ -239,49 +430,82 @@ def check_structure(path: Path, sections: dict[int, tuple[str, int, int]], lines
             f.append(Finding("WARN", name,
                              f"structure: section {num} is titled {sections[num][0]!r}, "
                              f"expected {expected!r} (headings are machine tokens — do not translate)"))
+    for num, expected in OPTIONAL_SECTIONS.items():
+        if num in sections and sections[num][0].strip().lower() != expected.lower():
+            f.append(Finding("WARN", name,
+                             f"structure: section {num} is titled {sections[num][0]!r}, "
+                             f"expected {expected!r} (headings are machine tokens)"))
     for num in sorted(set(n for n in seen if seen.count(n) > 1)):
         f.append(Finding("ERROR", name, f"structure: section {num} appears {seen.count(num)} times"))
+    # only worth saying on a document whose sections parse: where they do not, the missing-section
+    # findings above already explain every stray heading, and repeating them buries that signal
+    structure_parses = all(n in sections for n in range(1, len(SECTIONS) + 1))
+    # everything above section 1 is front matter — the table of contents lives there, under whatever
+    # name the PRD's language gives it. Sub-heading misuse only means something inside a section.
+    first_section = min((s[1] for s in sections.values()), default=len(lines))
+    for i, line in enumerate(lines):
+        if not structure_parses or masked[i] or i < first_section:
+            continue
+        if not line.startswith("## ") or SECTION_RE.match(line):
+            continue
+        f.append(Finding("WARN", name,
+                         f"structure: {line.strip()!r} (line {i + 1}) uses the document's own"
+                         " heading level for a sub-heading — thematic groups inside a section"
+                         " belong at `####`"))
     ordered = [n for n in seen if seen.count(n) == 1]
     if ordered != sorted(ordered):
         f.append(Finding("ERROR", name, f"structure: sections are out of order — found {seen}"))
 
 
-def check_funcs(path: Path, lines: list[str], sections: dict, f: list[Finding]) -> set[str]:
-    """QG-4 (each FUNC has a WHEN/THEN scenario) and QG-6 (each FUNC is revealed by a journey)."""
+def check_funcs(path: Path, lines: list[str], sections: dict, blocks: list[FuncBlock],
+                f: list[Finding]) -> set[str]:
+    """QG-4 (each FUNC has a WHEN/THEN scenario) and QG-6 (FUNC <-> journey, both directions)."""
     name = path.name
-    s4 = body(lines, sections.get(4))
-    if not s4:
-        return set()
-
-    blocks: list[tuple[str, list[str]]] = []
-    current: str | None = None
-    buf: list[str] = []
-    for line in s4:
-        m = FUNC_HEADING_RE.match(line)
-        if m:
-            if current:
-                blocks.append((current, buf))
-            current, buf = m.group(1), []
-        elif current:
-            buf.append(line)
-    if current:
-        blocks.append((current, buf))
-
     if not blocks:
-        f.append(Finding("ERROR", name, "QG-4: section 4 defines no FUNC (`### FUNC-001 — …`)"))
+        if sections.get(4) is not None:
+            f.append(Finding("ERROR", name, "QG-4: section 4 defines no FUNC (`### FUNC-001 — …`)"))
         return set()
 
-    for func, block in blocks:
-        text = "\n".join(block)
+    for b in blocks:
+        text = "\n".join(b.body)
         if not (re.search(r"\bWHEN\b", text) and re.search(r"\bTHEN\b", text)):
-            f.append(Finding("ERROR", name, f"QG-4: {func} has no WHEN/THEN nominal scenario"))
+            f.append(Finding("ERROR", name, f"QG-4: {b.fid} has no WHEN/THEN nominal scenario"))
+        bullets, inline = func_criteria(b)
+        if not bullets and not (inline and ID_RE.search(inline)):
+            f.append(Finding("WARN", name,
+                             f"QG-12: {b.fid} lists no acceptance criteria — a capability with no "
+                             "criterion is unspecified, not simple"))
 
-    defined = {func for func, _ in blocks}
+    defined = {b.fid for b in blocks}
+
+    # journeys: every one reveals at least one capability, and none is left at its Step 2 placeholder
     revealed: set[str] = set()
-    for line in body(lines, sections.get(3)):
-        m = CAPABILITIES_RE.match(line)
-        if m:
-            revealed |= set(FUNC_RE.findall(m.group(1)))
+    s3 = sections.get(3)
+    if s3 is not None:
+        journeys: list[tuple[str, int, int]] = []
+        for i in range(s3[1] + 1, s3[2]):
+            m = SUBSECTION_RE.match(lines[i])
+            if m and not lines[i].startswith("####"):
+                journeys.append((m.group(1), i, s3[2]))
+                if len(journeys) > 1:
+                    journeys[-2] = (journeys[-2][0], journeys[-2][1], i)
+        for title, jstart, jend in journeys:
+            found: set[str] = set()
+            declared = False
+            for i in range(jstart, jend):
+                if LOOSE_CAPABILITIES_RE.match(lines[i]):
+                    declared = True
+                m = CAPABILITIES_RE.match(lines[i])
+                if m:
+                    found |= set(FUNC_RE.findall(m.group(1)))
+            revealed |= found
+            if not found:
+                detail = ("its *Capabilities revealed:* line is still a placeholder"
+                          if declared else "it carries no *Capabilities revealed:* line")
+                f.append(Finding("ERROR", name,
+                                 f"QG-6: journey {title!r} reveals no FUNC — {detail} "
+                                 f"(line {jstart + 1})"))
+
     for func in sorted(defined - revealed):
         f.append(Finding("ERROR", name,
                          f"QG-6: {func} appears in no journey's *Capabilities revealed:* list"))
@@ -292,14 +516,97 @@ def check_funcs(path: Path, lines: list[str], sections: dict, f: list[Finding]) 
 
 
 def check_acceptance_criteria(path: Path, lines: list[str], sections: dict,
-                              f: list[Finding]) -> None:
-    """QG-12 — every id a FUNC leans on must be defined in section 5."""
+                              blocks: list[FuncBlock], defs: dict[str, ACDef],
+                              funcs: set[str], f: list[Finding]) -> None:
+    """QG-12 — referential integrity between §4 and §5, and fidelity of the criteria bullets.
+
+    The two sections describe the same relation from both ends: a FUNC lists the criteria it leans
+    on, and a business rule lists the FUNCs it applies to. Nothing forced them to agree until now.
+
+    Deliberately NOT checked: gaps in the numbering. An id is an identifier, not a rank — a merge
+    retires its id and the gap is the expected trace of that merge. Flagging gaps would push authors
+    back into renumbering, which is the cascade the convention exists to avoid.
+    """
     name = path.name
-    referenced = {m.group(0) for m in ID_RE.finditer("\n".join(body(lines, sections.get(4))))}
-    defined = {m.group(0) for m in ID_RE.finditer("\n".join(body(lines, sections.get(5))))}
-    for missing in sorted(referenced - defined):
+    s4_text = "\n".join(body(lines, sections.get(4)))
+    mentioned = {m.group(0) for m in ID_RE.finditer(s4_text)}
+
+    for missing in sorted(mentioned - set(defs)):
         f.append(Finding("ERROR", name,
                          f"QG-12: {missing} is referenced in section 4 but not defined in section 5"))
+    for orphan in sorted(set(defs) - mentioned):
+        f.append(Finding("WARN", name,
+                         f"QG-12: {orphan} is defined but referenced by no FUNC in section 4"))
+
+    # `Applies to` must point at capabilities that exist, and mirror what the FUNC itself declares
+    declared: dict[str, set[str]] = {}
+    for b in blocks:
+        bullets, inline = func_criteria(b)
+        declared[b.fid] = {cid for cid, _ in bullets}
+        if inline and ID_RE.search(inline):
+            f.append(Finding("WARN", name,
+                             f"QG-12: {b.fid} still lists bare identifiers on its "
+                             "`**Acceptance criteria:**` line — expand them into "
+                             "`- **ID** — description` bullets"))
+        for cid, text in bullets:
+            d = defs.get(cid)
+            if d is None:
+                continue
+            if d.text is not None:
+                if norm(text) != norm(d.text):
+                    f.append(Finding("ERROR", name,
+                                     f"QG-12: {b.fid} describes {cid} differently from its "
+                                     f"section 5 definition (line {d.line}) — section 5 is the "
+                                     "source of truth, realign the bullet"))
+            else:
+                absent = [x for x in d.parts if x and norm(x).lower() not in norm(text).lower()]
+                if absent:
+                    f.append(Finding("ERROR", name,
+                                     f"QG-12: {b.fid}'s bullet for {cid} omits {absent[0]!r}, "
+                                     f"which its section 5 definition carries (line {d.line})"))
+
+    for cid, d in sorted(defs.items()):
+        for func in sorted(d.applies):
+            if func not in funcs:
+                f.append(Finding("ERROR", name,
+                                 f"QG-12: {cid} applies to {func}, which section 4 does not define"))
+            elif func in declared and declared[func] and cid not in declared[func]:
+                f.append(Finding("WARN", name,
+                                 f"QG-12: {cid} applies to {func}, but {func} does not list it — "
+                                 "the two directions disagree"))
+        expected = KIND_HEADING.get(d.kind)
+        actual = d.heading.strip().lower()
+        if expected and actual and actual != expected and actual in KIND_HEADING.values():
+            f.append(Finding("WARN", name,
+                             f"QG-12: {cid} is defined under {d.heading!r} (line {d.line}) — "
+                             "an id belongs under the heading for its type"))
+        if d.kind == "BR" and d.text is not None:
+            if not d.text.lstrip().startswith("**"):
+                f.append(Finding("WARN", name,
+                                 f"QG-12: {cid} opens with no recap (line {d.line}) — start the "
+                                 "rule with a short bold label naming the case handled"))
+            others = {x for x in re.findall(r"\bBR-\d+[a-z]?\b", d.text) if x != cid}
+            if others:
+                f.append(Finding("WARN", name,
+                                 f"QG-12: {cid} references {sorted(others)[0]} in its own body "
+                                 f"(line {d.line}) — a rule must stand alone; cite ST-XXX if a "
+                                 "state is involved"))
+
+    # ids owned by other sections: cited somewhere, defined nowhere
+    whole = "\n".join(lines)
+    for prefix, home in FOREIGN_PREFIX_HOME.items():
+        span = sections.get(home)
+        # only conclude when the owning section is actually there and actually is what it claims:
+        # on a PRD whose sections are misnumbered, check_structure already says so once, and
+        # repeating it here as one warning per id would bury the real signal
+        if span is None or span[0].strip().lower() != SECTIONS[home - 1].lower():
+            continue
+        home_text = "\n".join(body(lines, span))
+        cited = {m.group(0) for m in FOREIGN_ID_RE.finditer(whole) if m.group(1) == prefix}
+        for fid in sorted(cited):
+            if fid not in home_text:
+                f.append(Finding("WARN", name,
+                                 f"QG-12: {fid} is cited but defined nowhere in section {home}"))
 
 
 def check_metrics(path: Path, lines: list[str], sections: dict, f: list[Finding]) -> None:
@@ -393,8 +700,10 @@ def check_prd(path: Path, findings: list[Finding]) -> None:
     check_title(path, lines, start, fm, findings)
     check_brief(path, fm, findings)
     check_structure(path, sections, lines, masked, findings)
-    check_funcs(path, lines, sections, findings)
-    check_acceptance_criteria(path, lines, sections, findings)
+    blocks = collect_funcs(lines, sections, findings, path.name)
+    defs = index_criteria(lines, sections, findings, path.name)
+    funcs = check_funcs(path, lines, sections, blocks, findings)
+    check_acceptance_criteria(path, lines, sections, blocks, defs, funcs, findings)
     check_metrics(path, lines, sections, findings)
     check_leftovers(path, text, lines, start, findings)
 
