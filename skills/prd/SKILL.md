@@ -17,7 +17,12 @@ changelog:
     changes:
       - "Step 2 opens on a persona-goal list confirmed with the PM, before any flow is written — Cockburn's actor-goal list, absorbing the former coverage check"
       - "Journeys: each one states its goal on a `*Goal:*` line, at Cockburn's user-goal level — can the actor go away satisfied, in one sitting"
-      - "Journeys: completeness judged against the journey's own goal, with no reference to FUNCs"
+      - "Journeys: completeness judged on the nominal path — a variation may legitimately stop short of the goal"
+      - "Journeys: a variation sits where it diverges, not at the end of the list"
+      - "Journeys: splitting gains a test of its own — one goal, two situations with a different stake or precondition"
+      - "Saturation signal states which remedy applies: BR for rule detail, step or split for a different consequence"
+      - "A differing result means what the user ends up with, not what they had to supply to get there"
+      - "A step presents what it derived; what the skill parks, logs or records stays in the canonical memory"
       - "Journeys: how many to write is a readability decision — re-organising never changes the set of capabilities revealed"
       - "Step 2 reasons in observable results; FUNC ids are assigned and frozen at Step 3"
       - "Variation routing: same action on a different object is a parameter, a BR when the rules differ, a variation when the result differs"
@@ -101,6 +106,8 @@ PRD runs in **sequential steps**. Each step ends with a **Step Gate**. Wait for 
 [A] Advanced Elicitation
 [C] Validate and continue to the next step
 ```
+
+**What a step presents:** the artifact it has just derived, plus whatever that step explicitly says to surface. Anything the skill tells you to *park*, *log* or *record* goes to the canonical memory and is not part of the presentation — it comes back at the step that consumes it. A step that shows more than it produced turns its gate into a discussion of work that is not up for validation yet.
 
 After the PM chooses `[C]`, before continuing : run a backward check to ensure consistency, fill the corresponding PRD section to log the work done and update the canonical memory to record decisions and tensions.
 

@@ -64,20 +64,41 @@ every later reorganisation renumbers it. Leave `*Capabilities revealed:*` as `TB
 
 ## A journey is complete when its goal is reached
 
-The last step reaches the goal the journey states, and every step before it is a necessary move
-toward that goal. That is the whole test, and it needs no reference to the capabilities that come
-later — those are verified afterwards, when *Capabilities revealed* is filled.
+**The nominal path reaches the goal**, and every step on it is a necessary move toward that goal.
+That is the whole test, and it needs no reference to the capabilities that come later — those are
+verified afterwards, when *Capabilities revealed* is filled.
 
-A step that is not a move toward the goal belongs to another journey, or to no journey at all — route it below.
+Variation steps are judged differently. One may legitimately stop short of the goal — abandoning an
+edit is precisely a non-attainment, and writing it as though it reached the goal would be false.
+What a variation may not be is a dead end with no reading: one that never leads anywhere is either
+an error path, to be parked as an ERR candidate, or a step belonging to another journey.
+
+**Place each variation where it diverges from the nominal path**, not at the end of the list. A
+reader follows the numbering as a sequence, so a variation parked after the closing step reads as
+something that happens afterwards — which it is not.
+
+A step that is neither a move toward the goal nor a variation of one belongs to another journey, or
+to no journey at all — route it below.
 
 ---
 
 ## How many journeys
 
-Once the goals are settled, **the number of journeys is a readability decision, not a correctness one**. Two reasons justify writing more journeys than there are goals:
+Once the goals are settled, **the number of journeys is a readability decision, not a correctness one**. Three things justify writing more journeys than there are goals:
 
 - a journey long enough that its thread is hard to follow — split it at a natural pause;
-- a variation whose path diverges so far that inlining it would obscure both.
+- a variation whose path diverges so far that inlining it would obscure both;
+- **one goal pursued from two situations where the user's stake or precondition differs.** The test:
+  does a reader lose something by being shown only one of them? Correcting a search before
+  committing to anything and correcting it after building a basket share a goal, but one risks
+  nothing and the other discards work already done. A rule can state that difference in a sentence;
+  only a separate flow makes a PM decide about it.
+
+**Splitting deserves as much thought as merging.** Most of what this reference says pushes toward
+fewer journeys — parameters over variations, one goal over many, entry points folded into a step —
+because duplication is the more common failure. That pressure is deliberate, and it is not free:
+when two situations carry different consequences for the user, folding them together hides the
+decision the PM has to make.
 
 **The invariant:** re-organising for readability never changes the set of capabilities the journeys reveal. If merging two journeys makes a capability disappear, or splitting one invents another, that was not a readability change — it was a scope change wearing its clothes, and it has to be named as one.
 
@@ -171,6 +192,10 @@ Every candidate element gets an explicit destination — nothing is silently dro
    parameter, not a variation. Keep one step and let the object vary — unless the **rules** differ,
    in which case the difference belongs in a BR at Step 4, or the **observable result** differs, in
    which case it earns its own variation step.
+
+   The result is **what the user ends up with, not what they had to supply to get there**. Being
+   asked for one more value along the way — a date of birth for each child, say — is an extra input
+   for the same outcome: rule detail, not a variation.
 2. Same goal, different path, revealing a distinct capability or rule → one inline variation step in the same journey — flat numbering, prefixed `Variation:`. No branch notation (2a/2b).
 3. Different goal → separate journey.
 4. Response to a failure (payment declined, no availability…) → NOT a journey element. Park it in the canonical memory under the PRD's section as an **ERR candidate** — Step 4 derives it as ERR-XXX.
@@ -179,7 +204,17 @@ Established use-case practice does the same thing when it collapses create / upd
 object into a single "manage X" goal, and promotes one of those operations into a goal of its own
 only once it grows too important to sit inside. The test is unchanged: does the goal change?
 
-**Saturation signal:** ≥ 3 inline variations in one journey → either two goals coexist (split the journey) or the variations are business-rule detail (they become BRs at Step 4, not steps). **Re-apply this after any merge** — a journey assembled from several others is exactly where variations pile up unnoticed.
+**Saturation signal:** ≥ 3 inline variations in one journey → it is carrying more than it can show. Which remedy applies depends on what the variations are:
+
+- one that only changes **how a rule applies**, with no different consequence for the user, is
+  business-rule detail → it becomes a BR at Step 4, not a step;
+- one that leads to a **different consequence for the user** is not rule detail → it stays a step,
+  and the journey splits around it if that is what makes both readable.
+
+The count is the alarm, not the remedy. Demoting a variation to a BR in order to get back under
+three is gaming the signal rather than heeding it — the question is what the variation carries, not
+how many there are. **Re-apply this after any merge**: a journey assembled from several others is
+exactly where variations pile up unnoticed.
 
 ### Preconditions
 
