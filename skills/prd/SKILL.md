@@ -10,8 +10,20 @@ description: >
   Requires a validated brief as input. NOT for turning an existing PRD into developer specs or
   user stories — that is the `spec` skill.
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion
-version: 1.2.0
+version: 1.3.0
 changelog:
+  - version: 1.3.0
+    date: 2026-08-24
+    changes:
+      - "Journeys: a goal is defined at Cockburn's user-goal level, with the boss and elementary-business-process tests"
+      - "Journeys: completeness judged against the journey's own goal, with no reference to FUNCs"
+      - "Journeys: how many to write is a readability decision — re-organising never changes the set of capabilities revealed"
+      - "Step 2 reasons in observable results; FUNC ids are assigned and frozen at Step 3"
+      - "Variation routing: same action on a different object is a parameter, a BR when the rules differ, a variation when the result differs"
+      - "Saturation signal re-applied after any journey merge"
+      - "Journey-level preconditions, distinct from a scenario GIVEN"
+      - "One subject rule: the user stays the subject even when the system acts"
+      - "Pruned: the 10 journey validation criteria, the two altitudes table, the 4-8 step range, and two duplicated Challenge Pass rows"
   - version: 1.2.0
     date: 2026-08-24
     changes:
@@ -123,7 +135,7 @@ No passive progression. The user must explicitly choose to validate and move to 
 
 Detect the PM's language from their first message. Apply it consistently to all agent messages, canonical memory content, and PRD file content. Do not switch language mid-session unless the PM explicitly does so.
 
-**What does not translate.** Section titles, id prefixes (`FUNC-`, `BR-`, `ST-`, `PERM-`, `ERR-`, `CB-`, `CL-`, `LGM-`, `DC-`, `LDM-`, `NG-`, `OQ-`), frontmatter keys, the scenario keywords `GIVEN` / `WHEN` / `THEN` / `AND`, the labels `*Capabilities revealed:*` and `**Acceptance criteria:**`, the structural markers `None identified.` / `None defined.`, the journey variation prefix `Variation:` and the draft marker `[ASSUMPTION: ...]` stay exactly as written here, in English. They are machine tokens: `scripts/validate_prd.py` matches on some of them, and the downstream `spec` skill parses the same structure. Only the prose adapts — a French PRD has French journeys under an English `## 3. User Journeys` heading.
+**What does not translate.** Section titles, id prefixes (`FUNC-`, `BR-`, `ST-`, `PERM-`, `ERR-`, `CB-`, `CL-`, `LGM-`, `DC-`, `LDM-`, `NG-`, `OQ-`), frontmatter keys, the scenario keywords `GIVEN` / `WHEN` / `THEN` / `AND`, the labels `*Capabilities revealed:*`, `*Precondition:*` and `**Acceptance criteria:**`, the structural markers `None identified.` / `None defined.`, the journey variation prefix `Variation:` and the draft marker `[ASSUMPTION: ...]` stay exactly as written here, in English. They are machine tokens: `scripts/validate_prd.py` matches on some of them, and the downstream `spec` skill parses the same structure. Only the prose adapts — a French PRD has French journeys under an English `## 3. User Journeys` heading.
 
 ### Challenge Pass
 
@@ -239,11 +251,12 @@ Execute in this order before continuing
 
 **Methodology:** Read `references/REF-user-journeys.md`
 
-1. Run the **skeleton-based sufficiency check** and follow its routing: direct derivation (assumed elements marked `[ASSUMPTION: ...]`), partial derivation plus ONE grouped AskUserQuestion call for the empty fields, or full bootstrap canvas.
-2. Run the **coverage check** — a confirmed single-journey scope is acceptable, log it.
-3. Apply the granularity and routing rules — variations, orphan actions, ERR candidates parked in the canonical memory for Step 4.
-4. Challenge Pass, then present for the user check.
-5. Before the gate, **freeze the behavioural vocabulary** — the 2 to 4 terms carrying an implementation implication, confirmed in one message and recorded in the canonical memory's *Project glossary*.
+1. Name each candidate journey's **goal** and check it sits at the user-goal level — a manager would accept it as a day's work, and it is one person, one place, one time. A candidate that fails is a step inside another goal; one holding several goals is a summary to split.
+2. Run the **skeleton-based sufficiency check** and follow its routing: direct derivation (assumed elements marked `[ASSUMPTION: ...]`), partial derivation plus ONE grouped AskUserQuestion call for the empty fields, or full bootstrap canvas.
+3. Run the **coverage check** — a confirmed single-journey scope is acceptable, log it.
+4. Apply the granularity and routing rules — parameters, variations, orphan actions, ERR candidates parked in the canonical memory for Step 4. Reason in **observable results, never in `FUNC-` ids**: those are assigned and frozen at Step 3.
+5. Challenge Pass, then present for the user check.
+6. Before the gate, **freeze the behavioural vocabulary** — the 2 to 4 terms carrying an implementation implication, confirmed in one message and recorded in the canonical memory's *Project glossary*.
 
 **Step Gate:**
 ```
