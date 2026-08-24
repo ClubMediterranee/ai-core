@@ -23,19 +23,21 @@ Cockburn's *Writing Effective Use Cases* (Addison-Wesley, 2000). His hierarchy r
 goals (a kite, above the water) down through the user goal (at sea level) to subfunctions (a fish,
 below it). A PRD journey sits at sea level.
 
-Two tests decide whether a candidate belongs there:
+The question, in Cockburn's own terms: **can the primary actor go away satisfied, having done this?**
+A user goal is what someone sets out to finish **in one sitting** — one person, one place, one
+session.
 
-- **The boss test** — would a manager accept that this is what someone did all day? "Correct the
-  search criteria": yes. "Choose which criterion to edit": no, that is a subfunction.
-- **The elementary-business-process test** — one person, one place, one time, producing a result of
-  value and leaving things in a coherent state.
+"Correct the search criteria": yes, they can stop there satisfied. "Choose which criterion to edit":
+no, nothing is accomplished — that is a subfunction.
 
-A candidate that fails both is a step inside someone else's goal. One that clearly contains several
-such goals is a summary — split it.
+A candidate that fails the question is a step inside someone else's goal. One that clearly holds
+several such goals is a summary — split it.
 
-**Why this test earns its place.** Without it, "modify the dates" and "correct my search" are both
-defensible as goals, and the journey set is re-cut every time someone re-reads it. Each
-reorganisation drags along everything that referenced it.
+**Every journey states its goal in writing**, on a `*Goal:*` line under its heading. The heading is
+a short name for the flow; the goal is the proposition the journey has to satisfy, and it is what
+the question above is applied to. Left implicit in a title, a goal cannot be tested and two readers
+will hold two different versions of it — which is how a journey set ends up re-cut on every
+re-reading, dragging along everything that referenced it.
 
 ---
 
@@ -62,7 +64,7 @@ every later reorganisation renumbers it. Leave `*Capabilities revealed:*` as `TB
 
 ## A journey is complete when its goal is reached
 
-The last step reaches the goal named in the title, and every step before it is a necessary move
+The last step reaches the goal the journey states, and every step before it is a necessary move
 toward that goal. That is the whole test, and it needs no reference to the capabilities that come
 later — those are verified afterwards, when *Capabilities revealed* is filled.
 
@@ -91,16 +93,34 @@ Once the goals are settled, **the number of journeys is a readability decision, 
 
 ## Derivation process
 
+### Start with the goals, not the flows
+
+Before writing any flow, list what people come to this opportunity to accomplish: one line per
+**persona → goal**, drawn from OPP-XXX and the brief. Cockburn calls this the actor-goal list, and
+it is the cheapest artefact in the step — correcting a goal here costs a line, correcting it once
+the flows are written costs every step hanging off it.
+
+Apply the user-goal question to each candidate, then put the list in front of the PM in one message:
+here is what people come here to do — is anything missing, and is anything on this list not really
+a goal?
+
+**This is where the scope of the section is settled.** A single-goal PRD is legitimate once
+confirmed. Log the confirmation in the canonical memory, along with anything the PM adds or removes.
+
+**The confirmed list is a starting point, not a closed set.** Goals surface while flows are being
+written: the routing section below sends an orphan action back up to the goal it serves, and a goal
+in scope that nobody had listed is a journey to derive, not an intruder to reject. Bring it back to
+the PM rather than absorbing it silently.
+
 ### Sufficiency check — skeleton-based
 
-Before deriving, attempt to fill this skeleton for each candidate journey, from OPP-XXX + the brief only:
+For each confirmed goal, attempt to fill this skeleton from OPP-XXX + the brief only:
 
-- **Persona** — who goes through this journey. "Every user going through this flow" is a full,
+- **Persona** — who pursues this goal. "Every user going through this flow" is a full,
   valid answer, not an empty field: a PRD covering a cross-cutting step (a checkout form, a
   confirmation page, an error page) documents the population of that flow rather than inventing
   a persona for it. Section 2 then states that population, and no fictional persona is created.
-- **Trigger** — what makes the user start
-- **Goal** — what the user came to accomplish, at the user-goal level above
+- **Trigger** — what makes them start
 - **Known variations** — cases that produce a different path or outcome
 
 Each field is either **traced** (points to a brief/OPP element), **assumed** (plausible but not stated in the brief), or **empty**.
@@ -109,17 +129,9 @@ Each field is either **traced** (points to a brief/OPP element), **assumed** (pl
 
 - **All fields traced or assumed, none empty** → derive directly. Mark every assumed element inline: `[ASSUMPTION: ...]`. A step without a marker must trace to the brief or the OPP — no silent assumptions.
 - **1–2 fields empty** → derive what is derivable, then present ONE AskUserQuestion call grouping the empty fields. Options = plausible hypotheses derived from the brief, never generic; "Other" covers free input. This grouped call is the documented exception to the one-question-at-a-time rule.
-- **Skeleton mostly empty** (OPP is a title with no exploitable context) → full bootstrap canvas: one AskUserQuestion call with the 4 fields, same option rule.
+- **Skeleton mostly empty** (OPP is a title with no exploitable context) → full bootstrap canvas: one AskUserQuestion call with every field, same option rule. When the goals themselves could not be drawn from the brief, that canvas is the goal-list conversation and this one, held together.
 
 If AskUserQuestion is unavailable, present the canvas as markdown in a single message and wait for one grouped answer.
-
-### Coverage check — separate question
-
-Once ≥ 1 journey is derivable: can I identify a 2nd distinct scenario anchored to OPP-XXX? If not, ask one targeted question:
-
-> "OPP-XXX gives me [scenario A]. Is there another distinct case this PRD must cover, or is a single journey the actual scope?"
-
-A single-journey PRD is acceptable if confirmed — log the confirmation in the canonical memory.
 
 ### User check after derivation
 

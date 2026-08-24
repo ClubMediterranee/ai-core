@@ -77,9 +77,11 @@ population — do not invent a persona for it.]
 
 ## 3. User Journeys
 
-*End-to-end flows anchored on [OPP-XXX]. One journey carries one user goal, and the heading states that goal.*
+*End-to-end flows anchored on [OPP-XXX]. One journey carries one user goal, stated under its heading.*
 
-### Journey 1 — [The goal: what the user came to accomplish]
+### Journey 1 — [Short name for this flow]
+
+*Goal:* [what the user came to accomplish, stated so it can be tested — the last step reaches it]
 
 *Precondition:* [what must already be true before step 1 — delete this line if the journey needs none]
 
@@ -90,7 +92,9 @@ population — do not invent a persona for it.]
 
 *Capabilities revealed:* FUNC-001, FUNC-002
 
-### Journey 2 — [The goal: what the user came to accomplish]
+### Journey 2 — [Short name for this flow]
+
+*Goal:* [what the user came to accomplish, stated so it can be tested — the last step reaches it]
 
 1. [Step 1 — entry point / trigger]
 2. [Step 2 — main action]

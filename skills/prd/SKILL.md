@@ -15,7 +15,8 @@ changelog:
   - version: 1.3.0
     date: 2026-08-24
     changes:
-      - "Journeys: a goal is defined at Cockburn's user-goal level, with the boss and elementary-business-process tests"
+      - "Step 2 opens on a persona-goal list confirmed with the PM, before any flow is written — Cockburn's actor-goal list, absorbing the former coverage check"
+      - "Journeys: each one states its goal on a `*Goal:*` line, at Cockburn's user-goal level — can the actor go away satisfied, in one sitting"
       - "Journeys: completeness judged against the journey's own goal, with no reference to FUNCs"
       - "Journeys: how many to write is a readability decision — re-organising never changes the set of capabilities revealed"
       - "Step 2 reasons in observable results; FUNC ids are assigned and frozen at Step 3"
@@ -135,7 +136,7 @@ No passive progression. The user must explicitly choose to validate and move to 
 
 Detect the PM's language from their first message. Apply it consistently to all agent messages, canonical memory content, and PRD file content. Do not switch language mid-session unless the PM explicitly does so.
 
-**What does not translate.** Section titles, id prefixes (`FUNC-`, `BR-`, `ST-`, `PERM-`, `ERR-`, `CB-`, `CL-`, `LGM-`, `DC-`, `LDM-`, `NG-`, `OQ-`), frontmatter keys, the scenario keywords `GIVEN` / `WHEN` / `THEN` / `AND`, the labels `*Capabilities revealed:*`, `*Precondition:*` and `**Acceptance criteria:**`, the structural markers `None identified.` / `None defined.`, the journey variation prefix `Variation:` and the draft marker `[ASSUMPTION: ...]` stay exactly as written here, in English. They are machine tokens: `scripts/validate_prd.py` matches on some of them, and the downstream `spec` skill parses the same structure. Only the prose adapts — a French PRD has French journeys under an English `## 3. User Journeys` heading.
+**What does not translate.** Section titles, id prefixes (`FUNC-`, `BR-`, `ST-`, `PERM-`, `ERR-`, `CB-`, `CL-`, `LGM-`, `DC-`, `LDM-`, `NG-`, `OQ-`), frontmatter keys, the scenario keywords `GIVEN` / `WHEN` / `THEN` / `AND`, the labels `*Goal:*`, `*Capabilities revealed:*`, `*Precondition:*` and `**Acceptance criteria:**`, the structural markers `None identified.` / `None defined.`, the journey variation prefix `Variation:` and the draft marker `[ASSUMPTION: ...]` stay exactly as written here, in English. They are machine tokens: `scripts/validate_prd.py` matches on some of them, and the downstream `spec` skill parses the same structure. Only the prose adapts — a French PRD has French journeys under an English `## 3. User Journeys` heading.
 
 ### Challenge Pass
 
@@ -251,12 +252,11 @@ Execute in this order before continuing
 
 **Methodology:** Read `references/REF-user-journeys.md`
 
-1. Name each candidate journey's **goal** and check it sits at the user-goal level — a manager would accept it as a day's work, and it is one person, one place, one time. A candidate that fails is a step inside another goal; one holding several goals is a summary to split.
-2. Run the **skeleton-based sufficiency check** and follow its routing: direct derivation (assumed elements marked `[ASSUMPTION: ...]`), partial derivation plus ONE grouped AskUserQuestion call for the empty fields, or full bootstrap canvas.
-3. Run the **coverage check** — a confirmed single-journey scope is acceptable, log it.
-4. Apply the granularity and routing rules — parameters, variations, orphan actions, ERR candidates parked in the canonical memory for Step 4. Reason in **observable results, never in `FUNC-` ids**: those are assigned and frozen at Step 3.
-5. Challenge Pass, then present for the user check.
-6. Before the gate, **freeze the behavioural vocabulary** — the 2 to 4 terms carrying an implementation implication, confirmed in one message and recorded in the canonical memory's *Project glossary*.
+1. **List the goals before writing any flow** — one line per persona → goal, from OPP-XXX and the brief, each passing the user-goal question: the actor could stop there satisfied, in one sitting. Confirm the list with the PM in one message; a single-goal scope is acceptable, log it. This settles the section's scope while a correction still costs one line.
+2. Run the **skeleton-based sufficiency check** for each confirmed goal — persona, trigger, variations — and follow its routing: direct derivation (assumed elements marked `[ASSUMPTION: ...]`), partial derivation plus ONE grouped AskUserQuestion call for the empty fields, or full bootstrap canvas.
+3. Derive the flows, each carrying its goal on a `*Goal:*` line. Apply the granularity and routing rules — parameters, variations, orphan actions, ERR candidates parked in the canonical memory for Step 4. Reason in **observable results, never in `FUNC-` ids**: those are assigned and frozen at Step 3.
+4. Challenge Pass, then present for the user check.
+5. Before the gate, **freeze the behavioural vocabulary** — the 2 to 4 terms carrying an implementation implication, confirmed in one message and recorded in the canonical memory's *Project glossary*.
 
 **Step Gate:**
 ```
