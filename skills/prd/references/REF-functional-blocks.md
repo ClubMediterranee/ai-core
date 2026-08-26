@@ -65,7 +65,10 @@ constraint as a BR.
 
 ## Derivation
 
-FUNCs are derived from **validated journeys** + **business rules (BRs)** + PM answers.
+FUNCs are derived from **validated journeys** + PM answers. Business rules and error scenarios do
+not exist yet — they are derived at Step 4, and Step 4 comes back to fill each FUNC's
+`**Acceptance criteria:**` bullets. Writing a FUNC around an id that has not been assigned is how a
+capability ends up shaped by a rule nobody validated.
 
 **The output of this step is not a list of FUNCs — it is each journey's `*Capabilities revealed:*`
 line, filled in.** Derive by filling those lines. A journey step carrying an observable outcome that
@@ -74,8 +77,8 @@ cross-cutting FUNC. Leaving it unnamed is how a capability disappears until revi
 
 - One FUNC per distinct user capability
 - Every FUNC must trace to **at least one journey step**
-- For each FUNC, identify which ERR-XXX defined in the acceptance criteria apply — list them in the
-  FUNC's acceptance criteria
+- Which `ERR-XXX` a FUNC carries is settled **at Step 4**, once the error scenarios exist. At Step 3,
+  note the failure modes the capability implies and leave them with the parked ERR candidates
 
 **Saturation signal, optional.** A FUNC that would carry far more business rules than its
 neighbours — roughly more than fifteen, the threshold the `spec` skill applies per spec — is
@@ -142,7 +145,8 @@ A set of FUNCs is valid if:
    revealed* list), and every journey reveals at least one FUNC
 5. Every FUNC has **at least one testable nominal scenario** (WHEN/THEN, plus `GIVEN` wherever the
    prerequisite is not obvious)
-6. Every FUNC references the **applicable ERR-XXX** from the acceptance criteria
+6. Every FUNC references the **applicable ERR-XXX** from the acceptance criteria — *verified at
+   Step 4, when the error scenarios exist; not gateable at Step 3*
 7. No FUNC sits at the "UI interaction" level without a standalone user goal
 8. No FUNC covers two independent capabilities without having been split
 9. The same capability on several surfaces is a single FUNC, unless the rules or the observable

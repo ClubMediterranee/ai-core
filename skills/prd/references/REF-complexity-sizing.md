@@ -34,7 +34,7 @@ Take the **highest band** between FUNCs and Personas.
 ## Evaluation Process
 
 1. Count the validated FUNCs (final list after FUNC derivation)
-2. Count the active personas (PER-XXX defined or imported from the brief)
+2. Count the personas described in §2 — a cross-cutting population counts as one
 3. Apply the grid → identify the band for each criterion → retain the highest
 4. Propose the result to the PM with justification
 5. If the PM disputes: present the criteria → then defer to the PM's final decision

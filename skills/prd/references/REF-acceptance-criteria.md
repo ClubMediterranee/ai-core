@@ -58,22 +58,26 @@ step. Signal absent → carry on silently. The same discriminant is stated in
 The third signal is what keeps ST and BR from drifting apart: a state added to ST-XXX must not have
 to be propagated by hand into every rule that mentions it.
 
-**Format:**
+**Format** — one row of the §5 *Business Rules* table:
+
 ```
-BR-001 : **[Recap — the case handled]:** [condition] → [expected behavior]
-Variants : [FR] / [DE] if applicable
+| ID | Rule | Applies to |
+|----|------|-----------|
+| BR-001 | **[Recap — the case handled]:** [condition] → [expected behavior] | FUNC-001 |
 ```
+
+Country variants go **inline in the `Rule` cell, without brackets**: a bracketed token reads as an
+unreplaced placeholder, and a dedicated column would displace `Applies to`, which the validator reads
+as the last cell of the row.
 
 **Example:**
+
 ```
-BR-001 : **Standard shipping threshold:** cart total is < [threshold] €
-         → standard shipping fee applied
-Variants : [FR] 25 € / [DE] 30 €
-
-BR-002 : **Discount ceiling:** a promo code is applied → the discount cannot exceed
-         the cart total (minimum amount charged: 0 €)
-
-BR-003 : **Out-of-stock item:** an item is out of stock → it cannot be added to the cart
+| ID | Rule | Applies to |
+|----|------|-----------|
+| BR-001 | **Standard shipping threshold:** cart total is below the free-shipping floor → standard shipping fee applied. Variants : FR 25 € / DE 30 € | FUNC-002 |
+| BR-002 | **Discount ceiling:** a promo code is applied → the discount cannot exceed the cart total (minimum amount charged: 0 €) | FUNC-003 |
+| BR-003 | **Out-of-stock item:** an item is out of stock → it cannot be added to the cart | FUNC-001 |
 ```
 
 #### Grouping past ~10 rules
@@ -105,31 +109,26 @@ Whatever the grouping, **an entry is recognised by its id prefix, never by which
 - Tied to a specific entity (order, cart, user, etc.)
 - Define what is possible or impossible depending on the current state
 
-**Format:**
+**Format** — one row of the §5 *States & Transitions* table. Separate the items of a list with `/`:
+a bare `|` inside a cell is read as a column break, and an escaped `\|` survives the validator but
+not the reader.
+
 ```
-ST-001 : [Object]
-  States : [state A] | [state B] | [state C]
-  Allowed transitions : [A → B] | [B → C]
-  Blocked transitions : [C → A] — [reason]
+| ID | Object | States | Allowed transitions | Blocked transitions |
+|----|--------|--------|---------------------|---------------------|
+| ST-001 | [Object] | [state A] / [state B] / [state C] | [A → B] / [B → C] | [C → A] — [reason] |
 ```
 
 **Example:**
+
 ```
-ST-001 : Order
-  States : cart | awaiting_payment | confirmed | in_preparation
-         | shipped | delivered | cancelled | returned
-  Allowed transitions :
-    cart → awaiting_payment (user validates checkout)
-    awaiting_payment → confirmed (payment accepted)
-    confirmed → in_preparation (warehouse picks up the order)
-    in_preparation → shipped (handed to carrier)
-    shipped → delivered (delivery confirmed)
-    confirmed → cancelled (cancellation before preparation starts)
-    delivered → returned (return requested within the legal window)
-  Blocked transitions :
-    cancelled → confirmed — a cancelled order cannot be reactivated
-    shipped → cancelled — cancellation not possible once shipped
+| ID | Object | States | Allowed transitions | Blocked transitions |
+|----|--------|--------|---------------------|---------------------|
+| ST-001 | Order | cart / awaiting_payment / confirmed / in_preparation / shipped / delivered / cancelled / returned | cart → awaiting_payment (user validates checkout) / awaiting_payment → confirmed (payment accepted) / confirmed → in_preparation (warehouse picks up the order) / in_preparation → shipped (handed to carrier) / shipped → delivered (delivery confirmed) / confirmed → cancelled (cancellation before preparation starts) / delivered → returned (return requested within the legal window) | cancelled → confirmed — a cancelled order cannot be reactivated / shipped → cancelled — cancellation not possible once shipped |
 ```
+
+A row this wide is the honest shape of a lifecycle: the table is scanned by `ID` and `Object`, and
+read in full only for the object under discussion.
 
 ---
 
@@ -143,21 +142,21 @@ ST-001 : Order
 - Based on roles or attributes
 - Cross-cutting: a PERM may apply to multiple FUNCs
 
-**Format:**
+**Format** — one row of the §5 *Permissions* table:
+
 ```
-PERM-001 : [Actor] can [action] if [condition]
-         : [Actor] cannot [action] if [opposite condition]
+| ID | Actor | Action | Allowed condition | Blocked condition |
+|----|-------|--------|-------------------|-------------------|
+| PERM-001 | [Actor] | [Action] | [condition allowing the action] | [condition blocking it] |
 ```
 
 **Example:**
-```
-PERM-001 : Logged-in user can save a delivery address if they have an active account
-         : Guest (not logged in) cannot save a delivery address
 
-PERM-002 : User can apply a promo code
-           if the code is valid, not expired, and not already used on this account
-         : User cannot apply a promo code
-           if the code has already been redeemed on this account or is expired
+```
+| ID | Actor | Action | Allowed condition | Blocked condition |
+|----|-------|--------|-------------------|-------------------|
+| PERM-001 | Logged-in user | Save a delivery address | the account is active | the visitor is a guest, not logged in |
+| PERM-002 | User | Apply a promo code | the code is valid, not expired, and not already used on this account | the code has already been redeemed on this account, or is expired |
 ```
 
 ---
@@ -169,27 +168,22 @@ PERM-002 : User can apply a promo code
 **Rules:**
 - Preserve the user's state — an error must never cause the user to lose their work.
 
-**Format:**
+**Format** — one row of the §5 *Error Scenarios* table:
+
 ```
-ERR-001 : [Condition that triggers the failure]
-  Expected behavior : [What the product must do]
+| ID | Failure mode | Expected behavior |
+|----|--------------|-------------------|
+| ERR-001 | [Condition that triggers the failure] | [What the product must do] |
 ```
 
 **Example:**
+
 ```
-ERR-001 : Payment is declined by the bank
-  Expected behavior : the cart and delivery information are preserved;
-  an explicit error message is displayed; the user can retry
-  or choose a different payment method
-
-ERR-002 : An item goes out of stock at confirmation time
-          (stock depleted between adding to cart and checkout)
-  Expected behavior : the order is not created; the cart is updated
-  with the item removed; the user is notified before resuming checkout
-
-ERR-003 : The delivery address is outside the delivery zone
-  Expected behavior : carrier selection is blocked;
-  a message indicates the covered zones; the cart is preserved
+| ID | Failure mode | Expected behavior |
+|----|--------------|-------------------|
+| ERR-001 | Payment is declined by the bank | the cart and delivery information are preserved; an explicit error message is displayed; the user can retry or choose a different payment method |
+| ERR-002 | An item goes out of stock at confirmation time (stock depleted between adding to cart and checkout) | the order is not created; the cart is updated with the item removed; the user is notified before resuming checkout |
+| ERR-003 | The delivery address is outside the delivery zone | carrier selection is blocked; a message indicates the covered zones; the cart is preserved |
 ```
 
 ---
@@ -272,5 +266,5 @@ A pool of acceptance criteria is valid if:
 6. **PERM-XXX** are derived only for restrictions identified in the journeys or BRs
 7. Every **ERR-XXX** referenced in a FUNC is defined in the acceptance criteria
 8. Every criterion is defined **once**, in the Acceptance Criteria section, and referenced from the FUNCs that need it. The FUNC bullet repeats the description for readability — it is a copy of the definition, never a second definition, and the Acceptance Criteria section wins on any divergence
-9. Country/language variants are annotated inline on the relevant BR, not created as separate BRs *(this criterion is not covered by a dedicated QG check — it falls under validation by this REF)*
+9. Country/language variants are annotated inline in the BR's `Rule` cell, without brackets, and never created as separate BRs *(this criterion is not covered by a dedicated QG check — it falls under validation by this REF)*
 10. Beyond ~10 BRs, the rules are grouped into `####` thematic sub-sections by business domain, never by FUNC

@@ -10,6 +10,11 @@ type: reference
 
 Advanced Elicitation [A] is triggered on the PM's request. The agent **reasons visibly** about what it does not yet know, identifies 2-3 patterns, then derives questions from that reasoning — never from a generic template.
 
+**The questions are the agent's to produce.** `[A]` is a request to go deeper, not a request to be
+told where to dig. Answering it with *what would you like to explore?* hands the analysis back to the
+PM and skips the protocol entirely — it is the one response the option never means. If nothing is
+genuinely unresolved, say so and re-present the gate; do not manufacture questions either.
+
 **Common format:**
 ```
 Let me think about what I don't yet know about [current artifact]...

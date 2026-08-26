@@ -2,8 +2,8 @@
 name: ref-challenge-pass
 description: >
   Challenge Pass protocol: automatic anti-pattern filter applied before
-  every artifact presentation (journeys, FUNCs, ACs). Consolidated anti-pattern
-  tables for all three artifact types.
+  every artifact presentation (journeys, FUNCs, ACs, metrics). Consolidated
+  anti-pattern tables for all four artifact types.
 type: reference
 ---
 
@@ -59,3 +59,16 @@ positive when the knowledge base is thin — a redesign starting from little. As
 logic belongs; open an `OQ-XXX` only when they cannot say or choose to defer. Guessing a
 destination, or silently logging an open question instead of asking, produces a document that looks
 resolved while encoding an unvalidated assumption.
+
+---
+
+## Challenge Pass — Metrics
+
+| Anti-pattern | What it looks like | How to fix |
+|---|---|---|
+| Unmeasurable LDM | The leading metric names a behaviour with no identifiable collection method | Flag it. Name the event that would capture it, or drop the metric — an indicator nobody can read is not one. |
+| Wrong family for the feature | A completion metric (step completion, drop-off) on a pure consultation feature, or an engagement metric on a pure action feature | Flag it. Re-derive from the journeys' dominant interaction type — see `REF-metrics.md`, "Feature Type Inference". |
+| Lagging disguised as leading | The LDM only becomes measurable after the brief's KR timeframe, so it predicts nothing in time to act on | Flag it. Propose an earlier observable behaviour on the same causal chain. |
+
+`LGM` and `DC` are imported from the brief and validated at import — they are not challenged here.
+Only the `LDM` derived at Step 5 go through this pass.

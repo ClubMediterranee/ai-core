@@ -10,25 +10,29 @@ description: >
   Requires a validated brief as input. NOT for turning an existing PRD into developer specs or
   user stories — that is the `spec` skill.
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion
-version: 1.3.0
+version: 1.4.0
 changelog:
+  - version: 1.4.0
+    date: 2026-08-26
+    changes:
+      - "Gate contract made explicit: nothing reaches the PRD file before `[C]`, and every gate block states what `[C]` writes — the canonical memory keeps taking parked items during derivation"
+      - "`[A]` is the agent's work: the protocol is inlined in SKILL.md, and answering it by asking the PM what to dig into is named as the one response it never means"
+      - "New golden rule *Name the Arbitrations* — boundary decisions are presented with the artifact, and a PM-decidable ambiguity is asked before the gate rather than filed as an OQ"
+      - "Acceptance criteria reference realigned on §5's tables: the block format it documented defined nothing the validator could see"
+      - "Step 4 back-fills each FUNC's acceptance-criteria bullets; FUNCs no longer derive from rules that do not exist yet"
+      - "Section 2 Personas filled at Step 2, where the persona is resolved, instead of Step 6, which counts them; PER-XXX dropped from complexity sizing"
+      - "Challenge Pass gains its Metrics table, so every artifact presentation has one"
+      - "Validator: a bold id and an escaped pipe no longer fail a gate, country variant tags are content; QG-11 split between the script and the judged block"
+      - "First test suite for `validate_prd.py` — 12 regression cases, stdlib only"
   - version: 1.3.0
     date: 2026-08-24
     changes:
-      - "Step 2 opens on a persona-goal list confirmed with the PM, before any flow is written — Cockburn's actor-goal list, absorbing the former coverage check"
-      - "Journeys: each one states its goal on a `*Goal:*` line, at Cockburn's user-goal level — can the actor go away satisfied, in one sitting"
-      - "Journeys: completeness judged on the nominal path — a variation may legitimately stop short of the goal"
-      - "Journeys: a variation sits where it diverges, not at the end of the list"
-      - "Journeys: splitting gains a test of its own — one goal, two situations with a different stake or precondition"
-      - "Saturation signal states which remedy applies: BR for rule detail, step or split for a different consequence"
-      - "A differing result means what the user ends up with, not what they had to supply to get there"
+      - "Step 2 opens on a persona-goal list confirmed with the PM before any flow is written — Cockburn's actor-goal list, absorbing the former coverage check; each journey then states its goal on a `*Goal:*` line at the user-goal level"
+      - "Journey rules reworked: completeness judged on the nominal path, a variation placed where it diverges, splitting given a test of its own against merging, and how many journeys to write settled as a readability decision that never changes the capabilities revealed"
+      - "Variation routing: same action on a different object is a parameter, a BR when the rules differ, a variation when the observable result differs — the result being what the user ends up with, not what they had to supply"
+      - "Saturation signal states which remedy applies (BR for rule detail, step or split for a different consequence) and is re-applied after any merge"
+      - "Journey-level preconditions distinct from a scenario GIVEN; the user stays the subject even when the system acts; Step 2 reasons in observable results, FUNC ids being assigned and frozen at Step 3"
       - "A step presents what it derived; what the skill parks, logs or records stays in the canonical memory"
-      - "Journeys: how many to write is a readability decision — re-organising never changes the set of capabilities revealed"
-      - "Step 2 reasons in observable results; FUNC ids are assigned and frozen at Step 3"
-      - "Variation routing: same action on a different object is a parameter, a BR when the rules differ, a variation when the result differs"
-      - "Saturation signal re-applied after any journey merge"
-      - "Journey-level preconditions, distinct from a scenario GIVEN"
-      - "One subject rule: the user stays the subject even when the system acts"
       - "Pruned: the 10 journey validation criteria, the two altitudes table, the 4-8 step range, and two duplicated Challenge Pass rows"
   - version: 1.2.0
     date: 2026-08-24
@@ -69,7 +73,8 @@ You **translate a validated problem into a solution**. The problem and the scope
 ## Bundled resources
 
 Paths are relative to this skill's directory — they resolve wherever the skill is installed (plugin
-cache, project `.claude/skills/`, or the repository itself).
+cache, project `.claude/skills/`, or the repository itself). The quality gate command below calls
+that same directory `<skill-dir>`.
 
 | File | Read it when |
 |------|--------------|
@@ -103,22 +108,22 @@ PRD runs in **sequential steps**. Each step ends with a **Step Gate**. Wait for 
 
 **Step Gate options:**
 ```
-[A] Advanced Elicitation
-[C] Validate and continue to the next step
+[A] Advanced Elicitation — I name what I could not settle, and ask about it
+[C] Validate → the step's section is written to file, then the next step
 ```
 
-**What a step presents:** the artifact it has just derived, plus whatever that step explicitly says to surface. Anything the skill tells you to *park*, *log* or *record* goes to the canonical memory and is not part of the presentation — it comes back at the step that consumes it. A step that shows more than it produced turns its gate into a discussion of work that is not up for validation yet.
+**What a step presents:** the artifact it has just derived, plus whatever that step explicitly says to surface. Anything the skill tells you to *park*, *log* or *record* goes to the canonical memory and is not part of the presentation — it comes back at the step that consumes it. A step that shows more than it produced turns its gate into a discussion of work that is not up for validation yet. And an open question at presentation time means **the gate is not due yet** — ask it, wait for the answer, then surface the gate.
 
 After the PM chooses `[C]`, before continuing : run a backward check to ensure consistency, fill the corresponding PRD section to log the work done and update the canonical memory to record decisions and tensions.
 
 | Step validated | Fill in the PRD | Canonical memory |
 |---------------|-------------|------------------|
 | Step 1 | Create the PRD from the full skeleton — frontmatter + Section 1 Executive Summary | OPP selected, scope confirmed |
-| Step 2 | Section 3 — User Journeys *(Capabilities revealed: TBD — filled at Step 3)* | Journeys validated, OQs opened, ERR candidates parked |
+| Step 2 | Section 2 — Personas + Section 3 — User Journeys *(Capabilities revealed: TBD — filled at Step 3)* | Journeys validated, OQs opened, ERR candidates parked |
 | Step 3 | Section 4 — FUNCs + update Section 3 (Capabilities revealed) | FUNCs validated, OQs opened/resolved |
-| Step 4 | Section 5 — Acceptance Criteria | ACs validated, OQs opened/resolved |
+| Step 4 | Section 5 — Acceptance Criteria + back-fill each FUNC's `**Acceptance criteria:**` bullets in Section 4 | ACs validated, OQs opened/resolved |
 | Step 5 | Section 7 — Metrics | Metrics validated |
-| Step 6 | Frontmatter (complexity) + Sections 2, 6, 8, 9 | Final complexity |
+| Step 6 | Frontmatter (complexity) + Sections 6, 8, 9 | Final complexity |
 
 > Sections 6 (Out of Scope), 8 (Glossary), 9 (Open Questions) — and 10 (Constraints) when the PRD
 > inherits any — are filled incrementally at each step as new items emerge.
@@ -134,6 +139,16 @@ As you analyse, you will encounter ambiguities, missing information, or decision
 - The **journey bootstrap canvas** (Step 2) — full, or reduced to the empty skeleton fields — is ONE AskUserQuestion call grouping up to 4 fields; never decompose it into sequential questions. See `references/REF-user-journeys.md`.
 
 Wait for the answer before surfacing the step gate.
+
+### Name the Arbitrations
+
+Every artifact is presented with the boundary decisions that produced it: *here are the N calls I had
+to make — confirm or correct*, never *did I miss anything?*. The second form moves the work onto the
+PM and buys a silent validation.
+
+A decision only the PM can make is **asked before the gate** — not absorbed into the artifact, and
+not filed as an `OQ-XXX`. An `OQ-XXX` records what stays open **after** asking, or what the PM
+explicitly defers.
 
 ### Step Confirmation
 
@@ -151,11 +166,30 @@ Read `references/REF-challenge-pass.md`, apply the protocol and surface the resu
 
 ### Advanced Elicitation
 
-Read `references/REF-advanced-elicitation.md` and apply the protocol whenever the user chooses Advanced Elicitation.
+`[A]` is **the agent's work, not a question to the PM.** Never answer `[A]` by asking what they want
+to dig into — that is the one thing the option does not mean. Produce, in one message:
 
-### Progressive File Writing
+1. what you could not settle on your own, reasoned visibly;
+2. 2–3 patterns identified for the current artifact — the per-artifact lists live in
+   `references/REF-advanced-elicitation.md`;
+3. 1–3 questions derived from that reasoning, never generic.
 
-The PRD file exists in full from Step 1 — the whole skeleton, every section, placeholders included. Each step then **replaces its section's placeholders in place**. This is what keeps the document consistent: a replacement is idempotent and position-independent, whereas inserting into a half-written file is how sections end up duplicated, out of order, or missing from the table of contents.
+Then re-present the gate. Read the reference for the pattern list of the artifact at hand.
+
+### Write Only After [C]
+
+**Nothing reaches the PRD file before the PM has chosen `[C]`.** A derivation presented at a gate
+lives in the conversation until it is validated — the PRD file records validated work, it is not a
+scratchpad. This holds at every step, including a version corrected after `[A]`.
+
+**The canonical memory is the other file, and it plays by other rules.** It receives items *during*
+derivation — the ERR candidates parked at Step 2, a tension spotted mid-analysis — because that is
+what it is for. Only the PRD waits for `[C]`.
+
+Once validated, a section is filled **in place**: the file has held the full skeleton, every section
+and every placeholder, since Step 1, and each step **replaces its own placeholders**. A replacement
+is idempotent and position-independent, whereas inserting into a half-written file is how sections
+end up duplicated, out of order, or missing from the table of contents.
 
 After each `[C]` validated by the PM, execute in this order before continuing:
 
@@ -242,7 +276,7 @@ Show the list of opportunities imported from the brief. Ask user to choose the o
 
 **Step Gate:**
 ```
-[C] Confirm the opportunity and continue
+[C] Confirm the opportunity → the PRD file is created, then Step 2 — User journeys
 ```
 
 Execute in this order before continuing
@@ -259,7 +293,7 @@ Execute in this order before continuing
 
 **Methodology:** Read `references/REF-user-journeys.md`
 
-1. **List the goals before writing any flow** — one line per persona → goal, from OPP-XXX and the brief, each passing the user-goal question: the actor could stop there satisfied, in one sitting. Confirm the list with the PM in one message; a single-goal scope is acceptable, log it. This settles the section's scope while a correction still costs one line.
+1. **List the goals before writing any flow** — one line per persona → goal, from OPP-XXX and the brief, each passing the user-goal question: the actor could stop there satisfied, in one sitting. Confirm the list with the PM in one message; a single-goal scope is acceptable, log it. This settles the section's scope while a correction still costs one line. **The personas confirmed here are what Section 2 states at `[C]`** — including the case where the answer is a cross-cutting population rather than a named persona.
 2. Run the **skeleton-based sufficiency check** for each confirmed goal — persona, trigger, variations — and follow its routing: direct derivation (assumed elements marked `[ASSUMPTION: ...]`), partial derivation plus ONE grouped AskUserQuestion call for the empty fields, or full bootstrap canvas.
 3. Derive the flows, each carrying its goal on a `*Goal:*` line. Apply the granularity and routing rules — parameters, variations, orphan actions, ERR candidates parked in the canonical memory for Step 4. Reason in **observable results, never in `FUNC-` ids**: those are assigned and frozen at Step 3.
 4. Challenge Pass, then present for the user check.
@@ -267,13 +301,14 @@ Execute in this order before continuing
 
 **Step Gate:**
 ```
-[A] Advanced Elicitation
-[C] Continue to Step 3 — Functional blocks
+[A] Advanced Elicitation — I name what I could not settle, and ask about it
+[C] Validate → Sections 2 and 3 are written to file, then Step 3 — Functional blocks
 ```
 
 At the gate: every remaining `[ASSUMPTION]` marker is confirmed by the PM or converted to an OQ-XXX — none survives into Section 3.
 
-**After [C]:** backward check, fill the PRD section, update the canonical memory
+**Before [C]:** the derivation stays in the conversation — nothing is written to the PRD file.
+**On [C]:** backward check → fill the PRD section → update the canonical memory.
 
 ---
 
@@ -287,11 +322,12 @@ cross-cutting FUNC. Fix the FUNC order before the gate; the ids are frozen once 
 
 **Step Gate:**
 ```
-[A] Advanced Elicitation
-[C] Validate FUNCs and continue to Step 4 — Acceptance criteria
+[A] Advanced Elicitation — I name what I could not settle, and ask about it
+[C] Validate FUNCs → Section 4 is written to file, then Step 4 — Acceptance criteria
 ```
 
-**After [C]:** backward check, fill the PRD section, update the canonical memory
+**Before [C]:** the derivation stays in the conversation — nothing is written to the PRD file.
+**On [C]:** backward check → fill the PRD section → update the canonical memory.
 
 ---
 
@@ -300,13 +336,19 @@ cross-cutting FUNC. Fix the FUNC order before the gate; the ids are frozen once 
 **Methodology:** Read `references/REF-acceptance-criteria.md`
 Derive acceptance criteria when you have enough information. Start from the **ERR candidates** parked in the canonical memory at Step 2.
 
+**This step also completes Section 4.** A FUNC written at Step 3 could not cite criteria that did not
+exist yet, so its `**Acceptance criteria:**` bullets are filled here, at `[C]`, from the ids just
+derived. Section 5 is the source of truth for the wording — see the reference for the per-type
+linearisation. A FUNC left with no criterion is unspecified, not simple, and the validator says so.
+
 **Step Gate:**
 ```
-[A] Advanced Elicitation
-[C] Validate and continue to Step 5
+[A] Advanced Elicitation — I name what I could not settle, and ask about it
+[C] Validate → Section 5 is written and Section 4 completed, then Step 5 — Leading metrics
 ```
 
-**After [C]:** backward check, fill the PRD section, update the canonical memory
+**Before [C]:** the derivation stays in the conversation — nothing is written to the PRD file.
+**On [C]:** backward check → fill the PRD section → update the canonical memory.
 
 ---
 
@@ -317,11 +359,12 @@ Derive leading metrics when you have enough information.
 
 **Step Gate:**
 ```
-[A] Advanced Elicitation
-[C] Validate and continue to Step 6 — Complexity
+[A] Advanced Elicitation — I name what I could not settle, and ask about it
+[C] Validate → Section 7 is written to file, then Step 6 — Complexity
 ```
 
-**After [C]:** backward check, fill the PRD section, update the canonical memory
+**Before [C]:** the derivation stays in the conversation — nothing is written to the PRD file.
+**On [C]:** backward check → fill the PRD section → update the canonical memory.
 
 ---
 
@@ -332,16 +375,17 @@ Count FUNCs and personas. Apply grid. Propose result with justification. If PM d
 
 **Step Gate:**
 ```
-[C] Confirm complexity and continue to PRD generation
+[C] Confirm complexity → the remaining sections are written to file, then the quality gate
 ```
 
-**After [C]:** backward check, fill the PRD section, update the canonical memory
+**Before [C]:** the derivation stays in the conversation — nothing is written to the PRD file.
+**On [C]:** backward check → fill the PRD section → update the canonical memory.
 
 ---
 
 ## Check Quality Gate
 
-Run all 12 checks before saving. Fix any failure first.
+Run all 12 checks before saving. Fix any failure first. QG-11 appears in both tables — one number, two halves, because only one of them is decidable by a script.
 
 **Structural block** — run the deterministic validator, do not eyeball it:
 
@@ -349,9 +393,12 @@ Run all 12 checks before saving. Fix any failure first.
 python3 <skill-dir>/scripts/validate_prd.py {DOCS_ROOT}/prd/prd<NN>-<short-name>.md
 ```
 
-It covers QG-4, QG-6, QG-8, QG-9, QG-10, QG-11 and QG-12 — everything a machine can decide,
-including the PRD's referential integrity (duplicate ids, orphan criteria, the FUNC ↔ AC mirror)
-and the fidelity of each acceptance-criteria bullet to its section 5 definition. This
+It covers QG-4, QG-6, QG-8, QG-9, QG-10, QG-12 and the resolvable half of QG-11 — everything a
+machine can decide, including the PRD's referential integrity (duplicate ids, orphan criteria, the
+FUNC ↔ AC mirror) and the fidelity of each acceptance-criteria bullet to its section 5 definition.
+**QG-11 is split on purpose:** the script resolves the brief and reads its status, while whether
+every LGM/DC traces back to the brief is judged with the content block below — no script can decide
+that half, and leaving it implied is how it ended up checked by nobody. This
 matters because the remaining checks are judged by the same model that just wrote the PRD, and a
 self-graded gate drifts. Exit `0` = clean, `1` = at least one error, `2` = bad path. Display the
 output only on failure.
@@ -363,8 +410,8 @@ output only on failure.
 | QG-8 | **Metrics completeness** | Section 7 has all 3 subsections; each either populated or explicitly "None identified." / "None defined." | A subsection absent — OR — a DC row without numeric threshold |
 | QG-9 | **Frontmatter fields** | The 8 required fields present and valid: `id`, `title`, `version`, `status`, `complexity`, `date`, `author`, `brief` | A required field missing, misspelled, or invalid value |
 | QG-10 | **Document title** | First content line after `---` is a H1 matching `title` exactly | H1 absent — OR — H1 text differs from `title` field |
-| QG-11 | **Brief traceability** | Referenced brief exists with `status: validated`; every LGM/DC traces to brief | `brief` references non-existent or non-validated file — OR — LGM/DC introduced without brief anchor without tension |
-| QG-12 | **AC integrity** | Every id referenced in a FUNC is defined in Section 5, every id is defined once, every journey reveals a FUNC, every FUNC carries criteria, and Section 5's *Applies to* mirrors the FUNCs' lists | A dangling or duplicated id — OR — a journey revealing nothing — OR — a FUNC with no criteria — OR — the two directions disagreeing |
+| QG-11 | **Brief resolution** *(script half)* | The `brief` field resolves to a file on disk carrying `status: validated` | The brief resolves to nothing (ERROR) — OR — it is not validated (WARN: a signal, not a wall — continue and log the tension, see `references/REF-brief-contract.md`) |
+| QG-12 | **AC integrity** | Every id referenced in a FUNC is defined in Section 5, every id is defined once, every FUNC carries criteria, and Section 5's *Applies to* mirrors the FUNCs' lists | A dangling or duplicated id — OR — a FUNC with no criteria — OR — the two directions disagreeing |
 
 **Content block** — semantic checks, no script can decide these. Judge each one and display the result.
 
@@ -375,6 +422,7 @@ output only on failure.
 | QG-3 | **BR altitude** | Every BR: observable product behavior, no tech mechanism or design detail | BR names API, endpoint, UI component, or prescribes layout |
 | QG-5 | **Journey → FUNC** | Every journey step implying a capability has a matching FUNC | A journey step describes a capability with no FUNC |
 | QG-7 | **OQ completeness** | Every product ambiguity is an OQ-XXX; no OQ contains a tech choice | An assumption is embedded in a FUNC or BR — OR — an OQ asks about frameworks or protocols |
+| QG-11 | **Brief traceability** *(judged half)* | Every LGM and DC traces to a Desired Outcome or a Damage Control item of the brief | An LGM or DC introduced with no brief anchor and no divergence tension logged |
 
 **On QG pass:** set `status: review` and save.
 
