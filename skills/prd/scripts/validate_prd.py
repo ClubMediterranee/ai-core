@@ -36,7 +36,8 @@ Checks, per PRD:
                       Constraints checked only when present; no stray `## ` sub-heading.
   Leftovers         : the template's instantiation comment removed (ERROR); no `[ASSUMPTION: ...]`
                       marker surviving the step gate (ERROR); no `[placeholder]` or `XXX` token
-                      left behind (WARN).
+                      left behind (WARN) — short all-caps codes such as `[FR]` are content, not
+                      slots, and do not count.
 
 Deliberately NOT checked: gaps in the numbering. An id is an identifier, not a rank — a merged
 FUNC retires its id and the gap is the expected trace of that merge. Flagging gaps would push
@@ -110,6 +111,9 @@ ID_FIELD_RE = re.compile(r"^PRD-?(\d+)$", re.I)
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 # a bracketed span that is not a markdown link — i.e. a leftover template placeholder
 PLACEHOLDER_RE = re.compile(r"\[[^\]\n]{2,}\](?!\()")
+# …except a short all-caps code, which is content: `[FR]`, `[DE]`, `[B2C]` annotate a country variant
+# or a segment. `[XXX]` stays excluded — that one really is a template token.
+LOCALE_TAG_RE = re.compile(r"\[(?!XXX\])[A-Z][A-Z0-9]{1,3}\]")
 # a speculative-derivation marker from Step 2 — none may survive into a validated PRD
 ASSUMPTION_RE = re.compile(r"\[ASSUMPTION:")
 
@@ -634,15 +638,17 @@ def check_metrics(path: Path, lines: list[str], sections: dict, f: list[Finding]
             continue
         content = subs[match]
         text = "\n".join(content)
+        # `\*{0,2}` as in TABLE_ROW_ID_RE: an id written `**DC-001**` is the same row. Without it a
+        # bold id makes the subsection look empty, and QG-8 fails on a purely cosmetic choice.
         rows = [ln for ln in content if ln.strip().startswith("|")
-                and re.search(r"\|\s*(LGM|DC|LDM)-\d+", ln)]
+                and re.search(r"\|\s*\*{0,2}(LGM|DC|LDM)-\d+", ln)]
         if not rows and not any(marker in text for marker in EMPTY_MARKERS):
             f.append(Finding("ERROR", name,
                              f"QG-8: `{expected}` is empty and carries neither "
                              f'"None identified." nor "None defined."'))
         if expected == "Damage Control":
             for row in rows:
-                cells = [c.strip() for c in row.strip().strip("|").split("|")]
+                cells = split_cells(row)
                 if not cells or not re.search(r"\d", cells[-1]):
                     rid = re.search(r"DC-\d+", row)
                     f.append(Finding("ERROR", name,
@@ -672,7 +678,9 @@ def check_leftovers(path: Path, text: str, lines: list[str], start: int,
             continue
         placeholders += PLACEHOLDER_RE.findall(lines[i])
     placeholders = [p for p in placeholders
-                    if not re.fullmatch(r"\[[ x]\]", p) and not p.startswith("[ASSUMPTION:")]
+                    if not re.fullmatch(r"\[[ x]\]", p)
+                    and not LOCALE_TAG_RE.fullmatch(p)
+                    and not p.startswith("[ASSUMPTION:")]
     if placeholders:
         sample = ", ".join(dict.fromkeys(placeholders[:3]))
         f.append(Finding("WARN", name,

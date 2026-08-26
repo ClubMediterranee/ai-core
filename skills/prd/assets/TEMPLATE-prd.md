@@ -188,8 +188,8 @@ stays — reading order is the position below, not the number.*
 
 | Item | Reason |
 |------|--------|
-| [NG-001] [Excluded capability] | [Why out of scope] |
-| [NG-002] [Excluded capability] | [Why out of scope] |
+| NG-001 — [Excluded capability] | [Why out of scope] |
+| NG-002 — [Excluded capability] | [Why out of scope] |
 
 ---
 
