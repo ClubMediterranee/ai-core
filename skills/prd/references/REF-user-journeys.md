@@ -158,9 +158,9 @@ If AskUserQuestion is unavailable, present the canvas as markdown in a single me
 
 Ask the user to confirm, complete, modify or delete journeys.
 
-### At the step gate
+### Before the step gate
 
-Every remaining `[ASSUMPTION]` marker is either confirmed by the PM or converted to an `OQ-XXX` (with the journey in the *Blocks* column). No marker survives into the validated Section 3.
+Every remaining `[ASSUMPTION]` marker is either confirmed by the PM or converted to an `OQ-XXX` (with the journey in the *Blocks* column). No marker survives into the validated Section 3. Confirming one is a question, so it happens **before** the gate is surfaced — like the vocabulary freeze below.
 
 **Freeze the behavioural vocabulary before continuing.** The journeys are where the words that
 will propagate into the FUNCs, BRs and ERRs are chosen. Pick out the terms that carry an

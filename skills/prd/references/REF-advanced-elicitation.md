@@ -60,6 +60,7 @@ Patterns to identify (pick the 2-3 most relevant):
 - **Missing capability:** [journey step or BR that implies a capability with no corresponding FUNC]
 - **Oversized FUNC:** [FUNC covering two independent user goals, each with its own observable outcome — split it]
 - **Interaction-level FUNC:** [FUNC that describes a UI interaction with no standalone goal — "display", "show", "render" — merge into the parent capability]
+- **Non-autonomous FUNC:** [FUNC whose scenario cannot be written without another FUNC acting first — its `GIVEN` names another FUNC's action rather than a state of the world; a merge candidate, see `REF-functional-blocks.md`, *The boundary discriminant*. A cut the PM arbitrates, which is why it lives here and not in the Challenge Pass]
 
 ---
 

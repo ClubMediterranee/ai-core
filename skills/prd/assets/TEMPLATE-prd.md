@@ -14,7 +14,8 @@ INSTANTIATION NOTES — delete this whole comment block in the generated PRD.
 
 This file is a skeleton, not a description of one: Step 1 copies it verbatim into
 `{DOCS_ROOT}/prd/prd<NN>-<short-name>.md`, and each later step fills its section IN PLACE by
-replacing the [placeholders]. Nothing here is illustrative — every line you leave behind ends up
+replacing the [placeholders] — but only once the PM has chosen [C] at that step's gate. Nothing is
+written here before a validation. Nothing here is illustrative — every line you leave behind ends up
 in the PRD, so a placeholder still visible at the quality gate is an unfinished section.
 
 Frontmatter — the 8 required fields, all validated by `scripts/validate_prd.py` (QG-9):
@@ -31,9 +32,11 @@ Language: the PRD body is written in the PM's language, but section titles, id p
 structural markers "None identified." / "None defined." stay exactly as written here. The validator
 and the downstream `spec` skill match on them.
 
-Sections that stay empty: write "None identified." (§5 States, §5 Permissions, §7 Damage Control)
-or "None defined." (§7 Leading Metrics) rather than deleting the section — QG-8 checks that the
-three §7 subsections are present, and an absent section is indistinguishable from a forgotten one.
+Sections that stay empty: write "None identified." (§5 States, §5 Permissions, §7 Lagging Metrics,
+§7 Damage Control) or "None defined." (§7 Leading Metrics) rather than deleting the section — QG-8
+checks that the three §7 subsections are present, and an absent section is indistinguishable from a
+forgotten one. A brief with no Desired Outcomes leaves §7 Lagging at "None identified." and a tension
+logged; it is not a reason to fail the gate.
 -->
 
 # [Product Name]
@@ -69,15 +72,17 @@ three §7 subsections are present, and an absent section is indistinguishable fr
 
 ## 2. Personas
 
-[One short paragraph describing the persona, from the information in the brief. If this PRD covers
-a cross-cutting step that every user of the flow goes through, say so and describe that
-population — do not invent a persona for it.]
+[One short paragraph per persona confirmed at Step 2, from the information in the brief. If this
+PRD covers a cross-cutting step that every user of the flow goes through, say so and describe that
+population as one — do not invent a persona for it.]
 
 ---
 
 ## 3. User Journeys
 
-*End-to-end flows anchored on [OPP-XXX]. One journey carries one user goal, stated under its heading.*
+*End-to-end flows anchored on [OPP-XXX]. One journey carries one user goal, stated under its
+heading. Step 2 leaves every* Capabilities revealed: *line at `TBD` — Step 3 assigns the FUNC ids
+and fills them in.*
 
 ### Journey 1 — [Short name for this flow]
 
@@ -90,7 +95,7 @@ population — do not invent a persona for it.]
 3. [Step 3 — optional variation, prefixed "Variation:" — flat numbering, no 2a/2b branches]
 4. [Step 4 — the goal reached]
 
-*Capabilities revealed:* FUNC-001, FUNC-002
+*Capabilities revealed:* TBD
 
 ### Journey 2 — [Short name for this flow]
 
@@ -101,7 +106,7 @@ population — do not invent a persona for it.]
 3. [Step 3 — optional variation, prefixed "Variation:" — flat numbering, no 2a/2b branches]
 4. [Step 4 — the goal reached]
 
-*Capabilities revealed:* FUNC-003
+*Capabilities revealed:* TBD
 
 ---
 
@@ -199,11 +204,12 @@ stays — reading order is the position below, not the number.*
 
 ### Lagging Metrics
 
-*Imported from the brief's Desired Outcomes. These are the success criteria for the initiative.*
+*Imported from the brief's Desired Outcomes. These are the success criteria for the initiative.
+Write "None identified." if the brief carries none — and log the tension.*
 
-| ID | Metric | Threshold |
-|----|--------|-----------|
-| LGM-001 | [Imported from brief] | [Numeric target] |
+| ID | Metric | Baseline (T0) | Threshold |
+|----|--------|---------------|-----------|
+| LGM-001 | [Imported from brief] | [Current value, or TBD] | [Numeric target] |
 
 ### Damage Control
 

@@ -260,7 +260,7 @@ A pool of acceptance criteria is valid if:
 
 1. Every **BR** describes an observable product behavior without naming a technical mechanism or design detail
 2. Every **BR** is binary-testable (precise condition, no subjective language)
-3. Every **BR** opens with a recap naming the case handled, and **stands alone** — no BR references another BR in its body
+3. Every **BR** opens with a recap naming the case handled, and **stands alone** — no BR references another BR in its body *(both decided by `scripts/validate_prd.py`, QG-12 — the Challenge Pass does not restate them)*
 4. No **BR** re-enumerates the states of an object for which an **ST-XXX** exists
 5. **ST-XXX** are derived only for objects with an identifiable lifecycle in the journeys
 6. **PERM-XXX** are derived only for restrictions identified in the journeys or BRs

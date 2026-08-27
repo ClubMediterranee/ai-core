@@ -112,11 +112,11 @@ the validator reports it.
 Every FUNC has **at least one nominal scenario** that proves the capability is testable:
 
 ```
-Nominal scenario:
-  GIVEN [prerequisite state — only when it is not obvious from the WHEN]
-  WHEN [triggering condition]
-  THEN [observable outcome]
-  AND [additional outcome if needed]
+**Nominal scenario:**
+- **GIVEN** [prerequisite state — only when it is not obvious from the WHEN]
+- **WHEN** [triggering condition]
+- **THEN** [observable outcome]
+- **AND** [additional outcome if needed]
 ```
 
 `GIVEN` is **optional**. It states the conditions under which the test runs — logged in or not, a
@@ -127,6 +127,10 @@ booking that already holds a child, an option still valid. Skip it when the cont
 is legitimate, and the FUNC stays autonomous. A prerequisite describing **another FUNC's action**
 ("the user has submitted the form of FUNC-004") is the merge signal from the discriminant above,
 written down instead of judged from memory.
+
+Autonomy is a cut, decided here with the PM. The Challenge Pass does not re-litigate it: `[A]`
+offers it as a pattern (*Non-autonomous FUNC*, `REF-advanced-elicitation.md`) when the PM wants to
+go deeper, and the merge stays their call.
 
 `GIVEN` / `WHEN` / `THEN` / `AND` are machine tokens — they stay in English in every language.
 

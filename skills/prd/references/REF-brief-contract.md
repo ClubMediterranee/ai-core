@@ -28,7 +28,7 @@ what to do when it is missing.
 | Problem statement | Framing of §1 Executive Summary | State "Not in the brief" and ask the PM |
 | Personas | §2 Personas | Ask the PM — a PRD without an actor cannot produce ACs |
 | Opportunities `OPP-XXX` | The Step 1 choice, quoted verbatim in §1 | Ask the PM to name the opportunity; it becomes an untraced scope, log a tension |
-| Desired Outcomes / KRs | §7 Lagging Metrics (`LGM-XXX`) | §7 Lagging stays empty and QG-11 warns — the PRD has no success criterion |
+| Desired Outcomes / KRs | §7 Lagging Metrics (`LGM-XXX`) | Write "None identified." in §7 Lagging and log the tension — the PRD has no success criterion. Leaving the subsection blank is a QG-8 **error**, not a warning |
 | Damage Control | §7 Damage Control (`DC-XXX`) | Write "None identified." — an explicit absence, not a silent one |
 
 `brief` in the PRD frontmatter references the source file, so that `validate_prd.py` can resolve it

@@ -21,7 +21,11 @@ The PRD uses **three complementary metric lenses**:
 
 ## LGMs and DCs
 
-Imported from the brief and validated during the brief import — **do not re-present during Leading Metrics derivation**.
+Imported from the brief and validated at import, line by line against the brief's Desired Outcomes
+and Damage Control — **do not re-present during Leading Metrics derivation**. The Challenge Pass
+carries that validation as its first Metrics row, *LGM/DC without brief anchor*
+(`REF-challenge-pass.md`): an import that drifted from the brief, or a metric the brief never
+carried, is caught at Step 5 and once more when the pass re-runs at the quality gate.
 
 Each LGM must have:
 - A numeric threshold or a measurable direction of change
@@ -48,11 +52,25 @@ Each DC must have:
 
 ## LDM Format
 
+**Format** — one row of the §7 *Leading Metrics* table:
+
 ```
-LDM-001 : [Observable user behavior]
-  Collection method : [How it is collected — analytics event, survey, session recording...]
-  Review cadence : [weekly / monthly / per release]
+| ID | Observable behavior | Collection method | Review cadence |
+|----|---------------------|-------------------|----------------|
+| LDM-001 | [Observable user behavior] | [analytics event, survey, session recording…] | [weekly / monthly / per release] |
 ```
+
+**Example:**
+
+```
+| ID | Observable behavior | Collection method | Review cadence |
+|----|---------------------|-------------------|----------------|
+| LDM-001 | Rate of users who view ≥ 2 accommodations in a single session | analytics event on accommodation view | weekly |
+| LDM-002 | Share of sessions reaching the criteria-edit step | funnel step event | per release |
+```
+
+A block form defines nothing: §7 is a table, and `validate_prd.py` only counts table rows. A
+subsection filled in any other shape reads as empty and fails QG-8.
 
 **Formulation rule:**
 - Write as an **observable user behavior**, not a technical indicator
@@ -75,6 +93,12 @@ Wait for the answer. Then formalize as LDM-XXX with collection method and review
 > - **Unmeasurable LDM:** [leading metric with no identifiable collection method]
 > - **Missing LDM:** [FUNC that generates a user behavior not yet captured as a leading signal]
 > - **Lagging disguised as leading:** [metric that only becomes available after the brief's KR timeframe]
+
+---
+
+## Quality check
+
+Read `REF-challenge-pass.md` — section "Challenge Pass — Metrics" — and apply it before presenting.
 
 ---
 
