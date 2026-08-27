@@ -10,8 +10,13 @@ description: >
   Requires a validated brief as input. NOT for turning an existing PRD into developer specs or
   user stories — that is the `spec` skill.
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion
-version: 1.6.0
+version: 1.6.1
 changelog:
+  - version: 1.6.1
+    date: 2026-08-27
+    changes:
+      - "`REF-advanced-elicitation.md` keeps only what `[A]` adds — the completeness and cut patterns per artifact (missing step, edge case, oversized / interaction-level / non-autonomous FUNC, missing ERR / ST / PERM); the protocol was already inlined in SKILL.md and the altitude patterns duplicated the Challenge Pass rows"
+      - "Validator: a bare filename passed from inside `prd/` resolves its brief in `../brief/` — the unresolved path made `parent.parent` the current directory, and every eval fixture failed QG-11 for a brief that was there"
   - version: 1.6.0
     date: 2026-08-26
     changes:
