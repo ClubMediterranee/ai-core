@@ -546,6 +546,28 @@ class BriefStatus(unittest.TestCase):
         self.assertTrue(has(warns, "QG-11", "not validated"), warns)
 
 
+class TheBriefResolvesFromAnyWorkingDirectory(unittest.TestCase):
+    """A bare filename passed from inside `prd/` used to look for the brief in `./brief/`."""
+
+    def test_a_bare_filename_still_resolves_the_brief(self):
+        import os
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "brief").mkdir()
+            (root / "prd").mkdir()
+            (root / "brief" / "brief-001.md").write_text(
+                "---\nstatus: validated\n---\n\n# Brief 001\n", encoding="utf-8")
+            (root / "prd" / "prd01-demo.md").write_text(build(), encoding="utf-8")
+            cwd = os.getcwd()
+            os.chdir(root / "prd")
+            try:
+                findings: list[V.Finding] = []
+                V.check_prd(Path("prd01-demo.md"), findings)
+            finally:
+                os.chdir(cwd)
+        self.assertEqual([f.msg for f in findings], [], findings)
+
+
 class EveryIdFamilyIsDefinedOnce(unittest.TestCase):
     """§5 had the rule; FUNCs, metrics, exclusions and questions get the same one."""
 

@@ -1088,7 +1088,9 @@ EVERY_RUN = [check_references, check_leftovers]
 
 
 def check_prd(path: Path, findings: list[Finding], up_to: int | None = None) -> None:
-    doc = parse_document(path)
+    # resolved first: a bare filename passed from inside `prd/` has `parent.parent == .`, and the
+    # brief would be looked for in `./brief/` instead of `../brief/`
+    doc = parse_document(path.resolve())
     if not doc.fm:
         findings.append(Finding("ERROR", path.name, "QG-9: no YAML frontmatter delimited by `---`", 1))
         return
