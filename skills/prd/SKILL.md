@@ -16,14 +16,14 @@ changelog:
     date: 2026-08-27
     changes:
       - "`REF-advanced-elicitation.md` keeps only what `[A]` adds — the completeness and cut patterns per artifact (missing step, edge case, oversized / interaction-level / non-autonomous FUNC, missing ERR / ST / PERM); the protocol was already inlined in SKILL.md and the altitude patterns duplicated the Challenge Pass rows"
-      - "Validator: a bare filename passed from inside `prd/` resolves its brief in `../brief/` — the unresolved path made `parent.parent` the current directory, and every eval fixture failed QG-11 for a brief that was there"
+      - "Validator: a bare filename passed from inside `prd/` resolves its brief in `../brief/` — the unresolved path made `parent.parent` the current directory, and a PRD validated from inside its own folder failed QG-11 for a brief that was there"
   - version: 1.6.0
     date: 2026-08-26
     changes:
       - "Quality gate in three movements — the script, the Challenge Pass re-run on the finished document, and the two crossings no table can see (QG-5 implied capabilities, QG-7 assumptions linked to an OQ) — after the judged QG rows turned out to paraphrase the Challenge Pass tables, so that two definitions of one rule could drift"
       - "One check, one home: what the script decides is no longer restated in a Challenge Pass row (a BR citing a BR), and what a reader decides is defined once, in `REF-challenge-pass.md`; QG-11's judged half became the first row of the Metrics table, checked at import and again at the gate"
-      - "Challenge Pass tables in one funnel order — existence, cut, altitude (technical before design), wording — with the rows the campaign showed missing: out-of-scope leak on journeys and FUNCs, a misplaced variation, an LGM/DC with no brief anchor; the altitude rows apply to the four criterion types; a re-presentation re-runs the pass on the delta"
-      - "Step gates are two fixed lines, `[A]` and `[C]`, declared machine tokens: the checklist the block used to carry was translated away in every observed run, and what `[C]` executes is the agent's process, not something the PM reviews"
+      - "Challenge Pass tables in one funnel order — existence, cut, altitude (technical before design), wording — with the rows real runs showed missing: out-of-scope leak on journeys and FUNCs, a misplaced variation, an LGM/DC with no brief anchor; the altitude rows apply to the four criterion types; a re-presentation re-runs the pass on the delta"
+      - "Step gates are two fixed lines, `[A]` and `[C]`, declared machine tokens: the checklist the block used to carry was translated away in every run seen, and what `[C]` executes is the agent's process, not something the PM reviews"
       - "`[C]` runs `validate_prd.py --up-to <N>` on the sections written so far — a form error is caught at the step that made it, not six steps later"
       - "Validator rewritten: one parse into a document model, checks grouped by the step that writes what they read, `--up-to`; a missing DC threshold warns like its neighbours; every id family is defined once; a `FUNC-XXX` cited outside its own sections must exist; a duplicated id no longer hides the other findings on its row"
   - version: 1.5.0
