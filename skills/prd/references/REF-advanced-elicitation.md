@@ -56,4 +56,7 @@ template.
 
 ## Leading Metrics
 
-See `REF-metrics.md` — section "Advanced Elicitation — Patterns to Identify".
+- **Missing LDM:** [FUNC that generates a user behavior not yet captured as a leading signal]
+
+What is *wrong* with a metric — unmeasurable, lagging disguised as leading, no brief anchor — is
+the Challenge Pass's Metrics table, not an `[A]` pattern.

@@ -22,12 +22,17 @@ groups 1..N and stays silent about what later steps still owe; without it, every
   Step 2 — personas and journeys
     QG-1   every journey states a `*Goal:*` and numbers its steps flat, no `2a.`         WARN
     QG-12  §2 Personas is not empty                                                     WARN
+    QG-2   a journey step names a UI component (modal, drawer, onglet…) — the lexical
+           half; the semantic half (positions, mechanics, container-driven carving)
+           stays with the Challenge Pass                                                WARN
   Step 3 — functional blocks
     QG-4   every FUNC carries a WHEN and a THEN                                         ERROR
     QG-6   FUNC ↔ journeys in three directions: every FUNC revealed by a journey, every
            revealed id defined, every journey revealing at least one — a `TBD` left
            from Step 2 reveals nothing                                                  ERROR
     QG-12  FUNC ids defined once                                                        ERROR
+    QG-2   a FUNC names a UI component in its title, capability or scenario — same
+           lexical half as Step 2's                                                     WARN
   Step 4 — acceptance criteria
     QG-12  §4 ↔ §5: every id referenced in §4 is defined, every id is defined once, each
            bullet equals its §5 row (verbatim for BR/ERR, by containment for ST/PERM),
@@ -65,6 +70,9 @@ that says the document is misnumbered, the checks that depend on it stay silent 
 warning per id and bury the structural finding that explains them all. Headings are read outside
 fenced code blocks only, and ids inside a fence never count, so a PRD may quote a template or a
 payload without shadowing its own sections.
+
+The suite `test_validate_prd.py` beside this script tests the validator itself — run it after
+any change. It never runs during a PRD session; nothing in the skill loads it.
 
 Exit codes: 0 = clean · 1 = at least one ERROR · 2 = nothing to validate (empty or bad directory).
 A file the caller named explicitly is always validated: if it does not exist that is an ERROR, not
@@ -177,7 +185,13 @@ ID_FIELD_RE = re.compile(r"^PRD-?(\d+)$", re.I)
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 # the AI listing itself as author means the PM never took ownership; the convention also forbids
 # an email in this field (SKILL.md Step 1: "The name alone")
-AI_AUTHOR_RE = re.compile(r"anthropic|noreply|copilot", re.I)
+AI_AUTHOR_RE = re.compile(r"anthropic|noreply|copilot|gemini|chatgpt|openai", re.I)
+# QG-2's script half — an unambiguous UI-component noun in a journey step or a FUNC is a design
+# leak whatever the intent; the Challenge Pass judges the semantic half (positions, mechanics,
+# container-driven carving). WARN: a word list can misfire, a reader arbitrates. EN + FR.
+UI_COMPONENT_RE = re.compile(
+    r"\b(modale?s?|pop-?ups?|layers?|drawers?|carr?ousels?|tooltips?|infobulles?|dropdowns?|"
+    r"accord[ée]ons?|onglets?|checkbox(?:es)?|sliders?|toasts?|breadcrumbs?)\b", re.I)
 # a bracketed span that is not a markdown link — i.e. a leftover template placeholder
 PLACEHOLDER_RE = re.compile(r"\[[^\]\n]{2,}\](?!\()")
 # a speculative-derivation marker from Step 2 — none may survive into a validated PRD
@@ -586,12 +600,14 @@ def resolve_brief(path: Path, ref: str) -> Path | None:
     for p in (cand, cand.with_suffix(".md")):
         if p.is_file():
             return p
-    pattern = re.compile(re.escape(Path(ref).stem), re.I)
+    # `brief-01` and `brief01-shopping` are the same reference: an id's punctuation varies
+    # between a brief's frontmatter and its filename, the letters do not
+    wanted = re.sub(r"[^a-z0-9]", "", Path(ref).stem.lower())
     for folder in (path.parent.parent / "brief", path.parent.parent / "briefs",
                    path.parent, path.parent.parent):
         if folder.is_dir():
             for p in sorted(folder.glob("*.md")):
-                if pattern.search(p.stem):
+                if wanted and wanted in re.sub(r"[^a-z0-9]", "", p.stem.lower()):
                     return p
     return None
 
@@ -672,14 +688,52 @@ def check_journey_shape(doc: Document, f: list[Finding]) -> None:
 def check_personas(doc: Document, f: list[Finding]) -> None:
     if doc.section(2) is None:
         return
-    text = doc.text_of(2).strip()
-    prose = [ln for ln in text.splitlines() if ln.strip()]
-    if not prose or all(ln.startswith(("*", ">")) for ln in prose):
+    # emphasis is content — a persona written in italics is not an empty section. Non-content is
+    # only the quote lines and the bracketed placeholder, which in the template spans several lines
+    text = re.sub(r"\[[^\]]*\]", "", doc.text_of(2))
+    prose = [ln for ln in text.splitlines() if ln.strip() and not ln.lstrip().startswith(">")]
+    if not prose:
         say(f, doc, "WARN", 2, "QG-12: section 2 Personas is empty — a PRD without an actor cannot "
                                "produce acceptance criteria, and Step 6 counts personas to size it")
 
 
+def ui_components(doc: Document, number: int) -> list[tuple[int, str]]:
+    """(1-based line, matched word) for every clean line of a section naming a UI component."""
+    sec = doc.section(number)
+    if sec is None:
+        return []
+    out = []
+    for i in range(sec.start + 1, sec.end):
+        m = UI_COMPONENT_RE.search(doc.clean[i])
+        if m:
+            out.append((i + 1, m.group(0)))
+    return out
+
+
+def check_journey_ui(doc: Document, f: list[Finding]) -> None:
+    """QG-2, script half — see UI_COMPONENT_RE."""
+    for line, word in ui_components(doc, 3):
+        say(f, doc, "WARN", 2, f"QG-2: a journey step names a UI component ({word!r}, line {line}) "
+                               "— a step is written at product altitude; the component stays with "
+                               "the mockup")
+
+
 # --------------------------------------------------------------------------- step 3
+
+
+def check_func_ui(doc: Document, f: list[Finding]) -> None:
+    """QG-2, script half, on §4 — the finding names the FUNC when one encloses the line."""
+    for line, word in ui_components(doc, 4):
+        fid = None
+        for fn in doc.funcs:
+            if fn.line <= line:
+                fid = fn.fid
+            else:
+                break
+        where = fid or f"section 4 (line {line})"
+        say(f, doc, "WARN", 3, f"QG-2: {where} names a UI component ({word!r}, line {line}) — a "
+                               "capability is written at product altitude; the component stays "
+                               "with the mockup")
 
 
 def check_scenarios(doc: Document, f: list[Finding]) -> None:
@@ -929,8 +983,8 @@ def check_complexity(doc: Document, f: list[Finding]) -> None:
     expected = next(band for band, ceiling in COMPLEXITY_GRID if len(funcs) <= ceiling)
     if expected != declared:
         say(f, doc, "WARN", 6, f"QG-9: complexity is {declared} for {len(funcs)} FUNCs, the grid "
-                               f"says {expected} — legitimate if the PM overrode it, otherwise a "
-                               "miscount")
+                               f"says {expected} from the FUNC count alone — legitimate if the "
+                               "personas or the PM raised it, otherwise a miscount")
 
 
 def table_rows(doc: Document, number: int) -> list[tuple[int, list[str]]]:
@@ -1078,8 +1132,8 @@ def check_leftovers(doc: Document, up_to: int | None, f: list[Finding]) -> None:
 
 STEP_CHECKS = {
     1: [check_frontmatter, check_title, check_brief, check_structure],
-    2: [check_journey_shape, check_personas],
-    3: [check_scenarios, check_func_journeys, check_func_ids],
+    2: [check_journey_shape, check_personas, check_journey_ui],
+    3: [check_scenarios, check_func_journeys, check_func_ids, check_func_ui],
     4: [check_criteria, check_ac_tables],
     5: [check_metrics],
     6: [check_complexity, check_closing_sections],

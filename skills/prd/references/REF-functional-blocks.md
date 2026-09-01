@@ -56,6 +56,13 @@ form capability behaves. It is a constraint across FUNCs: one BR, referenced by 
 same observable result. One FUNC, with `WHEN the user adds an item from the listing or from the
 product page`. Two FUNCs would duplicate near-identical acceptance criteria.
 
+**Carved by container → re-cut by capability.**
+A details panel with three tabs — floor plan, amenities, 360° view — is not "open the panel"
+plus one FUNC per tab: `GIVEN the panel is open` binds each to the component. Apply the
+discriminant to the outcomes instead: consulting the floor plan and consulting the amenities are
+each autonomous (`Users can view … without leaving the room sheet`); the panel, its tabs and
+their default state belong to the DRD.
+
 **No standalone scenario → merge.**
 A "Users can confirm their slot selection" whose WHEN/THEN cannot be written without the slot picker
 having been used first is not a separate capability. Merge it into the picker FUNC, or restate the
@@ -126,13 +133,24 @@ booking that already holds a child, an option still valid. Skip it when the cont
 **`GIVEN` also makes the autonomy test visible.** A prerequisite describing a **state of the world**
 is legitimate, and the FUNC stays autonomous. A prerequisite describing **another FUNC's action**
 ("the user has submitted the form of FUNC-004") is the merge signal from the discriminant above,
-written down instead of judged from memory.
+written down instead of judged from memory. And a `GIVEN` naming a **UI container's state** —
+"the layer is open", "the modal is displayed" — is not a state of the world either: it binds the
+FUNC to a component. Carve FUNCs by capability, never by container: three tabs in one panel are
+one, two or three capabilities **by the discriminant**, never three FUNCs because the mockup
+shows three tabs.
 
 Autonomy is a cut, decided here with the PM. The Challenge Pass does not re-litigate it: `[A]`
 offers it as a pattern (*Non-autonomous FUNC*, `REF-advanced-elicitation.md`) when the PM wants to
 go deeper, and the merge stays their call.
 
 `GIVEN` / `WHEN` / `THEN` / `AND` are machine tokens — they stay in English in every language.
+
+---
+
+## Quality check
+
+Read `REF-challenge-pass.md` — section "Challenge Pass — Functional Blocks" — and apply it before
+presenting.
 
 ---
 
@@ -143,12 +161,16 @@ A set of FUNCs is valid if:
 1. Every FUNC has an **autonomous observable outcome** — demonstrable without another FUNC first
    being acted on or being in a specific state
 2. Every FUNC keeps the user as the subject — `Users can [verb] [object]` for user-initiated
-   capabilities, `Users benefit from [X] when [condition]` for system-triggered ones
+   capabilities, `Users benefit from [X] when [condition]` for system-triggered ones — shapes, not tokens: the words take the PM's language (« L'utilisateur.rice peut [verbe] [objet] »)
 3. No FUNC names a framework, endpoint, SQL type, protocol, UI component, or layout detail
+   *(judged by the Challenge Pass — Technical HOW / Design HOW rows; named components also trip
+   the validator's QG-2 lexicon)*
 4. Every FUNC traces to **at least one journey step** (it appears in that journey's *Capabilities
-   revealed* list), and every journey reveals at least one FUNC
+   revealed* list), and every journey reveals at least one FUNC *(decided by
+   `scripts/validate_prd.py`, QG-6)*
 5. Every FUNC has **at least one testable nominal scenario** (WHEN/THEN, plus `GIVEN` wherever the
-   prerequisite is not obvious)
+   prerequisite is not obvious) *(the WHEN/THEN presence is decided by `scripts/validate_prd.py`,
+   QG-4)*
 6. Every FUNC references the **applicable ERR-XXX** from the acceptance criteria — *verified at
    Step 4, when the error scenarios exist; not gateable at Step 3*
 7. No FUNC sits at the "UI interaction" level without a standalone user goal

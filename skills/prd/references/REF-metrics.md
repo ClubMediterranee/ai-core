@@ -88,14 +88,6 @@ Wait for the answer. Then formalize as LDM-XXX with collection method and review
 
 ---
 
-## Advanced Elicitation — Patterns to Identify
-
-> - **Unmeasurable LDM:** [leading metric with no identifiable collection method]
-> - **Missing LDM:** [FUNC that generates a user behavior not yet captured as a leading signal]
-> - **Lagging disguised as leading:** [metric that only becomes available after the brief's KR timeframe]
-
----
-
 ## Quality check
 
 Read `REF-challenge-pass.md` — section "Challenge Pass — Metrics" — and apply it before presenting.
@@ -107,8 +99,9 @@ Read `REF-challenge-pass.md` — section "Challenge Pass — Metrics" — and ap
 A set of metrics is valid if:
 
 1. The document has **3 metric subsections** (LGM, DC, LDM) — each is either filled in or marked "None identified." / "None defined."
-2. Every **DC-XXX** has a numeric threshold — no DC without a threshold
+2. Every **DC-XXX** has a numeric threshold — no DC without a threshold *(decided by
+   `scripts/validate_prd.py`, QG-8 — a WARN)*
 3. Every **LDM-XXX** has a collection method and a review cadence
 4. No LDM is a completion metric for a pure consultation feature
 5. No LDM only becomes measurable after the brief's KR timeframe (lagging disguised as leading)
-6. LGMs and DCs trace to the brief (Desired Outcomes and Damage Control) — any LGM introduced without a brief anchor has an open divergence tension
+6. LGMs and DCs trace to the brief (Desired Outcomes and Damage Control) — any LGM introduced without a brief anchor has an open divergence tension *(judged by the Challenge Pass — its "LGM/DC without brief anchor" row)*

@@ -26,11 +26,18 @@ Frontmatter — the 8 required fields, all validated by `scripts/validate_prd.py
   complexity  S / M / L / XL — set at Step 6
   date        YYYY-MM-DD
   author      the PM running the skill, name only
-  brief       the source brief this PRD translates
+  brief       the source brief this PRD translates, as its filename stem (e.g. brief01-booking-engine)
+              — never its frontmatter id: the validator resolves it on disk in {DOCS_ROOT}/brief/
 
-Language: the PRD body is written in the PM's language, but section titles, id prefixes and the
-structural markers "None identified." / "None defined." stay exactly as written here. The validator
-and the downstream `spec` skill match on them.
+Language: the PRD body is written in the PM's language, but section titles, table column headers,
+id prefixes and the structural markers "None identified." / "None defined." stay exactly as written
+here. The validator and the downstream `spec` skill match on them. The FUNC block labels
+**Actor:** / **Capability:** / **Nominal scenario:** are prose labels: they follow the PM's
+language (« Acteur : », « Capacité : », « Scénario nominal : ») — only `**Acceptance criteria:**`
+and the GIVEN/WHEN/THEN keywords are machine tokens.
+
+Section 10 Constraints is optional: delete it and its Table of Contents entry if the PRD inherits
+no constraint.
 
 Sections that stay empty: write "None identified." (§5 States, §5 Permissions, §7 Lagging Metrics,
 §7 Damage Control) or "None defined." (§7 Leading Metrics) rather than deleting the section — QG-8
@@ -40,8 +47,6 @@ logged; it is not a reason to fail the gate.
 -->
 
 # [Product Name]
-
-*Translated from [brief-XXX]. Defines what must be built, for whom, to what acceptance bar — and nothing else.*
 
 ---
 
@@ -80,10 +85,6 @@ population as one — do not invent a persona for it.]
 
 ## 3. User Journeys
 
-*End-to-end flows anchored on [OPP-XXX]. One journey carries one user goal, stated under its
-heading. Step 2 leaves every* Capabilities revealed: *line at `TBD` — Step 3 assigns the FUNC ids
-and fills them in.*
-
 ### Journey 1 — [Short name for this flow]
 
 *Goal:* [what the user came to accomplish, stated so it can be tested — the last step reaches it]
@@ -112,13 +113,10 @@ and fills them in.*
 
 ## 4. Functional Specifications
 
-*Capabilities focus on WHAT exists and WHAT the user can do.*
+*Ids are identifiers, not ranks: a gap left by a merged FUNC is normal — reading order is the
+position, not the number.*
 
-*Order follows the first appearance of each capability in the journeys, cross-cutting ones last.
-Ids are identifiers, not ranks: never renumber. A merged FUNC leaves its id retired and the gap
-stays — reading order is the position below, not the number.*
-
-### FUNC-001 — [Capability — "Users can [verb] [object]", or "Users benefit from [X] when [condition]" for a system-triggered one]
+### FUNC-001 — [Capability, in the PM's language — "Users can [verb] [object]" / « L'utilisateur.rice peut [verbe] [objet] », or "Users benefit from [X] when [condition]" for a system-triggered one]
 
 **Actor:** [persona — if relevant]
 
@@ -126,8 +124,7 @@ stays — reading order is the position below, not the number.*
 
 **Acceptance criteria:**
 
-- **BR-001** — [the `Rule` cell of BR-001, copied verbatim from §5]
-- **ERR-001** — [the `Failure mode` cell of ERR-001, copied verbatim from §5]
+- [Step 3 leaves this list empty — Step 4 back-fills one bullet per applicable criterion (BR, ERR, ST, PERM, CB/CL), its cell per the linearisation table of REF-acceptance-criteria.md. Delete this line when deriving the FUNC.]
 
 **Nominal scenario:**
 - **GIVEN** [prerequisite state — keep this line only when it is not obvious from the WHEN]
@@ -135,7 +132,7 @@ stays — reading order is the position below, not the number.*
 - **THEN** [observable result]
 - **AND** [additional result if needed]
 
-### FUNC-002 — [Capability — "Users can [verb] [object]"]
+### FUNC-002 — [Capability, in the PM's language — "Users can [verb] [object]" / « L'utilisateur.rice peut [verbe] [objet] »]
 
 **Actor:** [persona — if relevant]
 
@@ -143,7 +140,7 @@ stays — reading order is the position below, not the number.*
 
 **Acceptance criteria:**
 
-- **BR-002** — [the `Rule` cell of BR-002, copied verbatim from §5]
+- [Step 3 leaves this list empty — Step 4 back-fills one bullet per applicable criterion (BR, ERR, ST, PERM, CB/CL), its cell per the linearisation table of REF-acceptance-criteria.md. Delete this line when deriving the FUNC.]
 
 **Nominal scenario:**
 - **WHEN** [triggering condition]
@@ -156,9 +153,6 @@ stays — reading order is the position below, not the number.*
 
 ### Business Rules
 
-*Each rule opens with a short bold recap naming the case handled. Past ~10 rules, group them into
-`#### ` thematic sub-sections by business domain — never by FUNC, and never at `###` or `##`.*
-
 | ID | Rule | Applies to |
 |----|------|-----------|
 | BR-001 | **[Recap — the case handled]:** [condition] → [expected behavior] | FUNC-001, FUNC-002 |
@@ -169,15 +163,11 @@ stays — reading order is the position below, not the number.*
 |----|--------|--------|--------------------|--------------------|
 | ST-001 | [Object] | [States] | [Allowed] | [Blocked] |
 
-*Write "None identified." if no lifecycle object exists.*
-
 ### Permissions
 
 | ID | Actor | Action | Allowed condition | Blocked condition |
 |----|-------|--------|-------------------|-------------------|
 | PERM-001 | [Actor] | [Action] | [Condition allowing the action] | [Condition blocking the action] |
-
-*Write "None identified." if no access restriction exists.*
 
 ### Error Scenarios
 
@@ -189,7 +179,7 @@ stays — reading order is the position below, not the number.*
 
 ## 6. Out of Scope
 
-*What is explicitly not built — and why. First line of defense against scope creep.*
+*What is explicitly not built — and why.*
 
 | Item | Reason |
 |------|--------|
@@ -204,8 +194,7 @@ stays — reading order is the position below, not the number.*
 
 ### Lagging Metrics
 
-*Imported from the brief's Desired Outcomes. These are the success criteria for the initiative.
-Write "None identified." if the brief carries none — and log the tension.*
+*Imported from the brief's Desired Outcomes — the initiative's success criteria.*
 
 | ID | Metric | Baseline (T0) | Threshold |
 |----|--------|---------------|-----------|
@@ -213,7 +202,7 @@ Write "None identified." if the brief carries none — and log the tension.*
 
 ### Damage Control
 
-*Existing metrics that must not regress under a threshold. Write "None identified." if not applicable.*
+*Existing metrics that must not regress below a threshold.*
 
 | ID | Metric | Current baseline | Max acceptable degradation |
 |----|--------|-----------------|---------------------------|
@@ -221,7 +210,7 @@ Write "None identified." if the brief carries none — and log the tension.*
 
 ### Leading Metrics
 
-*Observable user behaviors that predict adoption — defined here in the PRD. Write "None defined." if not applicable.*
+*Observable user behaviors that predict adoption.*
 
 | ID | Observable behavior | Collection method | Review cadence |
 |----|---------------------|-----------------|----------------|
@@ -241,7 +230,7 @@ Write "None identified." if the brief carries none — and log the tension.*
 
 ## 9. Open Questions
 
-*Product ambiguities unresolved at PRD write time. Each one blocks work that depends on it — answer it, integrate into the relevant FUNC or section, then remove the row.*
+*Unresolved product ambiguities — each blocks the work its `Blocks` column names; answered means integrated, then the row is removed.*
 
 | ID     | Question | Impact if unresolved | Blocks | Source |
 |--------|----------|---------------------|--------|--------|
@@ -252,8 +241,7 @@ Write "None identified." if the brief carries none — and log the tension.*
 ## 10. Constraints
 
 *Conditions this PRD inherits rather than defines — a BR is a rule this PRD decides, a constraint
-is a boundary it accepts. Keep only the constraints that actually shape a FUNC or a BR here.
-Delete this section and its Table of Contents entry if the PRD inherits none.*
+a boundary it accepts.*
 
 ### Business
 

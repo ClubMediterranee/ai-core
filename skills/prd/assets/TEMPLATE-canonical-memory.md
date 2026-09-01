@@ -59,6 +59,21 @@ _Created: YYYY-MM-DD | Status: in-progress | current_step: Step 1_
 
 *(none yet)*
 
+### Sources
+
+<!-- Every document used beyond the brief and the PM — DRD, glossary, other PRDs, context — and what was derived from it, one row each. What the PM cut at the gate stays here, marked cut: that is what a review leaves behind. -->
+
+| Source | What it produced | Gate |
+|---|---|---|
+
+*(none yet)*
+
+### BR candidates
+
+<!-- Rule-level details spotted during derivation — a preselection, a threshold, an eligibility — consumed at Step 4, where each becomes a BR-XXX or is discarded with a reason. -->
+
+*(none yet)*
+
 ### ERR candidates
 
 <!-- Failure responses spotted during Step 2 journey derivation — consumed at Step 4, where each becomes an ERR-XXX or is discarded with a reason. -->

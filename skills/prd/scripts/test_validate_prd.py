@@ -697,8 +697,6 @@ class UpToReadsOnlyWhatTheStepsWrote(unittest.TestCase):
             ('author: "Firstname Lastname"', 'author: "Celine Net"'),
             ("brief: brief-XXX", "brief: brief-001"),
             ("# [Product Name]", "# Demo"),
-            ("*Translated from [brief-XXX]. Defines what must be built, for whom, to what "
-             "acceptance bar — and nothing else.*", "*Translated from brief-001.*"),
             ('**Source:** brief-XXX — "[Brief title]"',
              "**Source:** brief-001 — the checkout opportunity"),
             ("**Opportunity addressed:** [OPP-XXX — verbatim from brief. → See brief-XXX for full "
@@ -792,6 +790,57 @@ class TheCommandLine(unittest.TestCase):
         self.assertIn("up to Step 2", out)
         code, _ = self.cli(prd, "--up-to", "3")
         self.assertEqual(code, 1)
+
+
+
+
+class V173Additions(unittest.TestCase):
+    """v1.7.3 — honest complexity message, punctuation-insensitive brief, italic personas,
+    and the QG-2 lexical half (UI components in journeys and FUNCs)."""
+
+    def test_complexity_message_names_the_func_count_alone(self):
+        _, warns = run(build().replace("complexity: S", "complexity: XL"))
+        self.assertTrue(has(warns, "complexity is XL", "grid says S", "FUNC count alone"), warns)
+
+    def test_a_brief_id_with_different_punctuation_resolves(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "brief").mkdir()
+            (root / "prd").mkdir()
+            (root / "brief" / "brief001-shopping.md").write_text(
+                "---\nstatus: validated\n---\n\n# Brief\n", encoding="utf-8")
+            path = root / "prd" / "prd01-demo.md"
+            path.write_text(build(), encoding="utf-8")
+            findings: list[V.Finding] = []
+            V.check_prd(path, findings, None)
+            self.assertFalse(has([f.msg for f in findings], "does not resolve"),
+                             [f.msg for f in findings])
+
+    def test_personas_in_italics_are_content(self):
+        s2 = BLOCKS["s2"].replace("Every visitor going through checkout.",
+                                  "*Elodie, 38, books for her family.*")
+        _, warns = run(build(s2=s2))
+        self.assertFalse(has(warns, "Personas is empty"), warns)
+
+    def test_a_ui_component_in_a_journey_step_warns(self):
+        s3 = BLOCKS["s3"].replace("1. The user submits their payment",
+                                  "1. The user submits their payment in a modal")
+        _, warns = run(build(s3=s3))
+        self.assertTrue(has(warns, "QG-2", "journey step", "modal"), warns)
+
+    def test_a_ui_component_in_a_func_warns_and_names_the_func(self):
+        s4 = BLOCKS["s4"].replace("the user pays for the order they assembled.",
+                                  "the user pays for the order in a centered modale.")
+        _, warns = run(build(s4=s4))
+        self.assertTrue(has(warns, "QG-2", "FUNC-001", "modale"), warns)
+
+    def test_a_ui_word_in_a_fence_or_the_glossary_does_not_warn(self):
+        s8 = BLOCKS["s8"].replace(
+            "None identified.",
+            "| Term | Definition |\n|------|-----------|\n| Onglet | the DRD's tab component |")
+        s3 = BLOCKS["s3"] + "\n```\nthe mockup shows a modal here\n```\n"
+        _, warns = run(build(s3=s3, s8=s8))
+        self.assertFalse(has(warns, "QG-2"), warns)
 
 
 if __name__ == "__main__":

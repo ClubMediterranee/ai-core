@@ -55,9 +55,10 @@ relative position in each.
 
 | Anti-pattern | What it looks like | How to fix |
 |---|---|---|
-| Out-of-scope leak | The step covers ground that an `NG-XXX` or the selected `OPP-XXX` excludes — a flow that leaves the opportunity, an action the brief keeps out | Remove the step. If it reveals a real capability, it belongs to another PRD: name that perimeter and log it in the canonical memory. |
+| Out-of-scope leak | The step covers ground that an `NG-XXX` or the selected `OPP-XXX` excludes — a flow that leaves the opportunity, an action the brief keeps out | Remove the step. If it reveals a real capability, it belongs to another PRD: name that perimeter, log it in the canonical memory → written as an `NG-XXX` in §6 at this step's `[C]` — never mid-derivation, never waiting for Step 6. |
 | Error path as step | The step describes the product's response to a failure | Remove from the journey; park in the canonical memory as an ERR candidate for Step 4. |
 | Variation misplaced | A `Variation:` step sits after the closing step instead of at the step where it diverges from the nominal path | Move it to the point of divergence — see `REF-user-journeys.md`, *Place each variation where it diverges*. A reader follows the numbering as a sequence. |
+| Rule detail in a step | The step states conditions, thresholds, eligibility or content enumerations that do not change the observable path — true, but rule-level. A condition that changes the user's outcome is a variation (see the routing) — this row is for same-outcome detail | Strip the step to action → outcome; park the detail in the canonical memory as a **BR candidate** for Step 4 (*Park and Surface*). |
 | Technical HOW | The step names a technical mechanism (API call, data load, endpoint, protocol) | Rewrite as a user action + observable outcome for the user. |
 | Design HOW | The step describes a layout position, a scroll mechanic, or a named UI component. A journey step is no longer true if the mockup changes. | Rewrite as: [user action] → [observable outcome], without the UI detail. |
 | System as subject | The step uses "The system displays / loads / renders" as the subject | Rewrite with the user as the subject — what they observe, not what the machine does: "the user sees their criteria updated". This holds even when the system is what acts. |
@@ -69,8 +70,9 @@ relative position in each.
 | Anti-pattern | What it looks like | How to fix |
 |---|---|---|
 | Out-of-scope leak | The FUNC delivers a capability that an `NG-XXX` or the selected `OPP-XXX` excludes | Drop it. If the capability is real, it belongs to another PRD: name that perimeter and log it in the canonical memory. |
+| Rule detail in the capability | The Capability states a rule's conditions — a preselection, a threshold, an eligibility — instead of the capability they serve | Flag it. Keep the capability sentence; the rule goes to §5 as a BR (a BR candidate in the canonical memory until Step 4). |
 | Technical HOW leakage | The FUNC names a framework, endpoint, SQL type, or protocol | Flag it. Rewrite as "Users can [verb] [object]" without the technical reference. |
-| Design HOW leakage | The FUNC names a UI component, a layout, or an interaction mechanic | Flag it. Rewrite as a user capability with an observable outcome. |
+| Design HOW leakage | The FUNC names a UI component, a layout, or an interaction mechanic — in its title, its Capability, its GIVEN or its scenario. **The capability is no longer true if the mockup changes.** | Flag it. Rewrite at product altitude — what the user gets, not the container it arrives in: *view the floor plan without leaving the room sheet*, never *in a modal*. |
 | System as subject | The FUNC starts with "The system displays / The API returns / The page renders" | Flag it. Rewrite with the user as the subject. |
 
 Whether a FUNC is **autonomous** — demonstrable without another FUNC acting first — is a cut decided
@@ -124,5 +126,5 @@ quality gate in `SKILL.md`. Two things change:
   are transversal here and apply to §1–§10 alike: an endpoint in an open question, a component name
   in a glossary entry, a protocol in an out-of-scope reason fail the same row as they would in a
   FUNC.
-- **A finding is fixed before the PRD is saved** with `status: review` — the pass stays silent when
+- **A finding is fixed before the PRD carries `status: review`** — the pass stays silent when
   clean, as always, but nothing it names is carried into a reviewed document.

@@ -48,6 +48,10 @@ re-reading, dragging along everything that referenced it.
 - **Too coarse:** the step bundles several distinct user actions ("the user picks destination, dates and family composition") → split into one step per action.
 - **Too fine:** the step is a UI gesture with no standalone result (click, scroll, open) → merge into the action it serves.
 
+**A step states the action and its outcome — never the conditions under which a rule applies.**
+A preselection rule, a threshold, an eligibility, a content enumeration are true and rule-level:
+park them for Step 4 (*Park and Surface*, SKILL.md) and keep the step readable.
+
 Treat this as the readiness test for Step 3 rather than a matter of style: a step producing no
 observable result reveals nothing to build, and a step producing three hides two capabilities.
 

@@ -10,89 +10,43 @@ description: >
   Requires a validated brief as input. NOT for turning an existing PRD into developer specs or
   user stories — that is the `spec` skill.
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion
-version: 1.6.1
+version: 1.7.3
 changelog:
-  - version: 1.6.1
-    date: 2026-08-27
+  - version: 1.7.3
+    date: 2026-09-01
     changes:
-      - "`REF-advanced-elicitation.md` keeps only what `[A]` adds — the completeness and cut patterns per artifact (missing step, edge case, oversized / interaction-level / non-autonomous FUNC, missing ERR / ST / PERM); the protocol was already inlined in SKILL.md and the altitude patterns duplicated the Challenge Pass rows"
-      - "Validator: a bare filename passed from inside `prd/` resolves its brief in `../brief/` — the unresolved path made `parent.parent` the current directory, and a PRD validated from inside its own folder failed QG-11 for a brief that was there"
-  - version: 1.6.0
-    date: 2026-08-26
+      - "Mission restated: the document must last for those who work from it — altitude is the core discipline (every fact at its level, stated once, so a rule change touches one line, never a journey); nothing the PM says is lost, and nothing she has not said is invented"
+      - "The altitude ladder and its placement test live in SKILL.md, in context from Step 0 and at resume — the classification failures observed in real runs all happened at Step 2, before the step-loaded definitions arrived"
+      - "New golden rule *Park and Surface*: deferred PM input is parked in the canonical memory under the bucket of the step that consumes it, and the presentation names it — deferred, cut and wrong each have their home"
+      - "Provenance legitimises existence, never shape: what a mockup renders as a component enters the PRD as the capability it serves — a real PRD had carved its FUNCs from the DRD's component tree, one per tab, `GIVEN the layer is open`"
+      - "QG-2 gains a script half: an unambiguous UI-component noun in a journey step or a FUNC warns (EN+FR lexicon); the semantic half stays with the Challenge Pass, whose FUNC table gains the redesign test and a rule-detail row like the journeys table, and whose journeys out-of-scope fix now routes to an NG at the spotting step's `[C]`"
+      - "Step 0's `[C]` writes the frame at the `[PROJECT]` level and no `current_step` — the `[PRD<NN>]` section that carries it exists only from Step 1"
+      - "Quality gate movement A displays any reporting run — a WARN-only run exits 0 and was hidden by 'display only on failure'; the Step 6 `--up-to 6` and movement A runs are named as identical by design"
+      - "FUNC prose labels (Actor, Capability, Nominal scenario) follow the document's language; table column headers join the machine tokens; the complexity WARN says it counts FUNCs alone; `resolve_brief` matches ids punctuation-insensitively; personas in italics are content; a UI container state in a GIVEN is named as not a state of the world"
+      - "Template stripped of its meta-discourse (process sentences deleted, reader legends tightened); the acceptance-criteria placeholder covers all criterion types; changelog history moved to CHANGELOG.md; decision-record.md created"
+  - version: 1.7.2
+    date: 2026-08-30
     changes:
-      - "Quality gate in three movements — the script, the Challenge Pass re-run on the finished document, and the two crossings no table can see (QG-5 implied capabilities, QG-7 assumptions linked to an OQ) — after the judged QG rows turned out to paraphrase the Challenge Pass tables, so that two definitions of one rule could drift"
-      - "One check, one home: what the script decides is no longer restated in a Challenge Pass row (a BR citing a BR), and what a reader decides is defined once, in `REF-challenge-pass.md`; QG-11's judged half became the first row of the Metrics table, checked at import and again at the gate"
-      - "Challenge Pass tables in one funnel order — existence, cut, altitude (technical before design), wording — with the rows real runs showed missing: out-of-scope leak on journeys and FUNCs, a misplaced variation, an LGM/DC with no brief anchor; the altitude rows apply to the four criterion types; a re-presentation re-runs the pass on the delta"
-      - "Step gates are two fixed lines, `[A]` and `[C]`, declared machine tokens: the checklist the block used to carry was translated away in every run seen, and what `[C]` executes is the agent's process, not something the PM reviews"
-      - "`[C]` runs `validate_prd.py --up-to <N>` on the sections written so far — a form error is caught at the step that made it, not six steps later"
-      - "Validator rewritten: one parse into a document model, checks grouped by the step that writes what they read, `--up-to`; a missing DC threshold warns like its neighbours; every id family is defined once; a `FUNC-XXX` cited outside its own sections must exist; a duplicated id no longer hides the other findings on its row"
-  - version: 1.5.0
-    date: 2026-08-26
-    changes:
-      - "`[C]` is the whole gate, not the file write: every gate block carries its three numbered actions — backward check, section written, canonical memory updated with `current_step` — after a real run wrote its section and left the canonical memory behind"
-      - "`[A]` is a bare option again: the gate shows the choice, the substance comes only once the PM has picked it"
-      - "Validator: table headers are checked, since every cell in this format is read by position — a column added, removed or permuted is an error, a translated one only a warning, because a French PRD parses exactly as well; §5's four subsections are expected; the §4 ↔ §5 mirror runs both ways and an empty `Applies to` cell no longer switches it off"
-      - "Validator: journey shape (`*Goal:*` present, no `2a.` branch notation), metric completeness, glossary duplicates, empty personas, out-of-scope ids and the complexity grid — all rules the references state and nothing verified"
-      - "Diagnostics that named the wrong cause: an exotic dash no longer reads as a divergent text, and an unclosed fence says so instead of reporting eight missing sections"
-      - "QG-1 split between its script half (shape) and its judged half (altitude), as QG-11 already was"
-      - "Test suite: 28 regression cases, every new check mutation-verified"
-  - version: 1.4.0
-    date: 2026-08-26
-    changes:
-      - "Gate contract made explicit: nothing reaches the PRD file before `[C]`, every gate block states which sections `[C]` writes, and the two remaining ungated authorisations — the incremental §6/§8/§9 note and the template's instantiation comment — now carry the gate too; the canonical memory keeps taking parked items during derivation"
-      - "`[A]` is the agent's work: the protocol is inlined in SKILL.md, answering it by asking the PM what to dig into is named as the one response it never means, and the *nothing is genuinely open* branch is inlined too — so a compacted agent never has to choose between inventing a question and handing the choice back"
-      - "New golden rule *Name the Arbitrations* — boundary decisions are presented with the artifact, and a PM-decidable ambiguity is asked before the gate rather than filed as an OQ"
-      - "Acceptance criteria and metrics references realigned on the PRD's tables: the block format they documented defined nothing the validator could see, in §5 and in §7 alike"
-      - "Step 4 back-fills each FUNC's acceptance-criteria bullets; FUNCs no longer derive from rules that do not exist yet"
-      - "Section 2 Personas filled at Step 2, where the persona is resolved, instead of Step 6, which counts them; PER-XXX dropped from complexity sizing"
-      - "Challenge Pass gains its Metrics table, so every artifact presentation has one"
-      - "Template no longer contradicts the method it instantiates: no FUNC ids where Step 2 must leave `TBD`, a §7 Lagging Metrics that may legitimately be empty, and personas in the plural"
-      - "`###` sub-headings named as machine tokens — a translated `### Lagging Metrics` silently failed QG-8"
-      - "Validator: a bold id, an escaped pipe, a fenced example and a byte-order mark no longer fail a gate; criteria bullets are read past a `####` grouping heading, which is what kept §4 and §5 from silently disagreeing; QG-11 split between the script and the judged block"
-      - "First test suite for `validate_prd.py` — 16 regression cases, stdlib only, one of which executes the acceptance-criteria reference's own worked examples"
-  - version: 1.3.0
-    date: 2026-08-24
-    changes:
-      - "Step 2 opens on a persona-goal list confirmed with the PM before any flow is written — Cockburn's actor-goal list, absorbing the former coverage check; each journey then states its goal on a `*Goal:*` line at the user-goal level"
-      - "Journey rules reworked: completeness judged on the nominal path, a variation placed where it diverges, splitting given a test of its own against merging, and how many journeys to write settled as a readability decision that never changes the capabilities revealed"
-      - "Variation routing: same action on a different object is a parameter, a BR when the rules differ, a variation when the observable result differs — the result being what the user ends up with, not what they had to supply"
-      - "Saturation signal states which remedy applies (BR for rule detail, step or split for a different consequence) and is re-applied after any merge"
-      - "Journey-level preconditions distinct from a scenario GIVEN; the user stays the subject even when the system acts; Step 2 reasons in observable results, FUNC ids being assigned and frozen at Step 3"
-      - "A step presents what it derived; what the skill parks, logs or records stays in the canonical memory"
-      - "Pruned: the 10 journey validation criteria, the two altitudes table, the 4-8 step range, and two duplicated Challenge Pass rows"
-  - version: 1.2.0
-    date: 2026-08-24
-    changes:
-      - "FUNCs: one boundary discriminant (autonomous observable outcome) replacing the format constraint, the upper/lower bounds and the multi-surface rule"
-      - "Step 3: derivation output is each journey's *Capabilities revealed:* line, filled in"
-      - "FUNC ids are identifiers, not ordinals — order fixed at derivation, never renumbered"
-      - "Nominal scenario: optional GIVEN prerequisite"
-      - "Step 2 gate: behavioural vocabulary frozen in one grouped confirmation"
-      - "Journeys: a cross-cutting population is a valid persona answer"
-      - "BR hygiene: atomicity, one-rule-one-BR, state adequacy, out-of-scope and perimeter leaks"
-      - "ACs referenced from a FUNC with their description; section 5 stays the source of truth"
-      - "Business Rules grouped into #### thematic sub-sections past ~10 rules"
-      - "Optional section 10 Constraints (CB/CL)"
-      - "Validator: referential integrity, AC bullet fidelity, author guard"
-      - "Layout aligned on the standard skill anatomy: refs/ renamed references/, canonical memory template moved into assets/"
-  - version: 1.1.0
-    date: 2026-08-15
-    changes:
-      - "Step 2: skeleton-based sufficiency check with three routes (direct / annotated speculative / bootstrap canvas via one AskUserQuestion call)"
-      - "Step 2: journey granularity rules, two outcome altitudes, variation and orphan-action routing, ERR candidates parked for Step 4"
-      - "Challenge Pass journeys: Macro step, Bi-goal journey, Error path as step"
-      - "HITL rule: documented exception for the grouped journey bootstrap canvas"
-  - version: 1.0.0
-    date: 2026-07-28
-    changes:
-      - Initial release in ai-core (ported from the new-be project skill)
+      - "Sections 6/8/9 (and 10) are written at the `[C]` of the step that spotted the item — never parked until Step 6, which closes only what no earlier `[C]` wrote; the step table now says *close*. Two real runs read the previous sentence in opposite ways and a third stalled on it at Step 6"
+      - "Step 0's `[C]` creates nothing: the PRD file comes into existence at Step 1's own gate, never earlier — one real run in three creates it early and the scope gate silently disappears"
+      - "The quality gate presentation lists every remaining WARN verbatim before arbitration — a WARN the PM never saw is not arbitrated; one real run delivered its WARN unshown"
+      - "`brief:` is the source brief's filename stem, never its frontmatter `id:` — the validator resolves it on disk; a real run discovered this by reading the script's source"
+      - "The template's `**Acceptance criteria:**` placeholder bullets state their own fate: Step 3 deletes them, Step 4 back-fills one bullet per applicable BR/ERR"
+  - note: "Older entries (1.0.0 → 1.7.1): see CHANGELOG.md in this directory"
 created-at: 2026-07-21
 created-by: "Céline Net <celine.net.ext@clubmed.com>"
 ---
 
 # PRD
 
-You **translate a validated problem into a solution**. The problem and the scope of opportunities to solve it are established in a Brief. Each scoped opportunity is addressed by a PRD. The PRD resolves the solution space by defining the user journeys, acceptance criteria and capabilities - functional blocks. The PRD does not describe the conception - Design or Technical decisions.
+You **translate a validated problem into a solution** — into a document that must last for those
+who work from it: the dev who specs a capability, the PM who changes a rule tomorrow. This skill
+accelerates PRD writing and challenges received ideas, but its core discipline is **altitude**:
+every fact sits at its level — the goal in the journey, the capability in the FUNC, the condition
+in its criterion — stated once, so a rule change touches one line, never a journey. Nothing the PM
+says is lost: it lands at its level, or is parked, **named**, for the step that consumes it. And
+nothing the PM has not said is invented: what comes from anywhere else arrives with its source.
+The PRD does not describe the conception — no Design or Technical decisions.
 
 ---
 
@@ -132,6 +86,24 @@ PRD runs in **sequential steps**. Each step ends with a **Step Gate**. Wait for 
 | **Step 5 — Leading Metrics** | Identify observable user behaviors that predict adoption | [A] [C] |
 | **Step 6 — Complexity** | Size the PRD before drafting | [C] |
 
+### The altitude ladder
+
+Every piece of information met at any step belongs to exactly one level. These one-line
+definitions are the compressed form of each reference's own — key phrases identical:
+
+| Level | What it is | Derived at |
+|---|---|---|
+| Journey goal | what the actor accomplishes **in one sitting** — Cockburn's sea level | Step 2 |
+| Journey step | **one user action → one observable product result** | Step 2 |
+| FUNC | a distinct user capability with an **autonomous observable outcome** | Step 3 |
+| BR / ST / PERM / ERR | the conditions under which it behaves — decided rules, lifecycles, access, failure responses | Step 4 |
+| CB / CL | a condition this PRD **inherits** rather than defines | any step |
+
+**The placement test:** an item that would make the current artifact false when a lower level
+changes belongs to that lower level — park it, named, for the step that derives it (*Park and
+Surface*). At Step 2 the sort is coarse — belongs to the journey or not, plus a destination
+bucket; the fine typing happens at the step that consumes the bucket.
+
 **Step Gate options** — two fixed lines, and nothing else in the block:
 ```
 [A] Advanced Elicitation
@@ -140,11 +112,22 @@ PRD runs in **sequential steps**. Each step ends with a **Step Gate**. Wait for 
 
 `[A]` is offered at Steps 2–5 only. Both lines are machine tokens: not translated, not reworded,
 and carrying no checklist — what `[C]` executes is the agent's process (see *Write Only After
-[C]*), not something the PM reviews or amends. `[C]` is a gate, not a save: its four actions run
-together or the step is not validated — a section written with the canonical memory left behind
+[C]*), not something the PM reviews or amends. `[C]` is a gate, not a save: its actions run
+together or the step is not validated — four at Steps 2–6; Steps 0 and 1 list theirs in their own
+blocks — a section written with the canonical memory left behind
 loses `current_step`, and an interrupted PRD then has nothing to resume from.
 
 **What a step presents:** the artifact it has just derived, plus whatever that step explicitly says to surface. Anything the skill tells you to *park*, *log* or *record* goes to the canonical memory and is not part of the presentation — it comes back at the step that consumes it. A step that shows more than it produced turns its gate into a discussion of work that is not up for validation yet. And an open question at presentation time means **the gate is not due yet** — ask it, wait for the answer, then surface the gate.
+
+A presentation closes with a **Sources** recap, as the vocabulary freeze does — one row per document used
+beyond the brief and the PM's words, and what it produced:
+
+```
+| Source | What it produced |
+|---|---|
+| DRD SectionLayoutAccomodation — low-availability badge | BR-004, ST-001 |
+| Glossary | « catégorie d'hébergement » |
+```
 
 After the PM chooses `[C]`, before continuing: run a backward check to ensure consistency, fill the corresponding PRD section to log the work done, update the canonical memory to record decisions and tensions, and run the validator on what the file holds so far.
 
@@ -156,11 +139,12 @@ After the PM chooses `[C]`, before continuing: run a backward check to ensure co
 | Step 3 | Section 4 — FUNCs + update Section 3 (Capabilities revealed) | FUNCs validated, OQs opened/resolved |
 | Step 4 | Section 5 — Acceptance Criteria + back-fill each FUNC's `**Acceptance criteria:**` bullets in Section 4 | ACs validated, OQs opened/resolved |
 | Step 5 | Section 7 — Metrics | Metrics validated |
-| Step 6 | Frontmatter (complexity) + Sections 6, 8, 9 — and 10 if the PRD inherits any | Final complexity |
+| Step 6 | Frontmatter (complexity) + close Sections 6, 8, 9 — and 10 if the PRD inherits any | Final complexity |
 
 > Sections 6 (Out of Scope), 8 (Glossary), 9 (Open Questions) — and 10 (Constraints) when the PRD
 > inherits any — grow across the steps: an item spotted mid-step waits in the canonical memory and
-> is written at that step's `[C]`, alongside the step's own section. Step 6 closes whatever is left.
+> is written at the `[C]` of the step that spotted it, alongside that step's own section — it does
+> not wait for Step 6. Step 6 closes only what no earlier `[C]` has written.
 
 ---
 
@@ -184,15 +168,43 @@ A decision only the PM can make is **asked before the gate** — not absorbed in
 not filed as an `OQ-XXX`. An `OQ-XXX` records what stays open **after** asking, or what the PM
 explicitly defers.
 
+**What is not an arbitration.** A scope decision the brief leaves open — a tension (`T-XX`), an in/out
+status not settled, the exclusion of something the PM listed as a need — is a **question** to the PM,
+never a decision presented for confirmation. « Comparaison de chambres exclue — d'accord ? » takes the
+decision away from the PM and leaves her no room to say she does not know; « la comparaison de chambres
+est-elle dans le périmètre ? » gives it back.
+
+**Derive from everything, and show where it comes from.** The docs root is yours to read — the DRD, the
+glossary, other PRDs, context documents — and what they show is legitimate material to derive from. What
+they do not do is decide. And a source shows that something **exists** — never how it is written:
+what the DRD renders as a component (a modal, a layer, a tab) enters the PRD as the capability it
+serves, at product altitude; the component stays with its source. A capability, a rule, a state or a threshold that comes from anywhere but the
+brief or the PM's own words is presented **with its source**, so the PM can keep it or cut it at the gate
+— never as an established fact. Every artifact presentation closes with a *Sources* recap, and the
+canonical memory keeps it.
+
+### Park and Surface
+
+Nothing the PM gives you disappears. An element that does not belong to the artifact under
+derivation — a rule detail, a failure response, an exclusion, a term — gets an explicit
+destination: parked in the canonical memory under the bucket of the step that consumes it (BR
+candidates, ERR candidates, an NG for §6, a term for §8). The presentation says so in one line —
+*parked for Step 4: the default-preselection rule* — so the PM sees where her words went and why
+they wait: input that visibly lands somewhere is input she never has to repeat.
+
+This rule covers what is **deferred**. What is **cut** is an arbitration to name (*Name the
+Arbitrations*), and what is **wrong** is the Challenge Pass's, named with its correction — between
+the three, nothing is silently dropped.
+
 ### Step Confirmation
 
-No passive progression. The user must explicitly choose to validate and move to the next step at the Step Gate.
+No passive progression. The user must explicitly choose to validate and move to the next step at the Step Gate — `[C]` or a clear confirmation given to the gate block itself, the last thing presented. An agreement given to a question, anywhere else, is not that choice.
 
 ### Language Adaptation
 
 Detect the PM's language from their first message. Apply it consistently to all agent messages, canonical memory content, and PRD file content. Do not switch language mid-session unless the PM explicitly does so.
 
-**What does not translate.** Section titles — the `## N.` headings **and** the `###` sub-headings inside §5 (`Business Rules`, `States & Transitions`, `Permissions`, `Error Scenarios`) and §7 (`Lagging Metrics`, `Damage Control`, `Leading Metrics`), which the validator matches literally — id prefixes (`FUNC-`, `BR-`, `ST-`, `PERM-`, `ERR-`, `CB-`, `CL-`, `LGM-`, `DC-`, `LDM-`, `NG-`, `OQ-`, `OPP-`), frontmatter keys, the scenario keywords `GIVEN` / `WHEN` / `THEN` / `AND`, the labels `*Goal:*`, `*Capabilities revealed:*`, `*Precondition:*` and `**Acceptance criteria:**`, the structural markers `None identified.` / `None defined.`, the journey variation prefix `Variation:`, the draft marker `[ASSUMPTION: ...]` and the two step-gate lines `[A] Advanced Elicitation` / `[C] Validate → …` stay exactly as written here, in English. They are machine tokens: `scripts/validate_prd.py` matches on some of them, and the downstream `spec` skill parses the same structure. Only the prose adapts — a French PRD has French journeys under an English `## 3. User Journeys` heading.
+**What does not translate.** Section titles — the `## N.` headings **and** the `###` sub-headings inside §5 (`Business Rules`, `States & Transitions`, `Permissions`, `Error Scenarios`) and §7 (`Lagging Metrics`, `Damage Control`, `Leading Metrics`), which the validator matches literally — id prefixes (`FUNC-`, `BR-`, `ST-`, `PERM-`, `ERR-`, `CB-`, `CL-`, `LGM-`, `DC-`, `LDM-`, `NG-`, `OQ-`, `OPP-`), frontmatter keys, the scenario keywords `GIVEN` / `WHEN` / `THEN` / `AND`, the labels `*Goal:*`, `*Capabilities revealed:*`, `*Precondition:*` and `**Acceptance criteria:**`, the table column headers (`ID | Rule | Applies to`, `Term | Definition`, …), the structural markers `None identified.` / `None defined.`, the journey variation prefix `Variation:`, the draft marker `[ASSUMPTION: ...]` and the two step-gate lines `[A] Advanced Elicitation` / `[C] Validate → …` stay exactly as written here, in English. They are machine tokens: `scripts/validate_prd.py` matches on some of them, and the downstream `spec` skill parses the same structure. Only the prose adapts — a French PRD has French journeys under an English `## 3. User Journeys` heading. The FUNC title patterns `Users can [verb] [object]` and `Users benefit from [X] when [condition]` are **shapes, not tokens**: their words follow the PM's language — « L'utilisateur.rice peut [verbe] [objet] », « L'utilisateur.rice bénéficie de [X] quand [condition] ». The FUNC block labels `**Actor:**`, `**Capability:**` and `**Nominal scenario:**` are prose labels, not tokens: they follow the document's language (« Acteur : », « Capacité : », « Scénario nominal : ») — nothing machine-reads them.
 
 ### Challenge Pass
 
@@ -221,12 +233,29 @@ the reference for the pattern list of the artifact at hand.
 lives in the conversation until it is validated — the PRD file records validated work, it is not a
 scratchpad. This holds at every step, including a version corrected after `[A]`.
 
+**What validates a step.** The PM's answer to the gate block — `[C]`, or any clear confirmation
+(« OK », « ça me va », « on y va », « valide ») — provided three things hold at once:
+
+1. it **follows a gate block that is the last thing you presented** — after any exchange (a question
+   answered, a modification applied) the gate block is presented again, and only a confirmation that
+   follows it counts;
+2. it carries **no modification, no reservation, no question** — « OK mais… », « oui, sauf… »,
+   « ok pour le premier, pas sûr du second » are modifications: apply, run the Challenge Pass on the
+   delta, re-present the gate;
+3. an agreement given **to a question** answers that question, never the step — the path confirmation
+   at Step 1, « ça te va ? » on a partial artifact, « d'accord ? » on an arbitration.
+
+Three real runs slipped on exactly that: a step chained on a « ça convient » about the file path,
+acceptance criteria written after a « ça me va » given to a question, `current_step` moved on the same
+word — every time, an agreement to something else was read as the gate's answer.
+
 **The canonical memory is exempt: it takes parked items *during* derivation** — the ERR candidates
 of Step 2, a tension spotted mid-analysis, an item bound for §6, §8 or §9 — because that is what it
 is for. Only the PRD waits for `[C]`.
 
-**`[C]` is a gate, not a save.** The four actions run together — backward check, section written,
-canonical memory updated, validator run — or the step is not validated. Writing the section and skipping the
+**`[C]` is a gate, not a save.** The actions run together — at Steps 2–6: backward check, section
+written, canonical memory updated, validator run; Steps 0 and 1 list theirs in their own blocks —
+or the step is not validated. Writing the section and skipping the
 canonical memory leaves the next session unable to resume: `current_step` is what makes an
 interrupted PRD resumable, and its absence stays silent until someone tries.
 
@@ -310,8 +339,12 @@ Present the process to show the user the path — after the brief summary.
 ```
 
 What `[C]` executes here: no backward check (nothing has been derived yet), nothing written to the
-PRD (the file does not exist until Step 1), no validator run, and the canonical memory updated with
-the frame, the brief's status, any tension logged, and `current_step: Step 0`.
+PRD (the file does not exist until Step 1), no validator run, and the canonical memory updated **at
+the `[PROJECT]` level** with the frame, the brief's status and any tension logged — no
+`current_step`: the `[PRD<NN>]` section that carries it exists only from Step 1, and a session
+resuming after this step restarts at Step 1 from that frame. **It creates
+nothing**: the PRD file comes into existence at Step 1's own gate, never at this one — creating it
+here is this skill's most common failure.
 
 ---
 
@@ -323,20 +356,22 @@ Show the list of opportunities imported from the brief. Ask user to choose the o
 
 **If the named opportunity is not in the brief's list:** signal and open a tension. Do not block the Step Gate.
 
+**Before the gate — three questions**, one at a time, as questions precede any gate:
+
+1. Ask "What is your name?" unless the user's identity is already clear from context — the name will be used as the `author`. The name alone; the frontmatter takes no email.
+2. **Determine the PRD number.** Scan `{DOCS_ROOT}/prd/` with `Glob("[Pp][Rr][Dd]*.md")` — deliberately case-tolerant, because existing projects hold PRDs written before this convention (`PRD07 - Food & Drinks details.md`). Extract the leading number from each match, take the highest, increment by 1. Start at `01` if none exist. If a file matches but carries no extractable number, say so and ask the PM rather than silently restarting at `01` — a colliding id is exactly the failure this scan exists to prevent.
+3. **Propose the path** `{DOCS_ROOT}/prd/prd<NN>-<short-opportunity-name>.md` — lowercase kebab-case, no spaces and no `&`. Those characters break the filename regexes used downstream (a PRD cited in a spec's `prd_source` gets truncated at the first space), and they turn every shell path into an escaping exercise. The PM's answer confirms the path — it is not the step's validation: the gate below is still due. **Never rename existing PRDs** to this convention: specs already produced reference their current names.
+
 **Step Gate:**
 ```
 [C] Validate → Step 2 — User journeys
 ```
 
-**What `[C]` executes at this step, in detail:**
+**What `[C]` executes at this step:**
 
-1. Ask "What is your name?" unless the user's identity is already clear from context — the name will be used as the `author`. The name alone; the frontmatter takes no email.
-2. **Determine the PRD number.** Scan `{DOCS_ROOT}/prd/` with `Glob("[Pp][Rr][Dd]*.md")` — deliberately case-tolerant, because existing projects hold PRDs written before this convention (`PRD07 - Food & Drinks details.md`). Extract the leading number from each match, take the highest, increment by 1. Start at `01` if none exist. If a file matches but carries no extractable number, say so and ask the PM rather than silently restarting at `01` — a colliding id is exactly the failure this scan exists to prevent.
-3. **Propose the path** `{DOCS_ROOT}/prd/prd<NN>-<short-opportunity-name>.md` — lowercase kebab-case, no spaces and no `&`. Those characters break the filename regexes used downstream (a PRD cited in a spec's `prd_source` gets truncated at the first space), and they turn every shell path into an escaping exercise. Wait for confirmation before writing. **Never rename existing PRDs** to this convention: specs already produced reference their current names.
-4. **Create the PRD** — copy `assets/TEMPLATE-prd.md` in full (the 9 mandatory sections plus the optional §10, placeholders included), delete its instantiation comment block, then fill the frontmatter and Section 1.
-5. **Update the canonical memory** — add the `[PRD<NN>]` section, set `current_step: Step 1`.
-6. **Run the validator** — `--up-to 1`: frontmatter, title, brief, structure and Section 1.
-
+1. **Create the PRD** — copy `assets/TEMPLATE-prd.md` in full (the 9 mandatory sections plus the optional §10, placeholders included), delete its instantiation comment block, then fill the frontmatter and Section 1.
+2. **Update the canonical memory** — add the `[PRD<NN>]` section, set `current_step: Step 1`.
+3. **Run the validator** — `--up-to 1`: frontmatter, title, brief, structure and Section 1.
 ---
 
 ## Step 2 — User journeys
@@ -430,7 +465,7 @@ Count FUNCs and personas. Apply grid. Propose result with justification. If PM d
 
 ## Check Quality Gate
 
-Three movements, in this order, before saving. Fix every failure first. The twelve QG ids are
+Three movements, in this order, before `status: review`. Fix every failure first. The twelve QG ids are
 identifiers, not ranks: they stay stable across versions, and where a check changed home the
 movement says so.
 
@@ -446,7 +481,15 @@ QG-12, the shape half of QG-1 (a `*Goal:*` line, flat numbering) and the resolut
 ordered and unique, the template's instantiation comment removed, no surviving
 `[ASSUMPTION: ...]` marker, no placeholder left behind. The checks are listed step by step in the
 script's own docstring. Exit `0` = clean, `1` = at least one error, `2` = bad path. Display the
-output only on failure.
+output whenever it reports anything — an ERROR or a WARN; stay silent only on a clean pass. The
+Step 6 `[C]` already ran `--up-to 6`, which checks the same lines: the two runs are identical by
+design — both must appear.
+
+**A WARN is not a pass.** The gate presentation lists every remaining WARN verbatim; each is then
+fixed, or arbitrated by the PM at this gate and its reason stated in the delivery message before
+`status: review` — a WARN the PM never saw is not arbitrated. A FUNC without criteria is first a
+question to the PM — *what must hold for this capability?* — and only then, if she defers, a WARN
+to justify.
 
 Since the same script ran at every `[C]`, this pass should find nothing new; if it does, the step
 that wrote the section is the one to reopen. Do not eyeball what the script decides: a gate whose
@@ -471,7 +514,7 @@ QG-11's judged half — every LGM and DC traces to the brief — is the first ro
 
 Judge each one and display the result.
 
-**On QG pass:** set `status: review` and save.
+**On QG pass:** set `status: review`.
 
 > PRD saved with status: review.
 
