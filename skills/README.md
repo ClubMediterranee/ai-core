@@ -53,6 +53,7 @@ Skills are added to your Claude Code configuration and become available immediat
 | `nodejs-best-practices` | Node.js | Node.js development principles and decision-making. Framework selection, async patterns, security, and architecture. |
 | `observability-patterns` | Observability | Build production-ready monitoring, logging, and tracing systems. Implements comprehensive observability strategies, SLI/SLO management, and incident response workflows. |
 | `postgresql-optimization` | Database | PostgreSQL database optimization workflow for query tuning, indexing strategies, performance analysis, and production database management. |
+| `prd` | Product | Guides a PM through writing a PRD from a validated brief. Sequential steps (scope, journeys, FUNCs, ACs, metrics, complexity) with step gates, challenge pass, advanced elicitation, and a 12-check quality gate whose structural half is enforced by a deterministic validator. |
 | `prisma-expert` | Database | Expert in Prisma ORM with deep knowledge of schema design, migrations, query optimization, relations modeling, and database operations. |
 | `react-best-practices` | React / Next.js | 64 React and Next.js performance rules from Vercel Engineering, covering rendering, re-renders, server-side patterns, bundle optimization, and more. |
 | `react-component-performance` | React / Next.js | Diagnose slow React components and suggest targeted performance fixes. |
