@@ -3,6 +3,11 @@
 Complete version history. The SKILL.md frontmatter keeps only the two most recent
 versions — this file is the archive and is never loaded during a PRD session.
 
+## 1.7.4 — 2026-09-01
+
+- The journey goal gets a definition that yields its format: the end state the actor comes to obtain, letting her stop there satisfied — one accomplishment infinitive + object + testable stake, the implicit subject being the actor; the goal is an input from the confirmed actor-goal list and the last step is checked against it, never the reverse. Real Goal lines carried whole paragraphs
+- `**Capability:**` becomes optional with a deletion rule — kept only when it adds a boundary the title cannot carry, deleted when it would restate the title: the title names, a kept line bounds, the scenario proves. A field whose formulation cannot show its own value is a restatement
+
 ## 1.7.3 — 2026-09-01
 
 - Mission restated: the document must last for those who work from it — altitude is the core discipline (every fact at its level, stated once, so a rule change touches one line, never a journey); nothing the PM says is lost, and nothing she has not said is invented

@@ -114,6 +114,16 @@ the validator reports it.
 
 ---
 
+## The FUNC block divides the work
+
+The title **names** the capability — the scannable inventory. A `**Capability:**` line **bounds**
+it — kept only when it adds a boundary the title cannot carry (the precise object, the scope
+edge: "without leaving the room sheet"), deleted when it would restate the title. The nominal
+scenario **proves** it. What overflows the one Capability sentence is not lost: an enumeration of
+content or a condition is rule detail, parked for Step 4 (*Park and Surface*).
+
+---
+
 ## Nominal Scenario Format
 
 Every FUNC has **at least one nominal scenario** that proves the capability is testable:

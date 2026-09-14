@@ -87,7 +87,7 @@ population as one — do not invent a persona for it.]
 
 ### Journey 1 — [Short name for this flow]
 
-*Goal:* [what the user came to accomplish, stated so it can be tested — the last step reaches it]
+*Goal:* [the confirmed goal this journey serves — one accomplishment infinitive + object + the stake that makes "satisfied" testable. Never an activity verb, never the path; the implicit subject is the actor. The last step must reach it — never reword the goal to fit the flow]
 
 *Precondition:* [what must already be true before step 1 — delete this line if the journey needs none]
 
@@ -100,7 +100,7 @@ population as one — do not invent a persona for it.]
 
 ### Journey 2 — [Short name for this flow]
 
-*Goal:* [what the user came to accomplish, stated so it can be tested — the last step reaches it]
+*Goal:* [the confirmed goal this journey serves — one accomplishment infinitive + object + the stake that makes "satisfied" testable. Never an activity verb, never the path; the implicit subject is the actor. The last step must reach it — never reword the goal to fit the flow]
 
 1. [Step 1 — entry point / trigger]
 2. [Step 2 — main action]
@@ -120,7 +120,7 @@ position, not the number.*
 
 **Actor:** [persona — if relevant]
 
-**Capability:** [1 sentence: what the user can do.]
+**Capability:** [keep this line only when it adds a boundary the title cannot carry — the precise object, the scope edge; delete it when it would restate the title. One sentence; an enumeration or a condition is rule detail for Step 4.]
 
 **Acceptance criteria:**
 
@@ -136,7 +136,7 @@ position, not the number.*
 
 **Actor:** [persona — if relevant]
 
-**Capability:** [1 sentence: what the user can do.]
+**Capability:** [keep this line only when it adds a boundary the title cannot carry — the precise object, the scope edge; delete it when it would restate the title. One sentence; an enumeration or a condition is rule detail for Step 4.]
 
 **Acceptance criteria:**
 

@@ -10,8 +10,13 @@ description: >
   Requires a validated brief as input. NOT for turning an existing PRD into developer specs or
   user stories — that is the `spec` skill.
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion
-version: 1.7.3
+version: 1.7.4
 changelog:
+  - version: 1.7.4
+    date: 2026-09-01
+    changes:
+      - "The journey goal gets a definition that yields its format: the end state the actor comes to obtain, letting her stop there satisfied — one accomplishment infinitive + object + testable stake, the implicit subject being the actor; the goal is an input from the confirmed actor-goal list and the last step is checked against it, never the reverse. Real Goal lines carried whole paragraphs"
+      - "`**Capability:**` becomes optional with a deletion rule — kept only when it adds a boundary the title cannot carry, deleted when it would restate the title: the title names, a kept line bounds, the scenario proves. A field whose formulation cannot show its own value is a restatement"
   - version: 1.7.3
     date: 2026-09-01
     changes:
@@ -24,14 +29,6 @@ changelog:
       - "Quality gate movement A displays any reporting run — a WARN-only run exits 0 and was hidden by 'display only on failure'; the Step 6 `--up-to 6` and movement A runs are named as identical by design"
       - "FUNC prose labels (Actor, Capability, Nominal scenario) follow the document's language; table column headers join the machine tokens; the complexity WARN says it counts FUNCs alone; `resolve_brief` matches ids punctuation-insensitively; personas in italics are content; a UI container state in a GIVEN is named as not a state of the world"
       - "Template stripped of its meta-discourse (process sentences deleted, reader legends tightened); the acceptance-criteria placeholder covers all criterion types; changelog history moved to CHANGELOG.md; decision-record.md created"
-  - version: 1.7.2
-    date: 2026-08-30
-    changes:
-      - "Sections 6/8/9 (and 10) are written at the `[C]` of the step that spotted the item — never parked until Step 6, which closes only what no earlier `[C]` wrote; the step table now says *close*. Two real runs read the previous sentence in opposite ways and a third stalled on it at Step 6"
-      - "Step 0's `[C]` creates nothing: the PRD file comes into existence at Step 1's own gate, never earlier — one real run in three creates it early and the scope gate silently disappears"
-      - "The quality gate presentation lists every remaining WARN verbatim before arbitration — a WARN the PM never saw is not arbitrated; one real run delivered its WARN unshown"
-      - "`brief:` is the source brief's filename stem, never its frontmatter `id:` — the validator resolves it on disk; a real run discovered this by reading the script's source"
-      - "The template's `**Acceptance criteria:**` placeholder bullets state their own fate: Step 3 deletes them, Step 4 back-fills one bullet per applicable BR/ERR"
   - note: "Older entries (1.0.0 → 1.7.1): see CHANGELOG.md in this directory"
 created-at: 2026-07-21
 created-by: "Céline Net <celine.net.ext@clubmed.com>"

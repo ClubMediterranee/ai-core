@@ -10,6 +10,11 @@ type: reference
 
 # User Journeys — Methodological Reference
 
+**A goal is the end state the actor comes to obtain — the change, observable on her side, that
+lets her stop there satisfied.** Not the activity that leads to it (those are the steps), not the
+path (the journey), not the means (the FUNCs). Everything in this reference hangs off that
+definition.
+
 A user journey in the PRD is a **userflow** — what the user does and gets, at the level of product behavior. It is not a **wireflow** — how the UI is structured (screens, components, navigation mechanics, layout).
 
 Journeys do two jobs: they **reveal the capabilities** to build, and they **prove the user's intent is reachable** with those capabilities. Both are judged against the journey's goal, which is why naming that goal correctly is the first thing to get right.
@@ -38,6 +43,19 @@ a short name for the flow; the goal is the proposition the journey has to satisf
 the question above is applied to. Left implicit in a title, a goal cannot be tested and two readers
 will hold two different versions of it — which is how a journey set ends up re-cut on every
 re-reading, dragging along everything that referenced it.
+
+**Format — the definition's three parts, one line:** an **accomplishment infinitive** (*choose,
+correct, obtain* — accomplished when the state is reached; never an activity verb: *consult,
+browse, explore, compare* — those can go on forever without satisfying anyone), the **object**,
+and the **stake that makes "satisfied" testable** ("the room that fits her family", "without
+losing her basket"). The implicit subject is the actor: a goal that cannot be prefixed with "the
+actor wants to…" is a system goal. The heading names the flow; the goal carries the stake — that
+is what the last step must prove.
+
+**The goal is an input, and the check runs one way.** It comes from the confirmed actor-goal
+list; the last step is checked against it. A flow whose last step does not reach the goal is
+fixed — or the goal is re-opened with the PM. It is never reworded to fit the flow: that would
+absorb a scope drift no gate has seen.
 
 ---
 
