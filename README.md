@@ -29,7 +29,7 @@
 
 ## What's inside
 
-### [Plugins](plugins/README.md) — 9 available
+### [Plugins](plugins/README.md) — 4 available
 
 Role-based bundles that install a curated set of skills in one command.
 
@@ -38,58 +38,35 @@ Role-based bundles that install a curated set of skills in one command.
 claude plugin marketplace add ClubMediterranee/ai-core
 
 # Per project — install the plugin that matches your stack
-claude plugin install clubmed-frontend@clubmed --scope project        # React / Next.js / TypeScript
-claude plugin install clubmed-backend-node@clubmed --scope project    # Node.js / API / PostgreSQL
-claude plugin install clubmed-backend-python@clubmed --scope project  # Django / FastAPI / Python
-claude plugin install clubmed-backend-java@clubmed --scope project    # Java 21+ / Spring Boot
-claude plugin install clubmed-infra@clubmed --scope project           # Terraform / Kubernetes / Security
 claude plugin install clubmed-tracking-data@clubmed --scope project   # GA4 tracking plans / analytics
 claude plugin install clubmed-product@clubmed --scope project         # Spec generation / PRD / Product
 claude plugin install clubmed-github@clubmed --scope project          # GitHub workflow / PR / MCP
 claude plugin install clubmed-qa@clubmed --scope project              # Playwright E2E test generation
-
 ```
 
 | Plugin | Stack | Skills included |
 |--------|-------|-----------------|
-| `clubmed-frontend` | React · Next.js · TypeScript · GraphQL | 10 skills |
-| `clubmed-backend-node` | Node.js · API · PostgreSQL · Prisma | 11 skills |
-| `clubmed-backend-python` | Django · FastAPI · async Python | 11 skills |
-| `clubmed-backend-java` | Java 21+ · Spring Boot · API | 9 skills |
-| `clubmed-infra` | Terraform · Kubernetes · Container security | 7 skills |
 | `clubmed-tracking-data` | GA4 tracking plans · analytics · Figma | 5 skills |
 | `clubmed-product` | Spec generation · PRD · User stories | 1 skill |
 | `clubmed-github` | GitHub workflow · PR lifecycle · MCP | 10 skills |
 | `clubmed-qa` | Playwright · E2E · cross-browser testing | 1 skill |
 
-### [Skills](skills/README.md) — 50 available
+### [Skills](skills/README.md) — 23 available
 
 Individual slash commands that extend Claude Code for specific tasks. Install plugins above to get them pre-bundled, or pick skills individually.
 
 | Category | Skills |
 |----------|--------|
 | Accessibility | `a11y-audit` · `a11y-web` |
-| API | `api-patterns` · `api-security-best-practices` · `graphql` |
 | Automation | `agent-browser` |
-| Code Quality | `clean-code` |
 | Config | `agent-creator` · `skill-creator` |
-| Database | `database-migration` · `postgresql-optimization` · `prisma-expert` |
 | Design | `excalidraw` · `figma-authentication` · `figma-client` · `trident-icons` · `trident-ui-install` |
 | Development | `git-commit` · `git-push-branch` · `git-rebase-branch` · `github-authentication` · `github-cancel` · `github-my-prs` · `github-new` · `github-open-pr` · `github-publish` · `github-update` |
 | Product | `spec` |
 | Project Management | `jira-fetch` |
-| Error Handling | `error-handling-patterns` |
-| Infrastructure | `container-security-hardening` · `k8s-security-policies` · `terraform-specialist` |
-| Java | `java-pro` |
-| Node.js | `nodejs-best-practices` |
-| Observability | `observability-patterns` |
-| Python | `async-python-patterns` · `django-pro` · `fastapi-pro` |
-| React / Next.js | `nextjs-best-practices` · `react-best-practices` · `react-component-performance` · `react-patterns` |
-| Security | `backend-security-coder` · `security-scanning-security-hardening` · `security-scanning-security-sast` |
-| Testing | `e2e-test-generator` · `testing-patterns` |
-| TypeScript | `typescript-advanced-types` · `typescript-expert` |
+| Testing | `e2e-test-generator` |
 
-### [MCP Servers](mcps/README.md) — 6 available
+### [MCP Servers](mcps/README.md) — 5 available
 
 Curated MCP servers to connect Claude to external tools.
 
@@ -100,7 +77,7 @@ Curated MCP servers to connect Claude to external tools.
 | `github` | Development |
 | `gtm` | Analytics |
 | `playwright` | Testing / Automation |
-| `trident-icons` | Design |
+| `trident-icons` | Design — 🚧 in progress |
 
 ---
 
