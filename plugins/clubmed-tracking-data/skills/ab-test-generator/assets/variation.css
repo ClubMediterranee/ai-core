@@ -1,0 +1,51 @@
+/* =============================================================================
+ * VARIATION {{VN}} — {{NOM_DU_TEST}}
+ * Tous les styles sont scopés par .abt-v1 (posée sur <html> par le JS) :
+ *   → pas de collision avec le site, cleanup = retirer la classe racine.
+ * Dériver couleurs/typo/espacements des tokens de design.json (charte du site).
+ * ============================================================================= */
+
+/* Tokens de la charte (à remplir depuis design.json) ------------------------- */
+html.abt-v1 {
+  --abt-accent: {{BRAND_ACCENT}};      /* ex. #ff6a00 — couleur accent de la marque */
+  --abt-accent-dark: {{BRAND_ACCENT_DARK}}; /* version assombrie pour contraste AA */
+  --abt-radius: {{BRAND_RADIUS}};      /* ex. 8px — rayon des boutons du site */
+}
+
+/* Anti-flicker intégré — posé/retiré par variation.js (voir AFL_ID). ---------
+   Remplacer {{ZONE_MODIFIEE}} par le(s) sélecteur(s) réellement modifié(s) —
+   jamais body entier. min-height évite le CLS pendant le masquage. */
+html.abt-v1-hide {{ZONE_MODIFIEE}} {
+  visibility: hidden !important;
+  min-height: {{HAUTEUR_ZONE}}; /* ex. 480px — réserve l'espace pendant le masquage */
+}
+
+/* Exemple : titre raccourci / restylé --------------------------------------- */
+html.abt-v1 .product-title {
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+
+/* Exemple : CTA renforcé (couleur de marque, pas arbitraire) ----------------- */
+html.abt-v1 .abt-cta,
+html.abt-v1 .btn-primary {
+  background: var(--abt-accent);
+  border-radius: var(--abt-radius);
+  /* éviter !important ; ne l'utiliser que contre un style inline du site */
+}
+
+/* Multi-device : gérer le responsive en CSS, pas en JS ----------------------- */
+@media (max-width: 767px) {
+  html.abt-v1 .abt-cta,
+  html.abt-v1 .btn-primary {
+    width: 100%;            /* CTA pleine largeur sur mobile */
+    min-height: 44px;       /* cible tactile accessible */
+    font-size: 1.125rem;
+  }
+}
+
+/* Accessibilité : ne jamais supprimer le focus visible ---------------------- */
+html.abt-v1 .abt-cta:focus-visible {
+  outline: 2px solid var(--abt-accent-dark);
+  outline-offset: 2px;
+}
