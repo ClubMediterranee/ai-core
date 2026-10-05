@@ -65,8 +65,8 @@ Each DC must have:
 ```
 | ID | Observable behavior | Collection method | Review cadence |
 |----|---------------------|-------------------|----------------|
-| LDM-001 | Rate of users who view ≥ 2 accommodations in a single session | analytics event on accommodation view | weekly |
-| LDM-002 | Share of sessions reaching the criteria-edit step | funnel step event | per release |
+| LDM-001 | Rate of users who view ≥ 2 products in a single session | analytics event on product view | weekly |
+| LDM-002 | Share of sessions reaching the filter-edit step | funnel step event | per release |
 ```
 
 A block form defines nothing: §7 is a table, and `validate_prd.py` only counts table rows. A
@@ -74,7 +74,7 @@ subsection filled in any other shape reads as empty and fails QG-8.
 
 **Formulation rule:**
 - Write as an **observable user behavior**, not a technical indicator
-- Good: "Rate of users who view ≥ 2 accommodations in a single session"
+- Good: "Rate of users who view ≥ 2 products in a single session"
 - Bad: "Number of clicks on the comparison component"
 
 ---
@@ -104,4 +104,4 @@ A set of metrics is valid if:
 3. Every **LDM-XXX** has a collection method and a review cadence
 4. No LDM is a completion metric for a pure consultation feature
 5. No LDM only becomes measurable after the brief's KR timeframe (lagging disguised as leading)
-6. LGMs and DCs trace to the brief (Desired Outcomes and Damage Control) — any LGM introduced without a brief anchor has an open divergence tension *(judged by the Challenge Pass — its "LGM/DC without brief anchor" row)*
+6. LGMs and DCs trace to the brief (Desired Outcomes and Damage Control) — any LGM introduced without a brief anchor has a Tensions row in the decision record *(judged by the Challenge Pass — its "LGM/DC without brief anchor" row)*

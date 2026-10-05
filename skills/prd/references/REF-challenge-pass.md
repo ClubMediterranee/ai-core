@@ -55,10 +55,10 @@ relative position in each.
 
 | Anti-pattern | What it looks like | How to fix |
 |---|---|---|
-| Out-of-scope leak | The step covers ground that an `NG-XXX` or the selected `OPP-XXX` excludes — a flow that leaves the opportunity, an action the brief keeps out | Remove the step. If it reveals a real capability, it belongs to another PRD: name that perimeter, log it in the canonical memory → written as an `NG-XXX` in §6 at this step's `[C]` — never mid-derivation, never waiting for Step 6. |
-| Error path as step | The step describes the product's response to a failure | Remove from the journey; park in the canonical memory as an ERR candidate for Step 4. |
+| Out-of-scope leak | The step covers ground that an `NG-XXX` or the selected `OPP-XXX` excludes — a flow that leaves the opportunity, an action the brief keeps out | Remove the step. If it reveals a real capability, it belongs to another PRD: name that perimeter → written as an `NG-XXX` in §6 at this step's `[C]` — never waiting for Step 6. |
+| Error path as step | The step describes the product's response to a failure | Remove from the journey; a `## Parked` row, *ERR candidate*, `For: Step 4`. |
 | Variation misplaced | A `Variation:` step sits after the closing step instead of at the step where it diverges from the nominal path | Move it to the point of divergence — see `REF-user-journeys.md`, *Place each variation where it diverges*. A reader follows the numbering as a sequence. |
-| Rule detail in a step | The step states conditions, thresholds, eligibility or content enumerations that do not change the observable path — true, but rule-level. A condition that changes the user's outcome is a variation (see the routing) — this row is for same-outcome detail | Strip the step to action → outcome; park the detail in the canonical memory as a **BR candidate** for Step 4 (*Park and Surface*). |
+| Rule detail in a step | The step states conditions, thresholds, eligibility or content enumerations that do not change the observable path — true, but rule-level. A condition that changes the user's outcome is a variation (see the routing) — this row is for same-outcome detail | Strip the step to action → outcome; a `## Parked` row, *BR candidate*, `For: Step 4` (*Park and Surface*). |
 | Technical HOW | The step names a technical mechanism (API call, data load, endpoint, protocol) | Rewrite as a user action + observable outcome for the user. |
 | Design HOW | The step describes a layout position, a scroll mechanic, or a named UI component. A journey step is no longer true if the mockup changes. | Rewrite as: [user action] → [observable outcome], without the UI detail. |
 | System as subject | The step uses "The system displays / loads / renders" as the subject | Rewrite with the user as the subject — what they observe, not what the machine does: "the user sees their criteria updated". This holds even when the system is what acts. |
@@ -69,10 +69,10 @@ relative position in each.
 
 | Anti-pattern | What it looks like | How to fix |
 |---|---|---|
-| Out-of-scope leak | The FUNC delivers a capability that an `NG-XXX` or the selected `OPP-XXX` excludes | Drop it. If the capability is real, it belongs to another PRD: name that perimeter and log it in the canonical memory. |
-| Rule detail in the capability | The Capability states a rule's conditions — a preselection, a threshold, an eligibility — instead of the capability they serve | Flag it. Keep the capability sentence; the rule goes to §5 as a BR (a BR candidate in the canonical memory until Step 4). |
+| Out-of-scope leak | The FUNC delivers a capability that an `NG-XXX` or the selected `OPP-XXX` excludes | Drop it. If the capability is real, it belongs to another PRD: name that perimeter → an `NG-XXX` in §6 at this step's `[C]`, and a Decisions row whose `Affects` names the other PRD. |
+| Rule detail in the capability | The Capability states a rule's conditions — a preselection, a threshold, an eligibility — instead of the capability they serve | Flag it. Keep the capability sentence; the rule goes to §5 as a BR (a `## Parked` row, *BR candidate*, `For: Step 4`). |
 | Technical HOW leakage | The FUNC names a framework, endpoint, SQL type, or protocol | Flag it. Rewrite as "Users can [verb] [object]" without the technical reference. |
-| Design HOW leakage | The FUNC names a UI component, a layout, or an interaction mechanic — in its title, its Capability, its GIVEN or its scenario. **The capability is no longer true if the mockup changes.** | Flag it. Rewrite at product altitude — what the user gets, not the container it arrives in: *view the floor plan without leaving the room sheet*, never *in a modal*. |
+| Design HOW leakage | The FUNC names a UI component, a layout, or an interaction mechanic — in its title, its Capability, its GIVEN or its scenario. **The capability is no longer true if the mockup changes.** | Flag it. Rewrite at product altitude — what the user gets, not the container it arrives in: *view the specifications without leaving the product page*, never *in a modal*. |
 | System as subject | The FUNC starts with "The system displays / The API returns / The page renders" | Flag it. Rewrite with the user as the subject. |
 
 Whether a FUNC is **autonomous** — demonstrable without another FUNC acting first — is a cut decided
@@ -90,14 +90,14 @@ Applies to the four criterion types alike — `BR`, `ST`, `PERM`, `ERR` — unle
 | Out-of-scope leak | A clause can only be violated in a scenario an NG-XXX already excludes | Flag it. Remove the clause. Test: if the NG disappeared, would the clause become necessary again? Yes → it deserves its own BR. No → drop it. |
 | Perimeter leak | A clause describes an outcome for logic that no FUNC, BR or ST of *this* PRD governs — it says what happens without this PRD saying why or under which rule | Flag it. Ask the PM which perimeter owns it, then remove the clause and record an NG-XXX naming that perimeter. |
 | State re-enumeration | A BR lists an object's states while an ST-XXX is defined for that object | Flag it. Point the BR to ST-XXX rather than repeating the states — one source of truth. |
-| Technical HOW | The criterion names an API, endpoint, database, or protocol — in a rule, a transition, a permission condition, or a failure mode | Flag it. Rewrite as an observable condition (e.g. "if the API returns content" → "if content is available for the selected resort"). An `ERR` failure mode is an observable unavailability ("no availability for the new criteria"), never a mechanism ("timeout", "HTTP 500"). |
+| Technical HOW | The criterion names an API, endpoint, database, or protocol — in a rule, a transition, a permission condition, or a failure mode | Flag it. Rewrite as an observable condition (e.g. "if the API returns content" → "if content is available for the selected store"). An `ERR` failure mode is an observable unavailability ("no result for the new filters"), never a mechanism ("timeout", "HTTP 500"). |
 | Design HOW | The criterion prescribes a layout, alignment, named UI component, or interaction mechanic | Flag it. If a product rule is recoverable: propose it without the design detail. If design-only: mark it as a design spec and remove it from the criteria. |
 | Non-testable | The criterion uses subjective language ("clear", "sufficient", "appropriate") with no measurable condition — **or** its expected outcome is not observable at product level (an `ERR` whose expected behaviour is "the error is logged") | Flag it. Propose a rewrite with a precise, binary-testable condition and an outcome someone can observe. |
 
 **Applying the first two.** These are signals, not verdicts. A perimeter leak is the likeliest false
-positive when the knowledge base is thin — a redesign starting from little. Ask the PM where the
+positive when the docs root is thin — a redesign starting from little. Ask the PM where the
 logic belongs; open an `OQ-XXX` only when they cannot say or choose to defer. Guessing a
-destination, or silently logging an open question instead of asking, produces a document that looks
+destination, or silently filing an open question instead of asking, produces a document that looks
 resolved while encoding an unvalidated assumption.
 
 Whether a criterion **encodes an unvalidated assumption** is not a per-artifact question. It is
@@ -110,7 +110,7 @@ and verified once, on the whole document, at the quality gate (QG-7).
 
 | Anti-pattern | What it looks like | How to fix |
 |---|---|---|
-| LGM/DC without brief anchor | A lagging or damage-control metric that no Desired Outcome or Damage Control item of the brief carries, or one altered on import — with no divergence tension logged | Flag it. Trace it back to the brief line it comes from, or log the divergence as a tension and keep the brief's wording. `LGM` and `DC` are imported, not derived: the brief is their source of truth. |
+| LGM/DC without brief anchor | A lagging or damage-control metric that no Desired Outcome or Damage Control item of the brief carries, or one altered on import — with no Tensions row in the decision record | Flag it. Trace it back to the brief line it comes from, or record the divergence as a tension and keep the brief's wording. `LGM` and `DC` are imported, not derived: the brief is their source of truth. |
 | Wrong family for the feature | A completion metric (step completion, drop-off) on a pure consultation feature, or an engagement metric on a pure action feature | Flag it. Re-derive from the journeys' dominant interaction type — see `REF-metrics.md`, "LDMs — Feature Type Inference". |
 | Lagging disguised as leading | The LDM only becomes measurable after the brief's KR timeframe, so it predicts nothing in time to act on | Flag it. Propose an earlier observable behaviour on the same causal chain. |
 | Unmeasurable LDM | The leading metric names a behaviour with no identifiable collection method | Flag it. Name the event that would capture it, or drop the metric — an indicator nobody can read is not one. |

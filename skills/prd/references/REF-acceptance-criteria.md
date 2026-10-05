@@ -17,8 +17,9 @@ Acceptance criteria are the specific conditions a feature must meet for its deve
 
 ## Derivation
 
-Start from the **ERR candidates** parked in the canonical memory at Step 2, then derive the rules the
-journeys and the FUNCs imply.
+Start from the `## Parked` rows `For: Step 4` — the ERR and BR candidates of Steps 2 and 3: each
+becomes a criterion or is discarded with its reason named at the gate, and this step's `[C]` removes
+the rows. Then derive the rules the journeys and the FUNCs imply.
 
 **Watch for the re-cut signal while writing the BRs.** This is the step where the real structure of
 the feature surfaces — not a scan to run, a signal to notice:
@@ -36,14 +37,14 @@ step. Signal absent → carry on silently. The same discriminant is stated in
 
 ### Business Rules (BR-XXX)
 
-**Definition:** Core business rules that govern how the organization or domain operates. They reflect legal constraints, internal policies, or invariant business logic — including market/country-specific variants.
+**Definition:** Core business rules that govern how the organization or domain operates. They reflect internal policies or invariant business logic — including market/country-specific variants. What a regulation imposes is a `CL`, not a BR; a BR may go beyond it, and cites the CL it builds on.
 
 **Rules:**
 - Testable in binary (passes / fails) — no subjective language
 - Cross-cutting: a BR may apply to multiple FUNCs
 - Numbered independently from FUNCs
 - **Opens with a recap** — a short bold label naming *the case handled*, followed by a colon, then
-  the rule itself. "Adult selection quota", not "You cannot go over". The recap is what lets a
+  the rule itself. "Quantity cap per order", not "You cannot go over". The recap is what lets a
   reader scan thirty rules to find the one covering their subject. When two rules cover the same
   subject for different actors, the distinction goes into the recap after an em dash.
 
@@ -75,7 +76,7 @@ as the last cell of the row.
 ```
 | ID | Rule | Applies to |
 |----|------|-----------|
-| BR-001 | **Standard shipping threshold:** cart total is below the free-shipping floor → standard shipping fee applied. Variants : FR 25 € / DE 30 € | FUNC-002 |
+| BR-001 | **Standard shipping threshold:** cart total is below the free-shipping floor → standard shipping fee applied. Variants: FR 25 € / DE 30 € | FUNC-002 |
 | BR-002 | **Discount ceiling:** a promo code is applied → the discount cannot exceed the cart total (minimum amount charged: 0 €) | FUNC-003 |
 | BR-003 | **Out-of-stock item:** an item is out of stock → it cannot be added to the cart | FUNC-001 |
 ```
@@ -192,10 +193,14 @@ read in full only for the object under discussion.
 
 **Definition:** Conditions this PRD **inherits** rather than defines. `CB` for business constraints
 — a dependency on another PRD, on an existing platform behaviour, on an entry point owned
-elsewhere. `CL` for legal and compliance constraints — what a locale or a regulation imposes.
+elsewhere. `CL` for legal and compliance constraints — what a locale or a regulation imposes. The
+baseline — GDPR, accessibility law, consumer law — applies by default and is not restated in every
+PRD; a CL row is written when that baseline shapes a capability of this PRD: a consent step, a
+retention period, a withdrawal right.
 
 They differ from a BR in direction: a BR is a rule this PRD *decides*, a constraint is a boundary
-this PRD *accepts*. They live in the PRD's optional Constraints section, as bullets grouped under
+this PRD *accepts*. They live in the PRD's Constraints section (§10, present in every PRD, `None
+identified.` under a heading when nothing is inherited there), as bullets grouped under
 `### Business` and `### Legal / Compliance`, and a FUNC or a BR may reference them like any other
 id.
 
@@ -212,10 +217,9 @@ A FUNC lists its acceptance criteria **with their description**, not with bare i
 ```
 **Acceptance criteria:**
 
-- **BR-010** — **Validation blocking:** at click on the validation CTA, navigation to the Payment
-  step is blocked in two cases: […]
+- **BR-010** — **Validation blocking:** at click on the validation CTA, navigation to the Payment step is blocked in two cases: […]
 - **ST-001** — Form field — states: empty / in_progress / valid / in_error
-- **PERM-008** — Logged-in user : Edit a registered companion's information
+- **PERM-008** — Logged-in user : Edit a saved recipient's information
 - **ERR-001** — Field validation error (invalid email format, invalid phone, inconsistent date)
 ```
 

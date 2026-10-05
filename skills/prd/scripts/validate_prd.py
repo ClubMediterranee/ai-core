@@ -2,26 +2,34 @@
 """Validate PRDs produced by the `prd` skill.
 
 Deterministic, stdlib-only. It answers one question — **is the PRD well-formed and fully filled
-in?** — and leaves altitude and meaning to a reader: QG-2, QG-3, QG-5, QG-7 and the judged half of
-QG-1 are the Challenge Pass tables of `references/REF-challenge-pass.md`. One check, one home: what
+in?** — and leaves altitude and meaning to a reader: QG-3 and the judged halves of QG-1 and QG-2
+are the Challenge Pass tables of `references/REF-challenge-pass.md`; QG-5 and QG-7 are the gate's
+third movement, the two crossings no table can see. One check, one home: what
 this script decides, no table restates — and a gate whose every check is judged by the model that
 just wrote the PRD would drift, quietly.
 
 Checks run in the order the skill writes the document, one group per step. `--up-to N` runs the
 groups 1..N and stays silent about what later steps still owe; without it, every group runs.
 
-  Step 1 — the file is a PRD
+  Step 1 — frame & scope: the file is a PRD
     QG-9   frontmatter: 8 fields present; `id` = PRD<NN> = the filename's number; `status` and
            `complexity` in their enumerations; ISO date; `author` a human name (no email, not
-           the AI that drafted it)                                                      ERROR
+           the AI that drafted it); `record` present when `brief` is `none`             ERROR
     QG-10  the first content line is an H1 equal to `title`                             ERROR
-    QG-11  the brief resolves on disk (ERROR) and carries `status: validated` (WARN)
-    —      the 9 sections present, in order, once (ERROR); §10 optional; a fence left
+    QG-11  the brief resolves on disk (ERROR) and carries `status: validated` (WARN);
+           `brief: none` is a PRD framed without a brief (WARN)
+    —      the 9 sections present, in order, once (ERROR); §10 tolerated absent in
+           PRDs written before 1.8.0; a fence left
            open, the template's instantiation comment (ERROR); a `## ` used inside a
-           section, a translated section title (WARN)
+           section, a translated section title, a section after `## Parked` (WARN);
+           the `## Parked` table keeps its columns, every row targets `Step 2`..`6`
+           (ERROR); the project record resolves on disk (WARN)
   Step 2 — personas and journeys
     QG-1   every journey states a `*Goal:*` and numbers its steps flat, no `2a.`         WARN
     QG-12  §2 Personas is not empty                                                     WARN
+    QG-12  §8 ↔ the project record's Vocabulary: a term frozen in §8 has a row with the
+           same definition (ERROR on a different one, WARN when absent); a row minted
+           by this PRD is in §8 (WARN)
     QG-2   a journey step names a UI component (modal, drawer, onglet…) — the lexical
            half; the semantic half (positions, mechanics, container-driven carving)
            stays with the Challenge Pass                                                WARN
@@ -36,7 +44,8 @@ groups 1..N and stays silent about what later steps still owe; without it, every
   Step 4 — acceptance criteria
     QG-12  §4 ↔ §5: every id referenced in §4 is defined, every id is defined once, each
            bullet equals its §5 row (verbatim for BR/ERR, by containment for ST/PERM),
-           `Applies to` names FUNCs that exist and is never empty                       ERROR
+           `Applies to` names FUNCs that exist and is never empty — §10's constraints
+           are read from Step 6 only                                                    ERROR
            every FUNC lists criteria, the mirror agrees both ways, a BR opens with a
            bold recap and cites no other BR, an id sits under the heading of its type  WARN
     QG-12  §5 carries its four subsections (WARN); every table keeps the columns it is
@@ -49,16 +58,29 @@ groups 1..N and stays silent about what later steps still owe; without it, every
   Step 6 — closing sections
     QG-9   `complexity` coherent with the grid for the number of FUNCs                  WARN
     QG-12  NG and OQ ids defined once (ERROR); a §6 row opens with an NG id, a glossary
-           term is defined once (WARN); the §6/§8/§9 tables keep their columns
+           term is defined once (WARN); the §6/§8/§9 tables keep their columns; an
+           `accepted` PRD carries no open question; `## Parked` still in a `review` or
+           `accepted` PRD (ERROR)
   Every run, over what the steps so far own
     QG-12  an NG/OQ/LGM/DC/LDM id cited anywhere is defined in its home section; a
            FUNC cited outside §3–§5 is defined in §4                                    WARN
     —      no `[ASSUMPTION: ...]` survives a gate (ERROR); no `[placeholder]`, no
            `XXX` token left behind (WARN)
+    —      a `## Parked` row still targeting a step whose gate has passed (ERROR); under
+           `--up-to N`, a section a later step owns already holding content — written
+           before its gate (ERROR; known limits: a persona on one italic line, a
+           blockquote, a FUNC body entirely in a fence are not seen); a record decision
+           that resolves an OQ still open in §9 (ERROR)
+  The project record, `{DOCS_ROOT}/record/<record>.md`, once per run
+    —      its four tables present, each with its table and columns (every table of a
+           block is checked); its instantiation comment deleted, its title filled; D/T
+           ids unique and numbered for the PRD they name (a `brief-NN` row is the
+           brief's); a term defined once; a `Status` / `Gate` in its enumeration; a PRD
+           column that resolves on disk — the next number is reserved, not missing
 
 Under `--up-to N` the last group reads only the lines Steps 1..N own: §4's acceptance-criteria
-bullets belong to Step 4, §6/§8/§9 close at Step 6. A skeleton still holding its later
-placeholders therefore passes the earlier gates.
+bullets belong to Step 4, §6/§8/§9 close at Step 6, a `## Parked` row belongs to the step it is
+parked for. A skeleton still holding its later placeholders therefore passes the earlier gates.
 
 Deliberately NOT checked: gaps in the numbering. An id is an identifier, not a rank — a merged
 FUNC retires its id and the gap is the expected trace of that merge. Flagging gaps would push
@@ -71,10 +93,11 @@ warning per id and bury the structural finding that explains them all. Headings 
 fenced code blocks only, and ids inside a fence never count, so a PRD may quote a template or a
 payload without shadowing its own sections.
 
-The suite `test_validate_prd.py` beside this script tests the validator itself — run it after
-any change. It never runs during a PRD session; nothing in the skill loads it.
+The suite `tests/prd/test_validate_prd.py`, at the repository root, tests the validator itself —
+run it after any change. It never runs during a PRD session and is not packaged with the skill.
 
 Exit codes: 0 = clean · 1 = at least one ERROR · 2 = nothing to validate (empty or bad directory).
+Python 3.8 or later (the `:=` operator; later syntax is deferred by the `__future__` import).
 A file the caller named explicitly is always validated: if it does not exist that is an ERROR, not
 a silent skip. WARN never fails the run.
 
@@ -82,6 +105,7 @@ Usage:
     python3 validate_prd.py <DOCS_ROOT>/prd/prd01-short-name.md
     python3 validate_prd.py <DOCS_ROOT>/prd/prd01-short-name.md --up-to 3
     python3 validate_prd.py <DOCS_ROOT>/prd                      # every PRD in the folder
+    python3 validate_prd.py <DOCS_ROOT>/record/brief01-name.md   # the project record alone
 """
 from __future__ import annotations
 
@@ -94,6 +118,9 @@ from pathlib import Path
 # --------------------------------------------------------------------------- the format
 
 REQUIRED_FM = ["id", "title", "version", "status", "complexity", "date", "author", "brief"]
+# `record` names the project's decision record; it defaults to the brief's stem, so it is required
+# only for a PRD framed without a brief
+NO_BRIEF = "none"
 STATUS = {"in-progress", "review", "accepted"}
 COMPLEXITY = {"S", "M", "L", "XL"}
 COMPLEXITY_GRID = [("S", 3), ("M", 7), ("L", 14), ("XL", 10**6)]
@@ -102,11 +129,13 @@ SECTIONS = [
     "Executive Summary", "Personas", "User Journeys", "Functional Specifications",
     "Acceptance Criteria", "Out of Scope", "Metrics", "Glossary", "Open Questions",
 ]
-# section 10 is optional: a PRD that inherits no constraint simply does not carry it
+# section 10 is in every PRD since 1.8.0 (its legend states the inherited baseline), but a PRD
+# written before carries it only when it inherits a constraint — so its absence is not an error
 OPTIONAL_SECTIONS = {10: "Constraints"}
 AC_SUBSECTIONS = ["Business Rules", "States & Transitions", "Permissions", "Error Scenarios"]
 METRIC_SUBSECTIONS = ["Lagging Metrics", "Damage Control", "Leading Metrics"]
-EMPTY_MARKERS = ("None identified.", "None defined.")
+# read by its words: the case and the closing period are typography, not the marker
+EMPTY_MARKER_RE = re.compile(r"\bNone (?:identified|defined)\b", re.I)
 
 # every cell in this file is read by POSITION — `Applies to` is the last cell, an object's states are
 # the third. A column added, removed or permuted makes the reader take the wrong one, silently, and
@@ -129,7 +158,20 @@ TABLE_HEADERS = {
     "Leading Metrics": [["ID", "Observable behavior", "Collection method", "Review cadence"]],
     "Glossary": [["Term", "Definition"]],
     "Open Questions": [["ID", "Question", "Impact if unresolved", "Blocks", "Source"]],
+    "Parked": [["Item", "Kind", "For", "Origin"]],
 }
+# the project's decision record — one file per brief under {DOCS_ROOT}/record/, four tables by
+# nature, every row naming the PRD it comes from; ids are prefixed by that PRD's number
+RECORD_DIR = "record"
+RECORD_TABLES = {
+    "Decisions": ["ID", "PRD", "Step", "Decision", "Why", "Resolves", "Affects"],
+    "Tensions": ["ID", "PRD", "Tension", "Status", "Resolution", "Affects"],
+    "Vocabulary": ["Term", "Definition", "PRD"],
+    "Sources": ["PRD", "Source", "What it produced", "Gate"],
+}
+RECORD_ID_RE = re.compile(r"^\*{0,2}([DT])-(\d+)-(\d+)\*{0,2}$")
+TENSION_STATUS = {"open", "accepted", "resolved"}
+SOURCE_GATE = {"kept", "cut"}
 # §6, §8 and §9 carry a single unnamed table: the section title stands in for the sub-heading
 SECTION_TABLE_OWNER = {6: "Out of Scope", 8: "Glossary", 9: "Open Questions"}
 # which level-3 heading each criterion type belongs under
@@ -142,6 +184,10 @@ FOREIGN_PREFIX_HOME = {"NG": 6, "OQ": 9, "LGM": 7, "DC": 7, "LDM": 7}
 # §9 grow across the steps and close at Step 6; §4's criteria bullets are back-filled at Step 4.
 SECTION_STEP = {1: 1, 2: 2, 3: 2, 4: 3, 5: 4, 6: 6, 7: 5, 8: 6, 9: 6, 10: 6}
 LAST_STEP = 6
+# §6, §8, §9 and §10 grow across the steps — an item lands there at the `[C]` of the step that
+# spotted it — so content in them never means a gate was skipped; the other sections are written
+# at their own step's `[C]` and at no other moment
+GATED_SECTIONS = {n for n, step in SECTION_STEP.items() if step < LAST_STEP}
 STEP_TITLES = {
     0: "the file",
     1: "frontmatter, title, brief, structure",
@@ -150,6 +196,18 @@ STEP_TITLES = {
     4: "acceptance criteria",
     5: "metrics",
     6: "closing sections",
+}
+# the step after a gate, as SKILL.md names it, with the reference it reads and whether `[A]` is
+# offered — printed after every `--up-to N` run so the gate discipline re-enters the context at
+# the one moment it matters, whatever a compaction kept
+NEXT_STEP = {
+    0: ("Step 1 — Frame & scope", "references/REF-brief-contract.md", False),
+    1: ("Step 2 — User journeys", "references/REF-user-journeys.md", True),
+    2: ("Step 3 — Functional blocks", "references/REF-functional-blocks.md", True),
+    3: ("Step 4 — Acceptance criteria", "references/REF-acceptance-criteria.md", True),
+    4: ("Step 5 — Leading metrics", "references/REF-metrics.md", True),
+    5: ("Step 6 — Complexity", "references/REF-complexity-sizing.md", False),
+    6: ("the quality gate", None, False),
 }
 
 # --------------------------------------------------------------------------- patterns
@@ -164,39 +222,80 @@ BULLET_ID_RE = re.compile(r"^\s*[-*+]\s+\*\*((?:BR|ST|PERM|ERR|CB|CL)-\d+[a-z]?)
 OQ_ROW_RE = re.compile(r"^\s*\|\s*\*{0,2}(OQ-\d+[a-z]?)\b")
 NG_CELL_RE = re.compile(r"^\*{0,2}(NG-\d+[a-z]?)")
 METRIC_ROW_RE = re.compile(r"\|\s*\*{0,2}((?:LGM|DC|LDM)-\d+[a-z]?)")
-AC_BLOCK_RE = re.compile(r"^\s*\*\*Acceptance criteria:?\*\*\s*(.*)$", re.I)
+# the three labels are matched on their words, not on their typography: one or two asterisks, and
+# the space French puts before a colon, are the same label
+AC_BLOCK_RE = re.compile(r"^\s*\*{1,2}Acceptance criteria\s*:?\s*\*{1,2}\s*(.*)$", re.I)
 # a FUNC's criteria list ends at the block's next labelled field (`**Nominal scenario:**`) or at a
 # heading of the FUNC's own level or above — never at the first line that merely is not a bullet.
 # `####` is deliberately excluded: a long FUNC groups its criteria under one.
-AC_BLOCK_END_RE = re.compile(r"^\s*(?:\*\*[^*\n]+:\*\*|#{1,3}\s)")
+AC_BLOCK_END_RE = re.compile(r"^\s*(?:\*{1,2}[^*\n]+:?\s*\*{1,2}\s*$|#{1,3}\s)")
 # split a markdown table row on unescaped pipes only: a `States` cell legitimately holds `\|`,
 # and a naive split truncates it silently — the file stays valid and the check goes blind
 PIPE_SPLIT_RE = re.compile(r"(?<!\\)\|")
-SECTION_RE = re.compile(r"^##\s+(\d+)\.\s+(.+?)\s*$")
-SUBSECTION_RE = re.compile(r"^###\s+(.+?)\s*$")            # level 3 only: `####` does not match
-SUBHEAD_RE = re.compile(r"^(#{3,4})\s+(.+?)\s*$")
-FUNC_HEADING_RE = re.compile(r"^###\s+(FUNC-\d+[a-z]?)\b")
-CAPABILITIES_RE = re.compile(r"^\s*\*Capabilit(?:y|ies) revealed:\*(.*)$", re.I)
-LOOSE_CAPABILITIES_RE = re.compile(r"^\s*\*?Capabilit(?:y|ies) revealed:", re.I)
-GOAL_RE = re.compile(r"^\s*\*Goal:\*")
+# markdown reads a heading indented by up to three spaces as a heading — so does this file
+SECTION_RE = re.compile(r"^ {0,3}##\s+(\d+)\.\s+(.+?)\s*$")
+SUBSECTION_RE = re.compile(r"^ {0,3}###\s+(.+?)\s*$")            # level 3 only: `####` does not match
+SUBHEAD_RE = re.compile(r"^ {0,3}(#{3,4})\s+(.+?)\s*$")
+FUNC_HEADING_RE = re.compile(r"^ {0,3}###\s+(FUNC-\d+[a-z]?)\b")
+H2_RE = re.compile(r"^ {0,3}## ")
+# the PRD's scratch block: unnumbered, last, deleted once the quality gate passes
+PARKED_RE = re.compile(r"^ {0,3}##\s+Parked\s*$", re.I)
+PARKED_FOR_RE = re.compile(r"^\s*Step\s+(\d)\s*$", re.I)
+# a line a section holds before its step writes it: a bare label (`**Acceptance criteria:**`), a
+# `*Capabilities revealed:* TBD`, a legend in italics — everything else with a word in it is content
+BARE_LABEL_RE = re.compile(r"^\s*\*{1,2}[^*]+:\*{1,2}\s*(?:TBD)?\s*$", re.I)
+LEGEND_RE = re.compile(r"^\s*\*[^*].*[^*]\*\s*$")
+LEGEND_OPEN_RE = re.compile(r"^\s*\*[^*\s]")
+LABELLED_RE = re.compile(r"^\s*\*{1,2}[^*]+:\*{1,2}\s*\S")     # `*Goal:* the user …`
+# a fence opens on three backticks or three tildes, and only its own character closes it
+FENCE_RE = re.compile(r"^\s*(`{3,}|~{3,})")
+LEADING_COMMENTS_RE = re.compile(r"\A(?:\s*<!--.*?-->)+", re.S)
+CAPABILITIES_RE = re.compile(r"^\s*\*{1,2}Capabilit(?:y|ies) revealed\s*:\s*\*{1,2}(.*)$", re.I)
+LOOSE_CAPABILITIES_RE = re.compile(r"^\s*\*{0,2}Capabilit(?:y|ies) revealed\s*:", re.I)
+GOAL_RE = re.compile(r"^\s*\*{1,2}Goal\s*:\s*\*{1,2}")
 BRANCH_STEP_RE = re.compile(r"^\s*\d+[a-z]\.\s")
 FILENAME_NUM_RE = re.compile(r"^[Pp][Rr][Dd]\s*-?\s*(\d+)")
 ID_FIELD_RE = re.compile(r"^PRD-?(\d+)$", re.I)
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 # the AI listing itself as author means the PM never took ownership; the convention also forbids
 # an email in this field (SKILL.md Step 1: "The name alone")
-AI_AUTHOR_RE = re.compile(r"anthropic|noreply|copilot|gemini|chatgpt|openai", re.I)
+AI_AUTHOR_RE = re.compile(r"anthropic|noreply|copilot|gemini|chatgpt|openai|"
+                          r"claude\s+(?:code|opus|sonnet|haiku)", re.I)
 # QG-2's script half — an unambiguous UI-component noun in a journey step or a FUNC is a design
 # leak whatever the intent; the Challenge Pass judges the semantic half (positions, mechanics,
-# container-driven carving). WARN: a word list can misfire, a reader arbitrates. EN + FR.
-UI_COMPONENT_RE = re.compile(
-    r"\b(modale?s?|pop-?ups?|layers?|drawers?|carr?ousels?|tooltips?|infobulles?|dropdowns?|"
-    r"accord[ée]ons?|onglets?|checkbox(?:es)?|sliders?|toasts?|breadcrumbs?)\b", re.I)
+# container-driven carving). WARN: a word list can misfire, a reader arbitrates. The list lives in
+# `references/ui-lexicon.txt`, one `lang: word|word` line per language, so it is calibrated
+# without touching this script.
+UI_LEXICON = Path(__file__).resolve().parent.parent / "references" / "ui-lexicon.txt"
+
+
+def load_ui_lexicon(path: Path = UI_LEXICON) -> re.Pattern[str]:
+    """The lexicon as one pattern. An empty or missing file disables the check rather than
+    matching every line (`\\b()\\b` would) or crashing before the first PRD is read."""
+    words: list[str] = []
+    try:
+        for raw in path.read_text(encoding="utf-8").splitlines():
+            line = raw.strip()
+            if not line or line.startswith("#"):
+                continue
+            _, _, alternatives = line.partition(":")
+            words += [w.strip() for w in alternatives.split("|") if w.strip()]
+    except OSError:
+        words = []
+    if not words:
+        return re.compile(r"(?!x)x")
+    return re.compile(r"\b(" + "|".join(dict.fromkeys(words)) + r")\b", re.I)
+
+
+UI_COMPONENT_RE = load_ui_lexicon()
 # a bracketed span that is not a markdown link — i.e. a leftover template placeholder
 PLACEHOLDER_RE = re.compile(r"\[[^\]\n]{2,}\](?!\()")
 # a speculative-derivation marker from Step 2 — none may survive into a validated PRD
 ASSUMPTION_RE = re.compile(r"\[ASSUMPTION:")
-XXX_TOKEN_RE = re.compile(r"\b(?:brief|OPP|PRD)-?XXX\b")
+# every prefix the skill mints: the messages tell authors to write `OQ-XXX`, so a leftover may
+# carry any of them, not only the template's three
+XXX_TOKEN_RE = re.compile(
+    r"\b(?:brief|OPP|PRD|FUNC|BR|ST|PERM|ERR|CB|CL|LGM|DC|LDM|NG|OQ|D|T)-?XXX\b")
 # every dash a human or an editor may type as a bullet separator. Stripping only three of them made
 # `describes X differently` fire on the dash rather than on the text — a wrong diagnosis
 DASHES = "—–-‐‑‒―−﹘﹣－"
@@ -254,6 +353,29 @@ class Criterion:
 
 
 @dataclass
+class ParkedRow:
+    line: int                   # 1-based
+    item: str
+    kind: str
+    for_step: int | None        # None when the `For` cell is not `Step N`
+    origin: str
+
+
+@dataclass
+class Record:
+    """The project's decision record, read table by table. Rows are (1-based line, cells)."""
+    path: Path
+    tables: dict[str, list[tuple[int, list[str]]]]
+    headers: dict[str, tuple[list[str], int]]       # table -> (header cells, 1-based line)
+    missing: list[str]                              # tables whose heading or table is absent
+    text: str = ""
+
+    @property
+    def name(self) -> str:
+        return self.path.name
+
+
+@dataclass
 class Document:
     path: Path
     text: str
@@ -269,6 +391,16 @@ class Document:
     journeys: list[Journey] = field(default_factory=list)
     funcs: list[Func] = field(default_factory=list)
     criteria: list[Criterion] = field(default_factory=list)   # every row, duplicates included
+    parked_span: tuple[int, int] | None = None      # 0-based [heading, end) of `## Parked`
+    parked: list[ParkedRow] = field(default_factory=list)
+    record: Record | None = None                    # the project record, when it resolves
+    up_to: int | None = None                        # the `--up-to N` of this run, once known
+
+    def criteria_in_scope(self) -> list[Criterion]:
+        """The criteria the steps so far own — §10's constraints are Step 6's, so a Step 4 check
+        does not read them before their step."""
+        return [c for c in self.criteria
+                if self.up_to is None or self.owner[c.line - 1] <= self.up_to]
 
     @property
     def name(self) -> str:
@@ -297,6 +429,11 @@ class Document:
     def owned(self, up_to: int | None) -> list[int]:
         """Indices of the lines Steps 1..up_to have written — every line when up_to is None."""
         return [i for i in range(len(self.lines)) if up_to is None or self.owner[i] <= up_to]
+
+    def number(self) -> str:
+        """The PRD's number from its `id`, as written (`07`), or '' when the id is malformed."""
+        m = ID_FIELD_RE.match(self.fm.get("id", "").strip())
+        return m.group(1) if m else ""
 
 
 # --------------------------------------------------------------------------- parsing
@@ -331,14 +468,15 @@ def fence_mask(lines: list[str]) -> tuple[list[bool], int | None]:
     and the run would report eight missing sections without naming the cause. The opening line is
     returned so the structure check can say it in one finding.
     """
-    mask, inside, opened_at = [], False, None
+    mask, fence, opened_at = [], None, None
     for i, line in enumerate(lines):
-        if line.lstrip().startswith("```"):
-            inside = not inside
-            opened_at = i + 1 if inside else None
+        m = FENCE_RE.match(line)
+        if m and fence in (None, m.group(1)[0]):
+            fence = None if fence else m.group(1)[0]
+            opened_at = i + 1 if fence else None
             mask.append(True)
             continue
-        mask.append(inside)
+        mask.append(fence is not None)
     return mask, opened_at
 
 
@@ -353,7 +491,9 @@ def split_cells(line: str) -> list[str]:
 
 
 def norm(s: str) -> str:
-    """Comparison form: collapsed whitespace, no surrounding dash or space."""
+    """Comparison form: collapsed whitespace, no surrounding dash or space, and one spelling for
+    what editors respell on their own — a curly apostrophe, an escaped pipe, an ASCII arrow."""
+    s = s.replace("\u2019", "'").replace("\u2018", "'").replace("\\|", "|").replace("->", "\u2192")
     return re.sub(r"\s+", " ", s).strip().strip(DASHES).strip()
 
 
@@ -441,6 +581,8 @@ def parse_funcs(doc: Document) -> list[Func]:
         if m:
             current = Func(m.group(1), i + 1, i + 1, [])
             funcs.append(current)
+        elif SUBSECTION_RE.match(doc.clean[i]):
+            current = None          # a `###` that is no FUNC closes the block: what follows is nobody's
         elif current is not None:
             current.body.append(doc.clean[i])
     for func in funcs:
@@ -495,10 +637,33 @@ def parse_criteria(doc: Document) -> list[Criterion]:
     return out
 
 
+def parse_parked(doc: Document) -> list[ParkedRow]:
+    """The rows of `## Parked` — header and separator skipped, cells read by position."""
+    if doc.parked_span is None:
+        return []
+    start, end = doc.parked_span
+    out: list[ParkedRow] = []
+    for i in range(start + 1, end):
+        line = doc.clean[i]
+        if not line.lstrip().startswith("|"):
+            continue
+        cells = split_cells(line)
+        first = norm(cells[0]) if cells else ""
+        if not first or set(first) <= set("-: "):
+            continue
+        nxt = doc.clean[i + 1].strip() if i + 1 < end else ""
+        if set(nxt) <= set("|-: ") and "-" in nxt:     # the header, whatever word it carries
+            continue
+        cells += [""] * (4 - len(cells))
+        m = PARKED_FOR_RE.match(plain(cells[2]))
+        out.append(ParkedRow(i + 1, cells[0], cells[1], int(m.group(1)) if m else None, cells[3]))
+    return out
+
+
 def assign_owners(doc: Document) -> list[int]:
     """The step that writes each line. Everything before §1 — frontmatter, title, table of
     contents — is Step 1's; a section belongs to the step that writes it; §4's criteria block is
-    Step 4's."""
+    Step 4's; a `## Parked` row belongs to the step it is parked for, the block itself to Step 1."""
     owner = [1] * len(doc.lines)
     for sec in doc.sections.values():
         step = SECTION_STEP.get(sec.number, LAST_STEP)
@@ -507,6 +672,12 @@ def assign_owners(doc: Document) -> list[int]:
     for func in doc.funcs:
         for k in func.block:
             owner[func.body_start + k] = 4
+    if doc.parked_span is not None:
+        for i in range(*doc.parked_span):
+            owner[i] = 1
+        for row in doc.parked:
+            if row.for_step in range(2, LAST_STEP + 1):
+                owner[row.line - 1] = row.for_step
     return owner
 
 
@@ -521,17 +692,71 @@ def parse_document(path: Path) -> Document:
     clean = ["" if masked[i] else line for i, line in enumerate(lines)]
     heads = [(int(m.group(1)), m.group(2), i) for i, line in enumerate(lines)
              if not masked[i] and (m := SECTION_RE.match(line))]
+    # `## Parked` closes the section before it: an id parked there is not defined in §9, and the
+    # §9/§10 table readers must not take its rows for theirs
+    parked_at = next((i for i, line in enumerate(lines)
+                      if not masked[i] and PARKED_RE.match(line)), None)
+    bounds = sorted([i for _, _, i in heads] + ([parked_at] if parked_at is not None else []))
     sections: dict[int, Section] = {}
-    for k, (number, title, start) in enumerate(heads):
-        end = heads[k + 1][2] if k + 1 < len(heads) else len(lines)
+    for number, title, start in heads:
+        end = next((b for b in bounds if b > start), len(lines))
         sections[number] = Section(number, title, start, end)   # a later duplicate overwrites;
     doc = Document(path, text, lines, masked, unclosed, fm, body_start, sections,
                    [number for number, _, _ in heads], clean)   # the structure check reports it
+    if parked_at is not None:
+        doc.parked_span = (parked_at, next((b for b in bounds if b > parked_at), len(lines)))
     doc.journeys = parse_journeys(doc)
     doc.funcs = parse_funcs(doc)
     doc.criteria = parse_criteria(doc)
+    doc.parked = parse_parked(doc)
     doc.owner = assign_owners(doc)
     return doc
+
+
+def h2_tables(lines: list[str], masked: list[bool]) -> dict[str, tuple[int, int]]:
+    """Unnumbered `## Name` blocks of a file as name -> (heading line, end), 0-based."""
+    heads = [(line.strip()[3:].strip(), i) for i, line in enumerate(lines)
+             if not masked[i] and H2_RE.match(line) and not SECTION_RE.match(line)]
+    return {name: (i, heads[k + 1][1] if k + 1 < len(heads) else len(lines))
+            for k, (name, i) in enumerate(heads)}
+
+
+def parse_record(path: Path) -> Record:
+    lines = path.read_text(encoding="utf-8-sig").splitlines()
+    masked, _ = fence_mask(lines)
+    clean = ["" if masked[i] else line for i, line in enumerate(lines)]
+    blocks = {name.lower(): span for name, span in h2_tables(lines, masked).items()}
+    tables: dict[str, list[tuple[int, list[str]]]] = {}
+    headers: dict[str, tuple[list[str], int]] = {}
+    missing: list[str] = []
+    for name in RECORD_TABLES:
+        span = blocks.get(name.lower())
+        if span is None:
+            missing.append(name)
+            continue
+        start, end = span
+        head = table_header(clean, start + 1, end)
+        rows: list[tuple[int, list[str]]] = []
+        if head is None:
+            missing.append(name)
+        else:
+            headers[name] = head
+            for i in range(head[1] + 1, end):          # past the separator row
+                line = clean[i]
+                if line.lstrip().startswith("|"):
+                    cells = split_cells(line)
+                    if cells and norm(cells[0]) and not set(norm(cells[0])) <= set("-: "):
+                        rows.append((i + 1, cells))
+        tables[name] = rows
+    return Record(path, tables, headers, missing, "\n".join(lines))
+
+
+def record_path(doc: Document) -> Path | None:
+    """`{DOCS_ROOT}/record/<record>.md`, `record` defaulting to the brief's stem."""
+    stem = doc.fm.get("record", "").strip() or doc.fm.get("brief", "").strip()
+    if not stem or stem.lower() == NO_BRIEF:
+        return None
+    return doc.path.parent.parent / RECORD_DIR / f"{Path(stem).stem}.md"
 
 
 # --------------------------------------------------------------------------- step 1
@@ -562,6 +787,11 @@ def check_frontmatter(doc: Document, f: list[Finding]) -> None:
                 say(f, doc, "WARN", 1,
                     "QG-9: filename carries no PRD number — expected prd<NN>-<short-name>.md")
 
+    if fm.get("brief", "").strip().lower() == NO_BRIEF and not fm.get("record", "").strip():
+        say(f, doc, "ERROR", 1, "QG-9: `brief` is `none`, so `record` must name the project's "
+                                "decision record (its filename stem in record/) — nothing else "
+                                "ties this PRD to its project")
+
     status = fm.get("status", "").strip()
     if status and status not in STATUS:
         say(f, doc, "ERROR", 1,
@@ -582,8 +812,11 @@ def check_frontmatter(doc: Document, f: list[Finding]) -> None:
 
 
 def check_title(doc: Document, f: list[Finding]) -> None:
-    first = next((ln.strip() for ln in doc.lines[doc.body_start:] if ln.strip()), "")
-    if not first.startswith("# ") or first.startswith("## "):
+    # a comment above the title is not content: the forgotten instantiation block has its own
+    # finding in the structure check, and naming the title instead sends the author to the wrong place
+    body = LEADING_COMMENTS_RE.sub("", "\n".join(doc.lines[doc.body_start:]))
+    first = next((ln.strip() for ln in body.splitlines() if ln.strip()), "")
+    if not first.startswith("# "):
         say(f, doc, "ERROR", 1, "QG-10: first content line after the frontmatter is not an H1")
         return
     h1, title = first[2:].strip(), doc.fm.get("title", "").strip()
@@ -607,7 +840,11 @@ def resolve_brief(path: Path, ref: str) -> Path | None:
                    path.parent, path.parent.parent):
         if folder.is_dir():
             for p in sorted(folder.glob("*.md")):
-                if wanted and wanted in re.sub(r"[^a-z0-9]", "", p.stem.lower()):
+                if p.resolve() == path.resolve() or FILENAME_NUM_RE.match(p.name):
+                    continue              # a PRD is never a brief, least of all this one
+                # `brief1` must not take `brief10-transfers`: the digits end where the name's do
+                if wanted and re.search(re.escape(wanted) + r"(?!\d)",
+                                        re.sub(r"[^a-z0-9]", "", p.stem.lower())):
                     return p
     return None
 
@@ -616,6 +853,11 @@ def check_brief(doc: Document, f: list[Finding]) -> None:
     ref = doc.fm.get("brief", "").strip()
     if not ref:
         return                                        # already reported by check_frontmatter
+    if ref.lower() == NO_BRIEF:
+        say(f, doc, "WARN", 1, "QG-11: no brief — §1 carries the frame confirmed with the PM at "
+                               "Step 1 as this PRD's source; a Tensions row (`accepted`) in the "
+                               "project record is expected")
+        return
     brief = resolve_brief(doc.path, ref)
     if brief is None:
         say(f, doc, "ERROR", 1, f"QG-11: brief {ref!r} does not resolve to a file on disk")
@@ -624,8 +866,8 @@ def check_brief(doc: Document, f: list[Finding]) -> None:
     status = bfm.get("status", "").strip()
     if status != "validated":
         say(f, doc, "WARN", 1, f"QG-11: brief {brief.name} is not validated "
-                               f"({status or 'no `status` field'}) — the tension must be logged "
-                               "in canonical-memory.md")
+                               f"({status or 'no `status` field'}) — a Tensions row (`accepted`) "
+                               "in the project record is expected, written at Step 1's [C]")
 
 
 def check_structure(doc: Document, f: list[Finding]) -> None:
@@ -659,7 +901,8 @@ def check_structure(doc: Document, f: list[Finding]) -> None:
         first = min(sec.start for sec in doc.sections.values())
         for i in range(first, len(doc.lines)):
             line = doc.lines[i]
-            if doc.masked[i] or not line.startswith("## ") or SECTION_RE.match(line):
+            if doc.masked[i] or not H2_RE.match(line) or SECTION_RE.match(line) \
+                    or PARKED_RE.match(line):
                 continue
             say(f, doc, "WARN", 1, f"structure: {line.strip()!r} (line {i + 1}) uses the document's "
                                    "own heading level for a sub-heading — thematic groups inside a "
@@ -667,6 +910,27 @@ def check_structure(doc: Document, f: list[Finding]) -> None:
     ordered = [n for n in doc.marks if doc.marks.count(n) == 1]
     if ordered != sorted(ordered):
         say(f, doc, "ERROR", 1, f"structure: sections are out of order — found {doc.marks}")
+
+    if doc.parked_span is not None:
+        start, end = doc.parked_span
+        after = sorted(sec.number for sec in doc.sections.values() if sec.start > start)
+        if after:
+            say(f, doc, "WARN", 1, f"structure: section {after[0]} sits after `## Parked` (line "
+                                   f"{start + 1}) — Parked is the last block of the file, so "
+                                   "that it is deleted whole when the quality gate passes")
+        check_table_shape(doc, "Parked", start, end, 1, f)
+        for row in doc.parked:
+            if row.for_step not in range(2, LAST_STEP + 1):
+                say(f, doc, "ERROR", 1, f"structure: the parked item {row.item[:40]!r} (line "
+                                        f"{row.line}) targets no step — `For` is `Step 2`..`Step "
+                                        f"{LAST_STEP}`: every parked item is consumed by a step of "
+                                        "this PRD, nothing waits for later")
+
+    rec = record_path(doc)
+    if rec is not None and not rec.is_file():
+        say(f, doc, "WARN", 1, f"the project record {RECORD_DIR}/{rec.name} does not exist — "
+                               "Step 1's [C] creates it from the skill's template; a PRD written "
+                               "before 1.8.0 has none, create it once by hand")
 
 
 # --------------------------------------------------------------------------- step 2
@@ -681,8 +945,8 @@ def check_journey_shape(doc: Document, f: list[Finding]) -> None:
                                    "tested and two readers hold two versions of it")
         if j.branch_line is not None:
             say(f, doc, "WARN", 2, f"QG-1: journey {j.title!r} uses branch notation at line "
-                                   f"{j.branch_line} — variations are flat steps prefixed "
-                                   "`Variation:`, never `2a.`/`2b.`")
+                                   f"{j.branch_line} — a variation is a flat step carrying "
+                                   "the variation prefix, never `2a.`/`2b.`")
 
 
 def check_personas(doc: Document, f: list[Finding]) -> None:
@@ -731,7 +995,7 @@ def check_func_ui(doc: Document, f: list[Finding]) -> None:
             else:
                 break
         where = fid or f"section 4 (line {line})"
-        say(f, doc, "WARN", 3, f"QG-2: {where} names a UI component ({word!r}, line {line}) — a "
+        say(f, doc, "WARN", doc.owner[line - 1], f"QG-2: {where} names a UI component ({word!r}, line {line}) — a "
                                "capability is written at product altitude; the component stays "
                                "with the mockup")
 
@@ -744,7 +1008,8 @@ def check_scenarios(doc: Document, f: list[Finding]) -> None:
         say(f, doc, "ERROR", 3, "QG-4: section 4 defines no FUNC (`### FUNC-001 — …`)")
         return
     for func in doc.funcs:
-        text = "\n".join(func.body)
+        # read with the fenced blocks: a scenario written as a gherkin block is still a scenario
+        text = "\n".join(doc.lines[func.body_start:func.body_start + len(func.body)])
         if not (re.search(r"\bWHEN\b", text) and re.search(r"\bTHEN\b", text)):
             say(f, doc, "ERROR", 3, f"QG-4: {func.fid} has no WHEN/THEN nominal scenario")
 
@@ -790,10 +1055,12 @@ def check_criteria(doc: Document, f: list[Finding]) -> None:
     """
     if doc.section(5) is None:
         return
-    defs = doc.defined()
+    defs: dict[str, Criterion] = {}
+    for c in doc.criteria_in_scope():
+        defs.setdefault(c.cid, c)
 
     seen: dict[str, int] = {}
-    for c in doc.criteria:
+    for c in doc.criteria_in_scope():
         if c.cid in seen:
             say(f, doc, "ERROR", 4, f"QG-12: {c.cid} is defined twice (lines {seen[c.cid]} and "
                                     f"{c.line}) — an id identifies one criterion and is never reused")
@@ -844,7 +1111,7 @@ def check_criteria(doc: Document, f: list[Finding]) -> None:
 
     # §5 → §4: every row, read on its own
     funcs = doc.func_ids()
-    for c in doc.criteria:
+    for c in doc.criteria_in_scope():
         if c.kind == "BR" and not c.applies_declared:
             say(f, doc, "ERROR", 4, f"QG-12: {c.cid} has an empty `Applies to` cell (line {c.line}) "
                                     "— a rule bound to no capability reaches no spec, and the "
@@ -883,28 +1150,33 @@ def check_table_shape(doc: Document, title: str, start: int, end: int, step: int
     expected = next((v for k, v in TABLE_HEADERS.items() if k.lower() == title.lower()), None)
     if expected is None:
         return
-    found = table_header(doc.clean, start, end)
-    if found is None:
-        return                        # no table at all: the empty marker or the subsection rule speaks
-    cells, line_no = found
-    got = [norm(c).lower() for c in cells]
     accepted = [[c.lower() for c in a] for a in expected]
-    if got in accepted:
-        return
-    same_arity = [a for a in accepted if len(a) == len(got)]
-    if not same_arity:
-        say(f, doc, "ERROR", step, f"QG-12: the `{title}` table has {len(got)} columns (line "
-                                   f"{line_no}), expected {len(accepted[0])} — every cell here is "
-                                   "read by position, so a column added or removed shifts all of them")
-    elif any(sorted(got) == sorted(a) for a in same_arity):
-        say(f, doc, "ERROR", step, f"QG-12: the `{title}` table has its columns in the order {cells} "
-                                   f"(line {line_no}), expected {expected[0]} — the cells are read "
-                                   "by position, so a permuted header feeds every check the wrong one")
-    else:
-        say(f, doc, "WARN", step, f"QG-12: the `{title}` table has the columns {cells} (line "
-                                  f"{line_no}), expected {expected[0]} — column headers are machine "
-                                  "tokens and stay in English, like the section titles; only the "
-                                  "cells are translated")
+    # every table of the span, not only the first: §5 groups its rules under `####` sub-tables,
+    # and a permuted header there would feed three wrong diagnoses instead of this one
+    i = start
+    while i < end:
+        found = table_header(doc.clean, i, end)
+        if found is None:
+            return                    # no table (left): the empty marker or the subsection rule speaks
+        cells, line_no = found
+        i = line_no + 1
+        got = [norm(c).lower() for c in cells]
+        if got in accepted:
+            continue
+        same_arity = [a for a in accepted if len(a) == len(got)]
+        if not same_arity:
+            say(f, doc, "ERROR", step, f"QG-12: the `{title}` table has {len(got)} columns (line "
+                                       f"{line_no}), expected {len(accepted[0])} — every cell here is "
+                                       "read by position, so a column added or removed shifts all of them")
+        elif any(sorted(got) == sorted(a) for a in same_arity):
+            say(f, doc, "ERROR", step, f"QG-12: the `{title}` table has its columns in the order {cells} "
+                                       f"(line {line_no}), expected {expected[0]} — the cells are read "
+                                       "by position, so a permuted header feeds every check the wrong one")
+        else:
+            say(f, doc, "WARN", step, f"QG-12: the `{title}` table has the columns {cells} (line "
+                                      f"{line_no}), expected {expected[0]} — column headers are machine "
+                                      "tokens and stay in English, like the section titles; only the "
+                                      "cells are translated")
 
 
 def check_ac_tables(doc: Document, f: list[Finding]) -> None:
@@ -943,7 +1215,7 @@ def check_metrics(doc: Document, f: list[Finding]) -> None:
         # bold id makes the subsection look empty, and QG-8 fails on a purely cosmetic choice.
         rows = [(start + 1 + k, line) for k, line in enumerate(content)
                 if line.strip().startswith("|") and METRIC_ROW_RE.search(line)]
-        if not rows and not any(marker in "\n".join(content) for marker in EMPTY_MARKERS):
+        if not rows and not EMPTY_MARKER_RE.search("\n".join(content)):
             say(f, doc, "ERROR", 5, f"QG-8: `{expected}` is empty and carries neither "
                                     '"None identified." nor "None defined."')
         for i, row in rows:
@@ -988,7 +1260,10 @@ def check_complexity(doc: Document, f: list[Finding]) -> None:
 
 
 def table_rows(doc: Document, number: int) -> list[tuple[int, list[str]]]:
-    """(0-based line, cells) of every data row in a section's table — header and separator skipped."""
+    """(0-based line, cells) of every data row in a section's table — header and separator skipped.
+
+    The header is the row before a separator, whatever word it carries: a translated header is
+    the shape check's finding, not a data row without an id."""
     sec = doc.section(number)
     if sec is None:
         return []
@@ -1000,6 +1275,9 @@ def table_rows(doc: Document, number: int) -> list[tuple[int, list[str]]]:
         cells = split_cells(line)
         first = norm(cells[0]) if cells else ""
         if not first or set(first) <= set("-: "):
+            continue
+        nxt = doc.clean[i + 1].strip() if i + 1 < sec.end else ""
+        if set(nxt) <= set("|-: ") and "-" in nxt:
             continue
         out.append((i, cells))
     return out
@@ -1038,12 +1316,20 @@ def check_closing_sections(doc: Document, f: list[Finding]) -> None:
     for i, cells in table_rows(doc, 9):
         m = OQ_ROW_RE.match(doc.clean[i])
         if m is None:
+            if norm(cells[0]).lower() != "id":
+                say(f, doc, "WARN", 6, f"QG-12: open-question row {norm(cells[0])[:40]!r} (line "
+                                       f"{i + 1}) opens with no OQ-XXX id — a question nothing can "
+                                       "cite blocks nothing")
             continue
         if m.group(1) in seen:
             say(f, doc, "ERROR", 6, f"QG-12: {m.group(1)} is defined twice (lines {seen[m.group(1)]} "
                                     f"and {i + 1}) — an id identifies one question and is never reused")
         else:
             seen[m.group(1)] = i + 1
+    if seen and doc.fm.get("status", "").strip() == "accepted":
+        say(f, doc, "ERROR", 6, f"QG-12: the PRD is `accepted` with {len(seen)} open question(s) "
+                                "still in §9 — acceptance means every question answered, "
+                                "integrated and its row removed, with a Decisions row in the record")
 
     for number, title in SECTION_TABLE_OWNER.items():
         sec = doc.section(number)
@@ -1086,10 +1372,11 @@ def check_references(doc: Document, up_to: int | None, f: list[Finding]) -> None
         sec = doc.section(home)
         if sec is None or sec.title.strip().lower() != SECTIONS[home - 1].lower():
             continue
-        home_text, first_seen = doc.text_of(home), {}
+        home_ids = {m.group(0) for m in FOREIGN_ID_RE.finditer(doc.text_of(home))}
+        first_seen = {}
         for i in owned:
             for m in FOREIGN_ID_RE.finditer(doc.clean[i]):
-                if m.group(1) == prefix and m.group(0) not in home_text:
+                if m.group(1) == prefix and m.group(0) not in home_ids:
                     first_seen.setdefault(m.group(0), i)
         for fid, i in sorted(first_seen.items()):
             say(f, doc, "WARN", doc.owner[i], f"QG-12: {fid} is cited but defined nowhere in "
@@ -1128,6 +1415,245 @@ def check_leftovers(doc: Document, up_to: int | None, f: list[Finding]) -> None:
         say(f, doc, "WARN", doc.owner[token], "template token `XXX` still present")
 
 
+def is_content(line: str) -> bool:
+    """A line a step has written, as opposed to what the skeleton holds before that step: a
+    placeholder, a heading, a legend, a bare label, an empty marker, a table frame."""
+    s = line.strip()
+    if not s or s.startswith(("#", "<!--", "---", ">")):
+        return False
+    if set(s) <= set("|-: ") or BARE_LABEL_RE.match(s) or LEGEND_RE.match(s):
+        return False
+    if EMPTY_MARKER_RE.search(s) or s.strip("*").strip().upper() == "TBD":
+        return False
+    return bool(re.search(r"\w", s))
+
+
+def check_ahead_of_gate(doc: Document, up_to: int | None, f: list[Finding]) -> None:
+    """Under `--up-to N`, a section a later step owns holds nothing but the skeleton: content
+    there was written before the PM chose `[C]`. §6, §8, §9 and §10 grow across the steps and
+    are not read here; a table header is a frame, not content."""
+    if up_to is None:
+        return
+    seen: set[tuple[int, int]] = set()
+    for sec in doc.sections.values():
+        if sec.number not in GATED_SECTIONS:
+            continue
+        inside = 0                          # lines left for a `[placeholder` to close
+        skip_next = False                   # the closing line of a wrapped legend
+        for i in range(sec.start + 1, sec.end):
+            text = doc.lines[i]
+            if skip_next:
+                skip_next = False
+                continue
+            # a line carrying a placeholder is the skeleton's, whatever else it says — the
+            # template's rows hold example ids, and a leftover slot is check_leftovers' finding;
+            # an unclosed `[` is given five lines, not the rest of the section
+            if inside:
+                inside = 0 if "]" in text else inside - 1
+                continue
+            if PLACEHOLDER_RE.search(text):
+                continue
+            if "[" in text and "]" not in text[text.index("["):]:
+                inside = 5
+                continue
+            # a legend in italics may wrap once: `*Ids are identifiers, …` closes on the next line;
+            # an italic line that never closes is content (a persona, a note), not a legend
+            if LEGEND_OPEN_RE.match(text) and not LABELLED_RE.match(text):
+                if text.rstrip().endswith("*"):
+                    continue
+                nxt = doc.lines[i + 1].rstrip() if i + 1 < sec.end else ""
+                if nxt.endswith("*") and not LEGEND_OPEN_RE.match(nxt):
+                    skip_next = True
+                    continue
+            step = doc.owner[i]
+            if step <= up_to or (sec.number, step) in seen or doc.masked[i]:
+                continue
+            nxt = doc.lines[i + 1] if i + 1 < len(doc.lines) else ""
+            header = text.lstrip().startswith("|") and set(nxt.strip()) <= set("|-: ") \
+                and "-" in nxt
+            # a journey or FUNC heading with no placeholder left is written content
+            heading = SUBSECTION_RE.match(text) and sec.number in (3, 4)
+            if header or (not heading and not is_content(text)):
+                continue
+            seen.add((sec.number, step))
+            what = "the acceptance-criteria bullets" if step == 4 and sec.number == 4 \
+                else f"section {sec.number}"
+            say(f, doc, "ERROR", step, f"{what} already hold content (line {i + 1}) but Step "
+                                       f"{step}'s gate has not been passed — nothing reaches a "
+                                       "section before the PM's [C]; only `## Parked` takes rows "
+                                       "as they come")
+
+
+def check_parked(doc: Document, up_to: int | None, f: list[Finding]) -> None:
+    """A parked row is consumed at the `[C]` of the step it is parked for: once that gate has
+    passed, a row still there is an item that was never given its home."""
+    bound = up_to or LAST_STEP
+    if doc.parked_span is not None and doc.fm.get("status", "").strip() in ("review", "accepted"):
+        say(f, doc, "ERROR", LAST_STEP, f"`## Parked` is still in the file (line "
+                                        f"{doc.parked_span[0] + 1}) with `status: "
+                                        f"{doc.fm['status'].strip()}` — the block is deleted when "
+                                        "the quality gate passes")
+    for row in doc.parked:
+        if row.for_step is not None and 2 <= row.for_step <= bound:
+            say(f, doc, "ERROR", row.for_step,
+                f"{row.item[:40]!r} is parked for Step {row.for_step} and was never consumed (line "
+                f"{row.line}) — Step {row.for_step}'s [C] gives it a home (a row in its section, an "
+                "NG in §6, an OQ in §9) and removes the row, or re-targets it to a later step")
+
+
+def plain(s: str) -> str:
+    """A cell for comparison: normalised, emphasis and terminal punctuation stripped, case folded
+    — a full stop copied on one side and not the other is an editor's habit, not a divergence."""
+    return norm(s).replace("*", "").replace("`", "").strip().rstrip(".;").strip().lower()
+
+
+def record_prd_number(cell: str) -> str:
+    m = re.search(r"(\d+)", cell)
+    return m.group(1).lstrip("0") or "0" if m else ""
+
+
+def check_vocabulary_mirror(doc: Document, up_to: int | None, f: list[Finding]) -> None:
+    """§8 ↔ the record's Vocabulary: a term the PRD freezes has one row in the project's ledger,
+    with the same definition — whichever PRD minted it. §8 is the PRD's own source; the record is
+    what the next PRD reads before freezing a term."""
+    if doc.record is None or (up_to is not None and up_to < 2) or doc.section(8) is None:
+        return
+    ledger: dict[str, tuple[str, str, int]] = {}             # term -> (definition, prd, line)
+    for line, cells in doc.record.tables.get("Vocabulary", []):
+        cells += [""] * (3 - len(cells))
+        ledger.setdefault(plain(cells[0]), (cells[1], cells[2], line))
+    mine = doc.number().lstrip("0") or "0"
+    frozen: dict[str, str] = {}
+    for i, cells in table_rows(doc, 8):
+        term = plain(cells[0])
+        if term == "term" or not term or PLACEHOLDER_RE.search(cells[0]):
+            continue
+        frozen[term] = cells[1] if len(cells) > 1 else ""
+        hit = ledger.get(term)
+        if hit is None:
+            say(f, doc, "WARN", 2, f"QG-12: {cells[0]!r} is frozen in §8 (line {i + 1}) but has no "
+                                   f"Vocabulary row in {doc.record.name} — the record is what the "
+                                   "next PRD reads before freezing a term; add the row at [C]")
+        elif plain(hit[0]) != plain(frozen[term]):
+            say(f, doc, "ERROR", 2, f"QG-12: {cells[0]!r} is defined differently in §8 (line "
+                                    f"{i + 1}) and in {doc.record.name} (line {hit[2]}, frozen by "
+                                    f"PRD {hit[1] or '?'}) — a frozen term is reused, never "
+                                    "re-frozen; a divergence is a question to the PM")
+    for line, cells in doc.record.tables.get("Vocabulary", []):
+        cells += [""] * (3 - len(cells))
+        if record_prd_number(cells[2]) == mine and plain(cells[0]) not in frozen:
+            say(f, doc, "WARN", 2, f"QG-12: {cells[0]!r} is recorded as frozen by this PRD "
+                                   f"({doc.record.name} line {line}) but §8 does not define it")
+
+
+def check_resolved_oqs(doc: Document, up_to: int | None, f: list[Finding]) -> None:
+    """A Decisions row that resolves an OQ of this PRD means the answer was integrated and the
+    §9 row removed — a row still there is a question both open and closed."""
+    if doc.record is None or doc.section(9) is None:
+        return
+    open_oqs = {m.group(1) for i, _ in table_rows(doc, 9) if (m := OQ_ROW_RE.match(doc.clean[i]))}
+    mine = doc.number().lstrip("0") or "0"
+    for line, cells in doc.record.tables.get("Decisions", []):
+        cells += [""] * (7 - len(cells))
+        if record_prd_number(cells[1]) != mine:
+            continue
+        for oq in re.findall(r"\bOQ-\d+[a-z]?\b", cells[5]):
+            if oq in open_oqs:
+                say(f, doc, "ERROR", up_to or LAST_STEP,
+                    f"QG-12: {cells[0]} in {doc.record.name} (line {line}) resolves {oq}, which "
+                    "§9 still lists — a resolved question is integrated where it blocked and its "
+                    "row removed")
+
+
+def check_record(rec: Record, f: list[Finding]) -> None:
+    """The project record keeps its shape and its ids, whichever PRD wrote last. Findings are
+    reported under the file itself, step 0."""
+    def tell(level: str, msg: str) -> None:
+        f.append(Finding(level, rec.name, msg, 0))
+
+    if "INSTANTIATION NOTES" in rec.text:
+        tell("ERROR", "the record template's instantiation comment block was not deleted")
+    h1 = next((ln for ln in rec.text.splitlines() if ln.startswith("# ")), "")
+    if PLACEHOLDER_RE.search(h1):
+        tell("WARN", f"the record's title still holds a placeholder: {h1.strip()!r}")
+    for name in rec.missing:
+        tell("WARN", f"the record has no `## {name}` table — four tables, by nature, even empty")
+    for name, (cells, line) in rec.headers.items():
+        expected = RECORD_TABLES[name]
+        got = [plain(c) for c in cells]
+        want = [c.lower() for c in expected]
+        if got == want:
+            continue
+        if len(got) != len(want):
+            tell("ERROR", f"the `{name}` table has {len(got)} columns (line {line}), expected "
+                          f"{len(want)}: {expected} — every cell is read by position")
+        elif sorted(got) == sorted(want):
+            tell("ERROR", f"the `{name}` table has its columns in the order {cells} (line {line}), "
+                          f"expected {expected}")
+        else:
+            tell("WARN", f"the `{name}` table has the columns {cells} (line {line}), expected "
+                         f"{expected} — column headers are machine tokens")
+
+    prd_dir = rec.path.parent.parent / "prd"
+    on_disk = {record_prd_number(p.stem) for p in prd_dir.glob("[Pp][Rr][Dd]*.md")} \
+        if prd_dir.is_dir() else None
+    ids: dict[str, int] = {}
+    for name, prefix in (("Decisions", "D"), ("Tensions", "T")):
+        for line, cells in rec.tables.get(name, []):
+            cells += [""] * (len(RECORD_TABLES[name]) - len(cells))
+            m = RECORD_ID_RE.match(norm(cells[0]))
+            if m is None:
+                tell("WARN", f"`{name}` row at line {line} opens with {cells[0]!r}, not a "
+                             f"`{prefix}-<NN>-XX` id")
+            else:
+                rid = f"{m.group(1)}-{m.group(2)}-{m.group(3)}"
+                if rid in ids:
+                    tell("ERROR", f"{rid} is defined twice (lines {ids[rid]} and {line}) — an id "
+                                  "identifies one entry and is never reused")
+                else:
+                    ids[rid] = line
+                if m.group(1) != prefix:
+                    tell("WARN", f"{rid} sits in `{name}` (line {line}) but carries the other "
+                                 "table's prefix")
+                prd_no = record_prd_number(cells[1])
+                # a row the brief wrote names `brief-NN`, not a PRD: no PRD number to agree with
+                if prd_no and not cells[1].strip().lower().startswith("brief") \
+                        and prd_no != (m.group(2).lstrip("0") or "0"):
+                    tell("WARN", f"{rid} (line {line}) is numbered for PRD {m.group(2)} but its "
+                                 f"PRD column says {cells[1]!r}")
+            if name == "Tensions" and cells[3].strip() and plain(cells[3]) not in TENSION_STATUS:
+                tell("WARN", f"{cells[0]} (line {line}) has status {cells[3]!r} — one of "
+                             f"{sorted(TENSION_STATUS)}")
+    terms: dict[str, int] = {}
+    for line, cells in rec.tables.get("Vocabulary", []):
+        cells += [""] * (3 - len(cells))
+        term = plain(cells[0])
+        if term in terms:
+            tell("WARN", f"the term {cells[0]!r} is defined twice (lines {terms[term]} and {line}) "
+                         "— one term, one definition, reused by every PRD of the project")
+        else:
+            terms[term] = line
+    for line, cells in rec.tables.get("Sources", []):
+        cells += [""] * (4 - len(cells))
+        if cells[3].strip() and plain(cells[3]) not in SOURCE_GATE:
+            tell("WARN", f"Sources row at line {line} has gate {cells[3]!r} — `kept` or `cut`")
+    if on_disk is not None:
+        named: dict[str, int] = {}
+        for name in RECORD_TABLES:
+            col = RECORD_TABLES[name].index("PRD")
+            for line, cells in rec.tables.get(name, []):
+                cell = cells[col] if len(cells) > col else ""
+                if cell.strip() and not cell.strip().lower().startswith("brief"):
+                    named.setdefault(record_prd_number(cell), line)
+        reserved = str(max((int(n) for n in on_disk if n.isdigit()), default=0) + 1)
+        for prd_no, line in sorted(named.items()):
+            # the next number is reserved by the PRD being framed — its file exists only once
+            # Step 1's gate has passed, and the record is written at that same gate
+            if prd_no and prd_no not in on_disk and prd_no != reserved:
+                tell("WARN", f"a row names PRD {prd_no} (first at line {line}) but prd/ holds no "
+                             "such PRD")
+
+
 # --------------------------------------------------------------------------- driver
 
 STEP_CHECKS = {
@@ -1138,21 +1664,39 @@ STEP_CHECKS = {
     5: [check_metrics],
     6: [check_complexity, check_closing_sections],
 }
-EVERY_RUN = [check_references, check_leftovers]
+EVERY_RUN = [check_references, check_leftovers, check_ahead_of_gate, check_parked,
+             check_vocabulary_mirror, check_resolved_oqs]
 
 
-def check_prd(path: Path, findings: list[Finding], up_to: int | None = None) -> None:
+def check_prd(path: Path, findings: list[Finding], up_to: int | None = None,
+              records_seen: set[Path] | None = None) -> Document | None:
+    """Validate one PRD; its project record, when it resolves, is checked once per run —
+    `records_seen` is the set the caller keeps across PRDs."""
     # resolved first: a bare filename passed from inside `prd/` has `parent.parent == .`, and the
     # brief would be looked for in `./brief/` instead of `../brief/`
     doc = parse_document(path.resolve())
+    doc.up_to = up_to
     if not doc.fm:
         findings.append(Finding("ERROR", path.name, "QG-9: no YAML frontmatter delimited by `---`", 1))
-        return
+        return None
+    rec = record_path(doc)
+    if rec is not None and rec.is_file():
+        doc.record = parse_record(rec)
+        if records_seen is None or rec not in records_seen:
+            check_record(doc.record, findings)
+            if records_seen is not None:
+                records_seen.add(rec)
     for step in range(1, (up_to or LAST_STEP) + 1):
         for check in STEP_CHECKS[step]:
             check(doc, findings)
     for check in EVERY_RUN:
         check(doc, up_to, findings)
+    return doc
+
+
+def is_record(path: Path) -> bool:
+    """A file under `record/` is the project's decision record, never a PRD."""
+    return path.resolve().parent.name == RECORD_DIR
 
 
 def discover(paths: list[str]) -> list[Path]:
@@ -1160,6 +1704,8 @@ def discover(paths: list[str]) -> list[Path]:
     for raw in paths:
         p = Path(raw)
         if p.is_dir():
+            # `canonical-memory.md` is the pre-1.8 project memory: never a PRD, still found in
+            # docs trees written before the record existed
             skip = {"canonical-memory.md", "readme.md", "index.md"}
             out += [q for q in sorted(p.glob("*.md")) if q.name.lower() not in skip]
         else:
@@ -1167,14 +1713,40 @@ def discover(paths: list[str]) -> list[Path]:
     return out
 
 
-def report(findings: list[Finding], count: int, up_to: int | None) -> None:
+def next_step_card(up_to: int, parked_due: int) -> str:
+    """What the agent does next, said by the script at the gate it just checked."""
+    name, ref, elicitation = NEXT_STEP[up_to]
+    lines = [f"Next: {name}."]
+    if ref and up_to == 0:
+        lines.append(f"  Read {ref} first; the PRD and its first record rows are written at this "
+                     "step's [C].")
+        lines.append("    [C] Validate → Step 2 — User journeys")
+    elif ref:
+        lines.append(f"  Read {ref} first.")
+        lines.append(f"  Its gate block, the last thing presented, two fixed lines"
+                     f"{' (the first offered at this step)' if elicitation else ' (no [A] here)'}:")
+        if elicitation:
+            lines.append("    [A] Advanced Elicitation")
+        following = NEXT_STEP.get(up_to + 1, ("the quality gate",))[0]
+        lines.append(f"    [C] Validate → {following}")
+        lines.append("  Nothing reaches a numbered section before the PM answers that block; a `## Parked` "
+                     "row is written as soon as an item is parked.")
+    else:
+        lines.append("  Three movements — this script in full, the Challenge Pass on the whole "
+                     "document, the two crossings — then `## Parked` deleted and `status: review`.")
+    if parked_due:
+        lines.append(f"  {parked_due} row(s) parked for {name.split(' — ')[0]} — this step consumes them.")
+    return "\n".join(lines)
+
+
+def report(findings: list[Finding], count: int, up_to: int | None, parked_due: int = 0,
+           records_only: bool = False) -> None:
     errors = [x for x in findings if x.level == "ERROR"]
     warns = [x for x in findings if x.level == "WARN"]
     scope = f" up to Step {up_to}" if up_to else ""
-    print(f"Validated {count} PRD(s){scope}: {len(errors)} error(s), {len(warns)} warning(s)\n")
+    print(f"Validated {count} file(s){scope}: {len(errors)} error(s), {len(warns)} warning(s)\n")
     if not findings:
         print("  ✓ all structural checks passed\n")
-        return
     for step in sorted({x.step for x in findings}):
         group = [x for x in findings if x.step == step]
         print(f"  Step {step} — {STEP_TITLES[step]}" if step else f"  {STEP_TITLES[0]}")
@@ -1182,14 +1754,25 @@ def report(findings: list[Finding], count: int, up_to: int | None) -> None:
             mark = "✗ ERROR" if x.level == "ERROR" else "⚠ WARN "
             print(f"    {mark} [{x.prd}] {x.msg}")
         print()
+    if up_to or records_only:
+        print(("Once the errors above are fixed — " if errors else "")
+              + next_step_card(up_to or 0, parked_due) + "\n")
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="Validate PRDs generated by the prd skill.")
+    ap = argparse.ArgumentParser(
+        description="Validate PRDs generated by the prd skill, and their project record.",
+        epilog="exit codes: 0 = clean, 1 = at least one ERROR, 2 = nothing to validate. "
+               "Needs Python 3.8 or later; stdlib only.")
     ap.add_argument("prds", nargs="+", help="PRD .md files, or a directory containing them")
     ap.add_argument("--up-to", type=int, choices=range(1, LAST_STEP + 1), metavar="N",
                     help="check only what Steps 1..N have written — run at each step's [C]")
     args = ap.parse_args()
+
+    # the report prints ✓ ✗ ⚠ —: on a console that cannot encode them, a clean PRD must not crash
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
 
     prds = discover(args.prds)
     if not prds:
@@ -1197,17 +1780,27 @@ def main() -> int:
         return 2
 
     findings: list[Finding] = []
+    records_seen: set[Path] = set()
+    parked_due = 0
+    records_only = all(is_record(p) for p in prds if p.exists())
     for p in prds:
         if not p.exists():
             findings.append(Finding("ERROR", p.name, "file not found"))
             continue
         try:
-            check_prd(p, findings, args.up_to)
+            if is_record(p):
+                if p.resolve() not in records_seen:
+                    check_record(parse_record(p.resolve()), findings)
+                    records_seen.add(p.resolve())
+            else:
+                doc = check_prd(p, findings, args.up_to, records_seen)
+                if doc is not None and args.up_to:
+                    parked_due += sum(1 for r in doc.parked if r.for_step == args.up_to + 1)
         except Exception as e:                        # never let one bad file hide the others
             findings.append(Finding("ERROR", p.name,
                                     f"validator crashed on this file: {type(e).__name__}: {e}"))
 
-    report(findings, len(prds), args.up_to)
+    report(findings, len(prds), args.up_to, parked_due, records_only)
     return 1 if any(x.level == "ERROR" for x in findings) else 0
 
 

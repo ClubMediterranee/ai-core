@@ -7,6 +7,7 @@ complexity: M
 date: YYYY-MM-DD
 author: "Firstname Lastname"
 brief: brief-XXX
+record: brief-XXX
 ---
 
 <!--
@@ -15,35 +16,44 @@ INSTANTIATION NOTES — delete this whole comment block in the generated PRD.
 This file is a skeleton, not a description of one: Step 1 copies it verbatim into
 `{DOCS_ROOT}/prd/prd<NN>-<short-name>.md`, and each later step fills its section IN PLACE by
 replacing the [placeholders] — but only once the PM has chosen [C] at that step's gate. Nothing is
-written here before a validation. Nothing here is illustrative — every line you leave behind ends up
+written here before a validation, a `## Parked` row excepted. Nothing here is illustrative — every line you leave behind ends up
 in the PRD, so a placeholder still visible at the quality gate is an unfinished section.
 
-Frontmatter — the 8 required fields, all validated by `scripts/validate_prd.py` (QG-9):
+Frontmatter — the 8 required fields, plus `record` (required when `brief` is `none`), validated by
+`scripts/validate_prd.py` (QG-9):
   id          `PRD<NN>`, matching the number in the filename
   title       repeated verbatim as the H1 below (QG-10)
   version     "1.0" on first write
-  status      in-progress → review (quality gate passed) → accepted (human sign-off)
+  status      in-progress → review (quality gate passed) → accepted (human sign-off, §9 empty —
+              each last question answered gets its Decisions row in the record)
   complexity  S / M / L / XL — set at Step 6
   date        YYYY-MM-DD
   author      the PM running the skill, name only
-  brief       the source brief this PRD translates, as its filename stem (e.g. brief01-booking-engine)
-              — never its frontmatter id: the validator resolves it on disk in {DOCS_ROOT}/brief/
+  brief       the source brief this PRD translates, as its filename stem (e.g. brief01-checkout)
+              — never its frontmatter id: the validator resolves it on disk in {DOCS_ROOT}/brief/.
+              `none` when the PRD was framed without a brief: §1's Source line then reads
+              "no brief — frame confirmed with the PM at Step 1:" followed by the problem, the
+              persona, the opportunities and the KRs, so the PRD stands on its own
+  record      the project's decision record, as its filename stem in {DOCS_ROOT}/record/ — the
+              brief's stem by default; required when `brief` is `none`
 
-Language: the PRD body is written in the PM's language, but section titles, table column headers,
-id prefixes and the structural markers "None identified." / "None defined." stay exactly as written
-here. The validator and the downstream `spec` skill match on them. The FUNC block labels
-**Actor:** / **Capability:** / **Nominal scenario:** are prose labels: they follow the PM's
-language (« Acteur : », « Capacité : », « Scénario nominal : ») — only `**Acceptance criteria:**`
-and the GIVEN/WHEN/THEN keywords are machine tokens.
+Language: the PRD body is written in the PM's language, but the machine tokens listed in SKILL.md
+(*Language Adaptation*) stay exactly as written here — the validator and the downstream `spec`
+skill match on them.
 
-Section 10 Constraints is optional: delete it and its Table of Contents entry if the PRD inherits
-no constraint.
+Section 10 Constraints stays in every PRD — its legend states the baseline every capability
+inherits; write "None identified." under a heading when nothing is inherited there.
 
-Sections that stay empty: write "None identified." (§5 States, §5 Permissions, §7 Lagging Metrics,
-§7 Damage Control) or "None defined." (§7 Leading Metrics) rather than deleting the section — QG-8
+Sections that stay empty: write "None identified." (§5 States, §5 Permissions, §6, §7 Lagging Metrics,
+§7 Damage Control, §8, §9, each heading of §10) or "None defined." (§7 Leading Metrics) rather than deleting the section — QG-8
 checks that the three §7 subsections are present, and an absent section is indistinguishable from a
-forgotten one. A brief with no Desired Outcomes leaves §7 Lagging at "None identified." and a tension
-logged; it is not a reason to fail the gate.
+forgotten one. A brief with no Desired Outcomes leaves §7 Lagging at "None identified." and a
+Tensions row in the decision record; it is not a reason to fail the gate.
+
+`## Parked`, at the very end, is not a section of the PRD: unnumbered, outside the table of contents,
+scratch. A row is written the moment an item is parked for a later step (`For: Step N`, 2–6), removed
+at that step's [C] once the item has its home, and the whole block is deleted when the quality gate
+passes. The validator fails a row whose step's gate has already passed.
 -->
 
 # [Product Name]
@@ -234,14 +244,16 @@ position, not the number.*
 
 | ID     | Question | Impact if unresolved | Blocks | Source |
 |--------|----------|---------------------|--------|--------|
-| OQ-001 | [Question] | [What changes depending on the answer] | [FUNC / section] | [FUNC-XXX / BR-XXX / Journey — name] |
+| OQ-001 | [Question] | [What changes depending on the answer] | [FUNC / Journey / section] | [FUNC-XXX / BR-XXX / Journey — name] |
 
 ---
 
 ## 10. Constraints
 
 *Conditions this PRD inherits rather than defines — a BR is a rule this PRD decides, a constraint
-a boundary it accepts.*
+a boundary it accepts. The legal and accessibility baseline — GDPR, accessibility law, consumer law —
+applies to every capability without being restated; a `CL` is written where it shapes one, and a
+BR may go beyond it.*
 
 ### Business
 
@@ -250,3 +262,12 @@ a boundary it accepts.*
 ### Legal / Compliance
 
 - **CL-001** [What a locale or a regulation imposes]
+
+---
+
+## Parked
+
+*Scratch for the steps to come — nothing here is validated. A row is written the moment an item is parked; it is consumed by its step's `[C]`; the block is deleted when the quality gate passes.*
+
+| Item | Kind | For | Origin |
+|---|---|---|---|

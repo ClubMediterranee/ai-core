@@ -47,8 +47,8 @@ re-reading, dragging along everything that referenced it.
 **Format — the definition's three parts, one line:** an **accomplishment infinitive** (*choose,
 correct, obtain* — accomplished when the state is reached; never an activity verb: *consult,
 browse, explore, compare* — those can go on forever without satisfying anyone), the **object**,
-and the **stake that makes "satisfied" testable** ("the room that fits her family", "without
-losing her basket"). The implicit subject is the actor: a goal that cannot be prefixed with "the
+and the **stake that makes "satisfied" testable** (e.g. "the size that fits her", "without
+losing her cart"). The implicit subject is the actor: a goal that cannot be prefixed with "the
 actor wants to…" is a system goal. The heading names the flow; the goal carries the stake — that
 is what the last step must prove.
 
@@ -61,14 +61,15 @@ absorb a scope drift no gate has seen.
 
 ## What counts as a step
 
-**One step = one user action → one observable product result.** Not a gesture ("clicks compare"), not a macro-goal ("configures their stay").
+**One step = one user action → one observable product result.** Not a gesture ("clicks compare"), not a macro-goal ("configures their order").
 
-- **Too coarse:** the step bundles several distinct user actions ("the user picks destination, dates and family composition") → split into one step per action.
+- **Too coarse:** the step bundles several distinct user actions ("the user picks the size, the colour and the quantity") → split into one step per action.
 - **Too fine:** the step is a UI gesture with no standalone result (click, scroll, open) → merge into the action it serves.
 
 **A step states the action and its outcome — never the conditions under which a rule applies.**
 A preselection rule, a threshold, an eligibility, a content enumeration are true and rule-level:
-park them for Step 4 (*Park and Surface*, SKILL.md) and keep the step readable.
+a `## Parked` row each, *BR candidate*, `For: Step 4` (*Park and Surface*, SKILL.md), and keep the
+step readable.
 
 Treat this as the readiness test for Step 3 rather than a matter of style: a step producing no
 observable result reveals nothing to build, and a step producing three hides two capabilities.
@@ -93,7 +94,7 @@ verified afterwards, when *Capabilities revealed* is filled.
 Variation steps are judged differently. One may legitimately stop short of the goal — abandoning an
 edit is precisely a non-attainment, and writing it as though it reached the goal would be false.
 What a variation may not be is a dead end with no reading: one that never leads anywhere is either
-an error path, to be parked as an ERR candidate, or a step belonging to another journey.
+an error path — a `## Parked` row, *ERR candidate*, `For: Step 4` — or a step belonging to another journey.
 
 **Place each variation where it diverges from the nominal path**, not at the end of the list. A
 reader follows the numbering as a sequence, so a variation parked after the closing step reads as
@@ -111,8 +112,8 @@ Once the goals are settled, **the number of journeys is a readability decision, 
 - a journey long enough that its thread is hard to follow — split it at a natural pause;
 - a variation whose path diverges so far that inlining it would obscure both;
 - **one goal pursued from two situations where the user's stake or precondition differs.** The test:
-  does a reader lose something by being shown only one of them? Correcting a search before
-  committing to anything and correcting it after building a basket share a goal, but one risks
+  does a reader lose something by being shown only one of them? E.g. correcting a filter before
+  committing to anything and correcting it after building a cart share a goal, but one risks
   nothing and the other discards work already done. A rule can state that difference in a sentence;
   only a separate flow makes a PM decide about it.
 
@@ -130,7 +131,7 @@ decision the PM has to make.
 
 - Anchor journeys to the OPP-XXX selected upstream. The Key Problem from the brief provides global context — it does not determine the scope of the journeys.
 - When a boundary is ambiguous, consult the other opportunities in the brief to determine which one owns the scenario — and explain the assignment.
-- Exclude any scenario that touches an NG-XXX from the brief's explicit cuts.
+- Exclude any scenario that touches a cut listed in the brief's §5 Cuts (an NG-XXX of this PRD once written).
 
 ---
 
@@ -148,7 +149,8 @@ here is what people come here to do — is anything missing, and is anything on 
 a goal?
 
 **This is where the scope of the section is settled.** A single-goal PRD is legitimate once
-confirmed. Log the confirmation in the canonical memory, along with anything the PM adds or removes.
+confirmed. The confirmed list is what §2 and §3 state at `[C]`; a goal the PM removes that the brief
+listed is an NG in §6 at this `[C]`.
 
 **The confirmed list is a starting point, not a closed set.** Goals surface while flows are being
 written: the routing section below sends an orphan action back up to the goal it serves, and a goal
@@ -176,9 +178,12 @@ Each field is either **traced** (points to a brief/OPP element), **assumed** (pl
 
 If AskUserQuestion is unavailable, present the canvas as markdown in a single message and wait for one grouped answer.
 
-### User check after derivation
+### One presentation, at the gate
 
-Ask the user to confirm, complete, modify or delete journeys.
+The derived journeys are presented once, with the arbitrations that produced them (*Name the
+Arbitrations*) and the gate recap, and the gate block closes the message. There is no separate
+"confirm, complete, modify or delete" round: the PM's corrections come as answers to the gate,
+and each one goes through the Challenge Pass before the gate is presented again.
 
 ### Before the step gate
 
@@ -189,8 +194,10 @@ will propagate into the FUNCs, BRs and ERRs are chosen. Pick out the terms that 
 **implementation implication** — "validation on keystroke" and "validation on field exit" are two
 different behaviours, with different costs and different accessibility consequences — and put the
 exact wording in front of the PM in **one** message: here are the two to four terms I will use,
-confirm or correct them. Record what comes back in the *Project glossary* section of the canonical
-memory as frozen vocabulary.
+confirm or correct them. Check the project record's Vocabulary first, then the docs root's
+glossary when it has one: a term already frozen is reused verbatim, or a distinct term is coined —
+a changed meaning is a Tensions row, never a second Vocabulary row. What comes back is written at
+`[C]` to §8 and, for new terms, to the record's Vocabulary.
 
 A term corrected here costs one exchange. The same term corrected after Step 4 has to be replaced
 across the journeys, the FUNCs, the BRs, the ERRs and the glossary at once. Only include terms
@@ -205,22 +212,22 @@ Every candidate element gets an explicit destination — nothing is silently dro
 **An outcome reachable through a single user action** is a step, not a journey. Route it:
 
 1. It fits an existing journey → integrate it as a step where it occurs in the flow.
-2. It fits no journey → apply the goal test to what it serves. Goal in OPP scope → a missing journey was just revealed; derive it. Goal out of scope → log a drift tension in the canonical memory.
+2. It fits no journey → apply the goal test to what it serves. Goal in OPP scope → a missing journey was just revealed; derive it. Goal out of scope → ask the PM: cut → an NG in §6 at this `[C]`; kept despite the brief → a Tensions row.
 3. It duplicates an existing step → merge.
 
 **A variation** routes by what it changes:
 
-1. **Same action, different object** (edit the dates / the participants / the transport) → a
+1. **Same action, different object** (e.g. edit the quantity / the colour / the delivery address) → a
    parameter, not a variation. Keep one step and let the object vary — unless the **rules** differ,
    in which case the difference belongs in a BR at Step 4, or the **observable result** differs, in
    which case it earns its own variation step.
 
    The result is **what the user ends up with, not what they had to supply to get there**. Being
-   asked for one more value along the way — a date of birth for each child, say — is an extra input
+   asked for one more value along the way — a gift message for each recipient, say — is an extra input
    for the same outcome: rule detail, not a variation.
 2. Same goal, different path, revealing a distinct capability or rule → one inline variation step in the same journey — flat numbering, prefixed `Variation:`. No branch notation (2a/2b).
 3. Different goal → separate journey.
-4. Response to a failure (payment declined, no availability…) → NOT a journey element. Park it in the canonical memory under the PRD's section as an **ERR candidate** — Step 4 derives it as ERR-XXX.
+4. Response to a failure (payment declined, no availability…) → NOT a journey element. A `## Parked` row, *ERR candidate*, `For: Step 4`, written as it comes — Step 4 derives it as ERR-XXX.
 
 Established use-case practice does the same thing when it collapses create / update / delete of one
 object into a single "manage X" goal, and promotes one of those operations into a goal of its own
@@ -240,7 +247,7 @@ exactly where variations pile up unnoticed.
 
 ### Preconditions
 
-A journey may state what has to be true before its first step — a transport already selected, an account already created. A precondition is not a step: nothing is done and nothing is observed. Keep it at the journey level, and let Step 4 turn it into a BR or a PERM if it constrains behaviour rather than merely framing the scenario.
+A journey may state what has to be true before its first step — e.g. a delivery address already saved, an account already created. A precondition is not a step: nothing is done and nothing is observed. Keep it at the journey level, and let Step 4 turn it into a BR or a PERM if it constrains behaviour rather than merely framing the scenario.
 
 ---
 

@@ -57,16 +57,15 @@ same observable result. One FUNC, with `WHEN the user adds an item from the list
 product page`. Two FUNCs would duplicate near-identical acceptance criteria.
 
 **Carved by container → re-cut by capability.**
-A details panel with three tabs — floor plan, amenities, 360° view — is not "open the panel"
-plus one FUNC per tab: `GIVEN the panel is open` binds each to the component. Apply the
-discriminant to the outcomes instead: consulting the floor plan and consulting the amenities are
-each autonomous (`Users can view … without leaving the room sheet`); the panel, its tabs and
+E.g. a details panel with three tabs — description, specifications, reviews — is not "open the
+panel" plus one FUNC per tab: `GIVEN the panel is open` binds each to the component. Apply the
+discriminant to the outcomes instead: consulting the specifications and consulting the reviews
+are each autonomous (`Users can view … without leaving the product page`); the panel, its tabs and
 their default state belong to the DRD.
 
 **No standalone scenario → merge.**
-A "Users can confirm their slot selection" whose WHEN/THEN cannot be written without the slot picker
-having been used first is not a separate capability. Merge it into the picker FUNC, or restate the
-constraint as a BR.
+A FUNC whose WHEN/THEN cannot be written without another FUNC having run first is not a separate
+capability. Merge it into that FUNC, or restate the constraint as a BR.
 
 ---
 
@@ -85,7 +84,7 @@ cross-cutting FUNC. Leaving it unnamed is how a capability disappears until revi
 - One FUNC per distinct user capability
 - Every FUNC must trace to **at least one journey step**
 - Which `ERR-XXX` a FUNC carries is settled **at Step 4**, once the error scenarios exist. At Step 3,
-  note the failure modes the capability implies and leave them with the parked ERR candidates
+  note the failure modes the capability implies as `## Parked` rows, *ERR candidate*, `For: Step 4`
 
 **Saturation signal, optional.** A FUNC that would carry far more business rules than its
 neighbours — roughly more than fifteen, the threshold the `spec` skill applies per spec — is
@@ -118,9 +117,9 @@ the validator reports it.
 
 The title **names** the capability — the scannable inventory. A `**Capability:**` line **bounds**
 it — kept only when it adds a boundary the title cannot carry (the precise object, the scope
-edge: "without leaving the room sheet"), deleted when it would restate the title. The nominal
+edge: e.g. "without leaving the product page"), deleted when it would restate the title. The nominal
 scenario **proves** it. What overflows the one Capability sentence is not lost: an enumeration of
-content or a condition is rule detail, parked for Step 4 (*Park and Surface*).
+content or a condition is rule detail — a `## Parked` row, *BR candidate*, `For: Step 4` (*Park and Surface*).
 
 ---
 
@@ -137,7 +136,7 @@ Every FUNC has **at least one nominal scenario** that proves the capability is t
 ```
 
 `GIVEN` is **optional**. It states the conditions under which the test runs — logged in or not, a
-booking that already holds a child, an option still valid. Skip it when the context is neutral: a
+cart that already holds a gift card, an option still valid. Skip it when the context is neutral: a
 `GIVEN` that says "the user is on the site" adds noise, not precision.
 
 **`GIVEN` also makes the autonomy test visible.** A prerequisite describing a **state of the world**

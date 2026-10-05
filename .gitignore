@@ -24,3 +24,6 @@ __pycache__/
 
 # Claude Code local settings — contains secrets, never commit
 .claude/settings.local.json
+
+# Claude Code worktrees
+.claude/worktrees/

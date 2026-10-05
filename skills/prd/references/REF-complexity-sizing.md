@@ -8,7 +8,7 @@ type: reference
 
 # PRD Complexity Sizing — Reference
 
-Complexity is evaluated automatically **at the end of the analysis, before drafting** and proposed to the PM for confirmation. It is based on two measurable criteria derived from the analysis.
+Complexity is evaluated automatically **at the end of the analysis, before the quality gate** and proposed to the PM for confirmation. It is based on two measurable criteria derived from the analysis.
 
 ---
 

@@ -1,0 +1,7 @@
+# QG-2, script half — UI-component nouns that warn when they appear in a journey step (§3) or a
+# FUNC (§4). One line per language: `lang: word|word|…`, each word a regex matched whole and
+# case-insensitively. A word list can misfire — a reader arbitrates every WARN — so keep the list
+# to nouns that name a component and nothing else; calibrate it per campaign, never from one run.
+# `layer` is UI jargon in French prose only; `tab` is left out (a tab is also a bill)
+en: modals?|pop-?ups?|drawers?|carr?ousels?|tooltips?|drop-?downs?|accordions?|checkbox(?:es)?|sliders?|toasts?|breadcrumbs?
+fr: modales?|pop-?ups?|popins?|layers?|carr?ousels?|infobulles?|accord[ée]ons?|onglets?|bandeaux?|listes? déroulantes?|cases? à cocher

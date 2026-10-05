@@ -3,7 +3,7 @@ name: ref-brief-contract
 description: >
   The contract between a brief and this skill: which fields the PRD consumes,
   what each one becomes downstream, and how to proceed when a brief does not
-  carry them. Read at Step 0, before summarizing the brief.
+  carry them. Read at Step 1, before summarizing the brief.
 type: reference
 ---
 
@@ -14,9 +14,9 @@ opportunities live in the brief; the PRD picks exactly one opportunity and resol
 space. Everything below is what this skill reads out of the brief — and nothing else is expected
 from it.
 
-No skill in this repository produces briefs today, so real briefs vary in shape. This file exists so
-that the skill degrades **explicitly** rather than improvising: each field says what it becomes, and
-what to do when it is missing.
+The `brief` skill produces briefs, but real briefs still vary in shape, and a PRD may be framed
+without one. This file exists so that the skill degrades **explicitly** rather than improvising:
+each field says what it becomes, and what to do when it is missing.
 
 ---
 
@@ -24,12 +24,16 @@ what to do when it is missing.
 
 | Field in the brief | Becomes in the PRD | Missing → |
 |---|---|---|
-| `status: validated` (frontmatter) | Nothing — it is the precondition | Ask the PM to confirm out loud, log a tension, continue (see below) |
+| `status: validated` (frontmatter) | Nothing — it is the precondition | Ask the PM to confirm out loud; a Tensions row (`accepted`) in the record at Step 1's `[C]`; continue (see below) |
 | Problem statement | Framing of §1 Executive Summary | State "Not in the brief" and ask the PM |
 | Personas | §2 Personas | Ask the PM — a PRD without an actor cannot produce ACs |
-| Opportunities `OPP-XXX` | The Step 1 choice, quoted verbatim in §1 | Ask the PM to name the opportunity; it becomes an untraced scope, log a tension |
-| Desired Outcomes / KRs | §7 Lagging Metrics (`LGM-XXX`) | Write "None identified." in §7 Lagging and log the tension — the PRD has no success criterion. Leaving the subsection blank is a QG-8 **error**, not a warning |
+| Opportunities `OPP-XXX` | The Step 1 choice, quoted verbatim in §1 | Ask the PM to name the opportunity; it becomes an untraced scope — a Tensions row at Step 1's `[C]` |
+| Desired Outcomes / KRs | §7 Lagging Metrics (`LGM-XXX`) | Write "None identified." in §7 Lagging and a Tensions row at Step 5's `[C]` — the PRD has no success criterion. Leaving the subsection blank is a QG-8 **error**, not a warning |
 | Damage Control | §7 Damage Control (`DC-XXX`) | Write "None identified." — an explicit absence, not a silent one |
+| §5 Cuts | A journey never crosses a cut; a cut this PRD must restate is an NG in §6 at the `[C]` that meets it | Nothing |
+| §5 Constraints | §10 Constraints (`CB-XXX` / `CL-XXX`), where a constraint shapes a capability | Nothing: §10's legend states the baseline |
+| §6 Open Tensions `T-XX` | A question to the PM before the gate that meets it; still open afterwards → a Tensions row in the record | Nothing |
+| §7 Parked, rows `For: /prd` | Candidates judged at the step that consumes them — a section row, from Step 1's `[C]` on a `## Parked` row, or an NG | Nothing: the table may hold no `/prd` row |
 
 `brief` in the PRD frontmatter references the source file, so that `validate_prd.py` can resolve it
 and check its `status` (QG-11).
@@ -43,18 +47,20 @@ happen — that is why QG-11 exists. But an unvalidated brief is a **signal, not
 legitimately want to explore ahead of formal validation, and this skill's own rule at Step 1 is to
 open a tension rather than block a step gate.
 
-So, at Step 0, when the brief has no `status: validated`:
+So, at Step 1, when the brief has no `status: validated`:
 
 1. Say it plainly — which file, what its status is (or that it has none).
 2. Ask the PM whether to continue anyway. Wait for the answer.
-3. If they continue, log the tension in `{DOCS_ROOT}/prd/canonical-memory.md` under the PRD's
-   section, so the final quality gate reports a known, accepted divergence instead of a surprise.
+3. If they continue, the tension (`accepted`) is written to `{DOCS_ROOT}/record/<brief-stem>.md`
+   at Step 1's `[C]`, so the final quality gate reports a known, accepted divergence instead of a
+   surprise.
 
-The two cases that **do** stop the run, because there is nothing to translate:
-
-- `{DOCS_ROOT}/prd/../brief/` does not exist, or contains no `.md` — say so and stop.
-- The PM has no brief at all — a PRD needs a problem to translate. Point them at the upstream work
-  rather than inventing a problem statement.
+**No brief at all** is not a wall either. The fields above are what Step 1 expects; look for them
+in `{DOCS_ROOT}` (context documents, a glossary, other PRDs), and ask the PM for what is missing in
+one `AskUserQuestion` call — never invent a problem statement. The PM names the project (the
+record's stem); the frontmatter carries `brief: none` and `record: <project>`; §1's Source line
+carries the frame confirmed at Step 1; the absence is a Tensions row (`accepted`).
+`validate_prd.py` warns (QG-11) and does not fail, provided `record` is set.
 
 ---
 
@@ -62,7 +68,7 @@ The two cases that **do** stop the run, because there is nothing to translate:
 
 `LGM-XXX` and `DC-XXX` are **imported**, not invented: they are the initiative's success criteria and
 they belong to the brief. If the work reveals a metric the brief does not carry, do not quietly add
-it — add it and log the divergence, so the brief can be updated. QG-11 checks exactly this.
+it — add it and record the divergence as a tension, so the brief can be updated. QG-11 checks exactly this.
 
 Leading metrics (`LDM-XXX`) are the exception: they are *derived* in the PRD at Step 5 and have no
 brief anchor by design. See `references/REF-metrics.md`.
