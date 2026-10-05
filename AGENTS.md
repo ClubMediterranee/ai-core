@@ -2,6 +2,8 @@
 
 All skills, agents, and MCP documentation must be written in English.
 
+One sanctioned exception: a skill's `decision-record.md` — the record of its design decisions, never loaded in a session — may be written in its maintainer's language.
+
 ## Adding a skill
 
 Use the `skill-creator` skill — it handles the full lifecycle and enforces the correct frontmatter. Verify all frontmatter fields are properly filled before writing the file.
