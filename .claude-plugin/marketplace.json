@@ -15,15 +15,18 @@
     {
       "name": "clubmed-tracking-data",
       "displayName": "Club Med - Tracking & Analytics",
-      "description": "Build and maintain tracking plans from a Figma link, a DRD (Design Requirement Details), or a live URL: infer events, auto-approve with a confidence score, validate against GTM, render a review markdown, export to Excel, PDF or Markdown.",
-      "version": "2.0.0",
+      "description": "Build and maintain tracking plans from a Figma link, a DRD (Design Requirement Details), or a live URL: infer events, auto-approve with a confidence score, validate against GTM, render a review markdown, export to Excel, PDF or Markdown. Also generates AB Tasty-ready A/B tests from a CRO brief.",
+      "version": "2.1.0",
       "source": "./plugins/clubmed-tracking-data",
       "keywords": [
         "tracking",
         "gtm",
         "analytics",
         "figma",
-        "tracking-plan"
+        "tracking-plan",
+        "cro",
+        "ab-testing",
+        "ab-tasty"
       ],
       "category": "data"
     },
