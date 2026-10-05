@@ -2,7 +2,7 @@
 """
 Hook Stop Claude Code — si le skill ab-test-generator a été utilisé dans la session,
 extrait une éventuelle leçon généralisable et l'ajoute à la Knowledgebase ClubMed
-(dcx/cro/docs/lessons-learned/) via une pull request — jamais de push direct sur main.
+(dcx/analytics-cro/docs/lessons-learned/) via une pull request — jamais de push direct sur main.
 
 Comment ça marche :
   1. Claude Code appelle ce script à la fin de chaque session
@@ -29,7 +29,7 @@ from datetime import date
 from pathlib import Path
 
 KB = Path(os.environ.get("CLUBMED_KB", str(Path.home() / ".clubmed" / "knowledge-base")))
-LESSONS_DIR = KB / "dcx" / "cro" / "docs" / "lessons-learned"
+LESSONS_DIR = KB / "dcx" / "analytics-cro" / "docs" / "lessons-learned"
 FLAG_FILE = Path("/tmp/abt_session_active")
 PROJECTS_DIR = Path.home() / ".claude" / "projects"
 SKILL_NAMES = ("ab-test-generator",)

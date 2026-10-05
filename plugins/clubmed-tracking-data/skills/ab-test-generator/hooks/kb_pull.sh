@@ -1,5 +1,5 @@
 #!/bin/bash
-# SessionStart hook — met à jour la Knowledgebase ClubMed (dcx/cro) au démarrage de Claude Code.
+# SessionStart hook — met à jour la Knowledgebase ClubMed (dcx/analytics-cro) au démarrage de Claude Code.
 # Ne clone jamais automatiquement : si le dossier est absent, affiche la commande à lancer et
 # continue sans bloquer la session. Silencieux si tout va bien, affiche un message uniquement
 # en cas de mise à jour ou d'absence.
@@ -24,4 +24,4 @@ fi
 
 git pull origin main --quiet 2>/dev/null
 
-echo '{"systemMessage": "✅ Knowledgebase mise à jour depuis GitHub (dcx/cro : leçons et design system à jour)"}'
+echo '{"systemMessage": "✅ Knowledgebase mise à jour depuis GitHub (dcx/analytics-cro : leçons et design system à jour)"}'

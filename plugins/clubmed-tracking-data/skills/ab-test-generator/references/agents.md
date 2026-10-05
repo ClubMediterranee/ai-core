@@ -3,7 +3,7 @@
 ## OBLIGATOIRE — Leçons mémorisées à intégrer avant incarnation
 
 **Avant d'incarner un agent, lire UNIQUEMENT son fichier de leçons dans la Knowledgebase
-(`$CLUBMED_KB/dcx/cro/docs/lessons-learned/`, cf. `SKILL.md` pour le chemin exact).
+(`$CLUBMED_KB/dcx/analytics-cro/docs/lessons-learned/`, cf. `SKILL.md` pour le chemin exact).
 Ne pas lire tous les fichiers — chaque agent charge uniquement ce qui le concerne. Si la
 Knowledgebase est introuvable, continuer sans (voir message d'absence dans `SKILL.md`).**
 

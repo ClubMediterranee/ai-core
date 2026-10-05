@@ -19,7 +19,7 @@ changelog:
   - version: 1.0.0
     date: 2026-10-01
     changes:
-      - Migration vers le plugin clubmed-tracking-data (ai-core) — leçons et design system déplacés vers la Knowledgebase (dcx/cro/docs/)
+      - Migration vers le plugin clubmed-tracking-data (ai-core) — leçons et design system déplacés vers la Knowledgebase (dcx/analytics-cro/docs/)
 created-at: 2026-10-01
 created-by: "Floran Garrido <floran.garrido.ext@clubmed.com>"
 ---
@@ -43,7 +43,7 @@ created-by: "Floran Garrido <floran.garrido.ext@clubmed.com>"
 3. Si `$KB` existe, exécute (obligatoire — ne pas afficher les commandes brutes) :
    ```bash
    git -C "$KB" log -1 --format="%ci"
-   grep -rh "^### " "$KB/dcx/cro/docs/lessons-learned/" | wc -l
+   grep -rh "^### " "$KB/dcx/analytics-cro/docs/lessons-learned/" | wc -l
    ```
 4. Affiche la ligne suivante avec les valeurs réelles obtenues :
 
@@ -200,7 +200,7 @@ python scripts/scrape_site.py "https://exemple.com/page" --out /home/claude/abte
   (hover, focus, disabled), responsive, accessibilité AA. En Production Grade il propose
   **2 pistes** et recommande ; en Fast Build, une seule. Contraintes : `references/regles-ux.md`
   + charte du `design.json` + design system Trident UI
-  (`$CLUBMED_KB/dcx/cro/docs/design-system-trident-ui.md`).
+  (`$CLUBMED_KB/dcx/analytics-cro/docs/design-system-trident-ui.md`).
 - **A6 Front-End Build Agent** (déterministe strict) : génère le code selon
   `references/ab-tasty.md` et les templates `assets/variation.css` / `assets/variation.js`.
 
@@ -450,7 +450,7 @@ charte. Procédures : `references/workflow-iteration.md` et `references/qa-check
 
 Les leçons accumulées (`lessons-learned/`) et le design system Trident UI
 (`design-system-trident-ui.md`) ne vivent plus dans ce plugin : ils sont partagés entre équipes
-via le repo `knowledge-base`, sous `dcx/cro/docs/`.
+via le repo `knowledge-base`, sous `dcx/analytics-cro/docs/`.
 
 - **Chemin local attendu** : `${CLUBMED_KB:-$HOME/.clubmed/knowledge-base}`.
 - **Première utilisation sur une machine** : si ce dossier est absent, le hook `SessionStart`
