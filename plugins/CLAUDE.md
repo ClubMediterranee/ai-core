@@ -7,13 +7,13 @@ A plugin is a directory with a `.claude-plugin/plugin.json` manifest and compone
 Components in this repo are **shared globally** — skills live in `/skills/`, agents in `/agents/`. Each plugin references them via **symbolic links** rather than copies, so a fix to a skill propagates to every plugin that includes it.
 
 ```
-plugins/clubmed-frontend/
+plugins/clubmed-tracking-data/
 ├── .claude-plugin/
 │   └── plugin.json          ← manifest
 └── skills/
-    ├── react-best-practices  → ../../../skills/react-best-practices
-    ├── typescript-expert     → ../../../skills/typescript-expert
-    └── jira-fetch            → ../../../skills/jira-fetch
+    ├── agent-browser        → ../../../skills/agent-browser
+    ├── figma-client         → ../../../skills/figma-client
+    └── figma-authentication → ../../../skills/figma-authentication
 ```
 
 ## Version bump rule
