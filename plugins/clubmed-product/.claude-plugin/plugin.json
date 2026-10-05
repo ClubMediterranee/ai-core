@@ -1,7 +1,7 @@
 {
   "name": "clubmed-product",
-  "displayName": "Club Med — Product",
-  "version": "1.2.0",
+  "displayName": "Club Med - Product",
+  "version": "1.3.0",
   "description": "Skills for product managers and product owners: PRD authoring from a validated brief, spec generation from PRDs with a live-resolved data contract and Gherkin acceptance tests, user story enrichment, and developer-ready documentation.",
   "author": {
     "name": "Jeremy Wallez",
@@ -9,9 +9,16 @@
   },
   "repository": "https://github.com/ClubMediterranee/ai-core",
   "license": "MIT",
-  "keywords": ["product", "spec", "prd", "user-story", "documentation"],
+  "keywords": [
+    "product",
+    "spec",
+    "prd",
+    "user-story",
+    "documentation"
+  ],
   "skills": [
     "./skills/prd",
     "./skills/spec"
-  ]
+  ],
+  "hooks": "./hooks/hooks.json"
 }

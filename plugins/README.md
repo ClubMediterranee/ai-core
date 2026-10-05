@@ -179,13 +179,16 @@ claude plugin update clubmed-qa@clubmed --scope project
 
 ### `clubmed-product` — Club Med Product
 
-> Skills for product managers and product owners: spec generation from PRDs, user story enrichment, and developer-ready documentation.
+> Skills for product managers and product owners: PRD authoring from a validated brief, spec generation from PRDs with a live-resolved data contract and Gherkin acceptance tests, user story enrichment, and developer-ready documentation.
 
 **Keywords:** `product` · `spec` · `prd` · `user-story` · `documentation`
 
 | Skill | Description |
 |-------|-------------|
-| `spec` | Generates developer-ready specs (enriched user stories) from a PRD document. Reads `docs/specs/prd/`, cross-references `docs/specs/drd/` design files, and produces structured markdown specs in `docs/specs/`. Each spec covers one independently implementable unit sized for an AI developer to complete in under 2 hours. |
+| `prd` | Guides a PM through writing a PRD from a brief — or without one, flagged as a tension — in six gated steps (frame & scope, journeys, FUNCs, acceptance criteria, metrics, complexity), with a challenge pass before every presentation, a deterministic validator run at every gate, and a project-level decision record under `{DOCS_ROOT}/record/`. |
+| `spec` | Generates developer-ready specs (enriched user stories) from a PRD document. Reads `{DOCS_ROOT}/prd/`, cross-references `{DOCS_ROOT}/drd/` design files, and produces structured markdown specs in `{DOCS_ROOT}/specs/`. Each spec covers one independently implementable unit sized for an AI developer to complete in under 2 hours. |
+
+**Hook:** `SessionStart` on `compact` — after a context compaction, re-anchors a `prd` session by telling the agent to re-read the skill, the PRD (its `## Parked` block first), the project record and the current step's reference, and lists the PRDs `in-progress` it finds. The hook ships with the plugin only; a skill copied by hand into `.claude/skills/` has none. For long sessions, add a *Compact Instructions* section to the docs repository's `CLAUDE.md` asking the summary to keep the current step, the pending gate block and the items parked in the last presentation.
 
 ---
 

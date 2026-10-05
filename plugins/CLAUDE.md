@@ -144,10 +144,28 @@ Declare hooks inline (simple case) or via an external `hooks/hooks.json` file (r
 }
 ```
 
-**External file** — create `plugins/<plugin-name>/hooks/hooks.json` and reference it:
+**External file** — create `plugins/<plugin-name>/hooks/hooks.json` and reference it from `plugin.json`:
 ```json
 "hooks": "./hooks/hooks.json"
 ```
+
+Unlike the inline form, the external file wraps the event map in a top-level `hooks` key — without it the hooks never load — and the variable is quoted so a path with spaces stays one word:
+```json
+{
+  "description": "What these hooks do",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          { "type": "command", "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/after-compact.sh\"", "timeout": 10 }
+        ]
+      }
+    ]
+  }
+}
+```
+Check with `claude plugin validate plugins/<plugin-name>`.
 
 Supported hook events: `PreToolUse`, `PostToolUse`, `Stop`, `SubagentStop`, `SessionStart`, `SessionEnd`, `UserPromptSubmit`, `PreCompact`, `Notification`.
 

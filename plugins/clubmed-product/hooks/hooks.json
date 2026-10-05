@@ -1,0 +1,17 @@
+{
+  "description": "Re-anchor a prd session after a context compaction: re-read the skill, the PRD, the record, the step's reference.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/after-compact.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
