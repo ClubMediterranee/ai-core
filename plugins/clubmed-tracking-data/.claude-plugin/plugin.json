@@ -1,7 +1,7 @@
 {
   "name": "clubmed-tracking-data",
   "displayName": "Club Med - Tracking & Analytics",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Build and maintain tracking plans from a Figma link, a DRD (Design Requirement Details), or a live URL: infer events, auto-approve with a confidence score, validate against GTM, render a review markdown, export to Excel, PDF or Markdown.",
   "author": {
     "name": "Jeremy Wallez",

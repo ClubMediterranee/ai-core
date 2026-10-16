@@ -4,17 +4,24 @@
 
 A plugin is a directory with a `.claude-plugin/plugin.json` manifest and component subdirectories. Claude Code discovers components by scanning default directories (`skills/`, `agents/`, `commands/`, `hooks/`, `.mcp.json`) and any extra paths declared in the manifest.
 
-Components in this repo are **shared globally** — skills live in `/skills/`, agents in `/agents/`. Each plugin references them via **symbolic links** rather than copies, so a fix to a skill propagates to every plugin that includes it.
+**A skill lives in the plugin that ships it.** The skill folder sits directly under `plugins/<plugin>/skills/` — no symbolic links, no copies. One skill, one home: the plugin is the unit of ownership, versioning, and review.
 
 ```
 plugins/clubmed-tracking-data/
 ├── .claude-plugin/
 │   └── plugin.json          ← manifest
+├── .mcp.json
 └── skills/
-    ├── agent-browser        → ../../../skills/agent-browser
-    ├── figma-client         → ../../../skills/figma-client
-    └── figma-authentication → ../../../skills/figma-authentication
+    ├── figma-client/
+    │   ├── SKILL.md
+    │   └── scripts/
+    └── tracking-plan/
+        └── SKILL.md
 ```
+
+Top-level `/skills/` only holds **standalone** skills that belong to no plugin (installed one by one with `npx skills add`). When a standalone skill joins a plugin, move it (`git mv skills/<name> plugins/<plugin>/skills/<name>`) — never link it.
+
+Inside a `SKILL.md`, reference bundled files with `${CLAUDE_SKILL_DIR}` (e.g. `python3 ${CLAUDE_SKILL_DIR}/scripts/tool.py`), never with a repo path like `.claude/skills/<name>/…` — it does not exist once the plugin is installed from the marketplace.
 
 ## Version bump rule
 
@@ -29,13 +36,9 @@ The marketplace caches plugins by version. **Any time you add, remove, or rename
 
 ## Adding a skill to a plugin
 
-**Step 1 — Create the global skill** (if it does not already exist):
-Follow the root `AGENTS.md` workflow using the `skill-creator` skill.
+**Step 1 — Create the skill inside the plugin** at `plugins/<plugin-name>/skills/<skill-name>/`, using the `skill-creator` skill (or `git mv` an existing standalone skill from `/skills/`).
 
-**Step 2 — Create the symlink** in the plugin's `skills/` directory:
-```bash
-ln -s ../../../skills/<skill-name> plugins/<plugin-name>/skills/<skill-name>
-```
+**Step 2 — List it** in the plugin's table in `plugins/README.md` (and remove its row from `skills/README.md` if it was standalone).
 
 **Step 3 — Register it in `plugin.json`** under the `skills` array:
 ```json
@@ -51,16 +54,9 @@ ln -s ../../../skills/<skill-name> plugins/<plugin-name>/skills/<skill-name>
 
 Agents are auto-discovered from the `agents/` directory — no `agents[]` array needed in `plugin.json` (unlike skills).
 
-**Step 1 — Create the global agent** (if it does not exist):
-Follow the root `AGENTS.md` workflow using the `agent-creator` skill.
+**Step 1 — Create the agent inside the plugin** at `plugins/<plugin-name>/agents/<agent-name>.md`, using the `agent-creator` skill.
 
-**Step 2 — Create the symlink** in the plugin's `agents/` directory (create the directory if needed):
-```bash
-mkdir -p plugins/<plugin-name>/agents
-ln -s ../../../agents/<agent-name>.md plugins/<plugin-name>/agents/<agent-name>.md
-```
-
-**Step 3 — Bump the version** in `plugin.json` (MINOR).
+**Step 2 — Bump the version** in `plugin.json` (MINOR).
 
 If you need to point to a non-default agents directory, declare it explicitly:
 ```json
@@ -157,12 +153,12 @@ Use `${CLAUDE_PLUGIN_ROOT}` in hook commands — same as MCP servers.
 
 ## Nested plugins
 
-Plugin composition (a plugin referencing another plugin via a `plugins[]` field) is **not supported**. Each plugin is standalone. Share components by making them global skills or agents and symlinking from multiple plugins.
+Plugin composition (a plugin referencing another plugin via a `plugins[]` field) is **not supported**. Each plugin is standalone. If two plugins need the same capability, keep it in the plugin that owns the domain and make the other plugin's skill name it as a prerequisite ("requires the `clubmed-github` plugin") rather than duplicating or linking it.
 
 ## Checklist for any plugin change
 
-- [ ] Global skill or agent exists in `/skills/` or `/agents/`
-- [ ] Symlink created in the plugin's `skills/` or `agents/` directory
+- [ ] Skill or agent lives inside `plugins/<plugin>/` (no symlink)
+- [ ] Bundled files referenced through `${CLAUDE_SKILL_DIR}` / `${CLAUDE_PLUGIN_ROOT}`
 - [ ] Entry added / updated in `plugin.json`
-- [ ] Version bumped in `plugin.json`
+- [ ] Version bumped in `plugin.json` **and** in `.claude-plugin/marketplace.json`
 - [ ] Commit with `git-commit` skill (conventional commit)

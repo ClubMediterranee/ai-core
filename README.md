@@ -51,20 +51,16 @@ claude plugin install clubmed-qa@clubmed --scope project              # Playwrig
 | `clubmed-github` | GitHub workflow · PR lifecycle · MCP | 10 skills |
 | `clubmed-qa` | Playwright · E2E · cross-browser testing | 1 skill |
 
-### [Skills](skills/README.md) — 23 available
+### [Skills](skills/README.md) — 8 standalone
 
-Individual slash commands that extend Claude Code for specific tasks. Install plugins above to get them pre-bundled, or pick skills individually.
+Standalone slash commands that belong to no plugin, installed one by one. Every other skill ships inside its plugin above.
 
 | Category | Skills |
 |----------|--------|
 | Accessibility | `a11y-audit` · `a11y-web` |
-| Automation | `agent-browser` |
 | Config | `agent-creator` · `skill-creator` |
-| Design | `excalidraw` · `figma-authentication` · `figma-client` · `trident-icons` · `trident-ui-install` |
-| Development | `git-commit` · `git-push-branch` · `git-rebase-branch` · `github-authentication` · `github-cancel` · `github-my-prs` · `github-new` · `github-open-pr` · `github-publish` · `github-update` |
-| Product | `spec` |
+| Design | `excalidraw` · `trident-icons` · `trident-ui-install` |
 | Project Management | `jira-fetch` |
-| Testing | `e2e-test-generator` |
 
 ### [MCP Servers](mcps/README.md) — 5 available
 

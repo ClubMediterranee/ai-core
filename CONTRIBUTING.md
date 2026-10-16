@@ -24,14 +24,15 @@ Common types: `feat`, `fix`, `docs`, `chore`, `refactor`
 
 | Directory | Contents |
 |-----------|----------|
-| `skills/` | Claude Code slash commands |
+| `plugins/` | Role-based plugins — each one owns its skills under `plugins/<plugin>/skills/` |
+| `skills/` | Standalone skills that belong to no plugin |
 | `agents/` | Specialised AI agents |
 | `docs/` | Tutorials, guides, best practices |
 | `benchmarks/` | Model and tooling evaluations |
 
 ## Adding a skill
 
-Create a folder `skills/<name>/` with a `SKILL.md` file using this frontmatter:
+Create the skill inside the plugin that ships it — `plugins/<plugin>/skills/<name>/` (see [`plugins/CLAUDE.md`](plugins/CLAUDE.md)). Use `skills/<name>/` only for a standalone skill that belongs to no plugin. Either way, add a `SKILL.md` file using this frontmatter:
 
 ```yaml
 ---

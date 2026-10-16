@@ -21,7 +21,7 @@ Supports auto-login if `FIGMA_USERNAME` and `FIGMA_PASSWORD` are available in th
 ### Step 1 — Run the main script
 
 ```bash
-FIGMA_USERNAME=$(python3 .claude/skills/figma-authentication/scripts/manage-token.py)
+FIGMA_USERNAME=$(python3 ${CLAUDE_SKILL_DIR}/scripts/manage-token.py)
 EXIT_CODE=$?
 echo "EXIT_CODE=$EXIT_CODE"
 ```
@@ -260,7 +260,7 @@ fi
 Then save to `.claude/settings.local.json`:
 
 ```bash
-python3 .claude/skills/figma-authentication/scripts/manage-token.py --save "$TOKEN_VALUE"
+python3 ${CLAUDE_SKILL_DIR}/scripts/manage-token.py --save "$TOKEN_VALUE"
 ```
 
 ### Step 7 — Close the browser

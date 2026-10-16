@@ -32,7 +32,7 @@ If no token is found → invoke the `figma-authentication` skill.
 ## Usage
 
 ```bash
-python3 .claude/skills/figma-client/scripts/figma_client.py <figma_url> [options]
+python3 ${CLAUDE_SKILL_DIR}/scripts/figma_client.py <figma_url> [options]
 ```
 
 ### Options
@@ -242,7 +242,7 @@ The `-` or `:` separator in node-id is normalized automatically.
 ## Usage example
 
 ```bash
-DATA=$(python3 .claude/skills/figma-client/scripts/figma_client.py "<FIGMA_URL>" \
+DATA=$(python3 ${CLAUDE_SKILL_DIR}/scripts/figma_client.py "<FIGMA_URL>" \
   --output-dir "${WORKING_DIR}" \
   --output-json "${WORKING_DIR}/tree.json")
 
