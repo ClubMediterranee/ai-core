@@ -2,7 +2,7 @@
   "name": "clubmed-github",
   "displayName": "Club Med — GitHub",
   "description": "Send work to GitHub without knowing git: five commands (publish, update, new, cancel, my-prs) that cover the whole loop from local changes to a merged pull request. Bundles the GitHub and Playwright MCP servers, PAT lifecycle, and the reusable git building blocks used underneath.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "author": {
     "name": "Jeremy Wallez",
     "email": "jeremy.wallez@clubmed.com"

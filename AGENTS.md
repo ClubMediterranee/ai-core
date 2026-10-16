@@ -6,7 +6,11 @@ All skills, agents, and MCP documentation must be written in English.
 
 Use the `skill-creator` skill — it handles the full lifecycle and enforces the correct frontmatter. Verify all frontmatter fields are properly filled before writing the file.
 
-After creating a skill:
+Decide where it lives first:
+- **Plugin skill (default)** — create it directly in `plugins/<plugin>/skills/<name>/`. Never symlink a skill into a plugin. Follow `plugins/CLAUDE.md` (manifest, version bump in `plugin.json` and `.claude-plugin/marketplace.json`, `plugins/README.md` row).
+- **Standalone skill** — only when it belongs to no plugin; create it in `skills/<name>/`.
+
+After creating a standalone skill:
 1. Update `skills/README.md` — add a row with name, category, and description (keep rows sorted alphabetically by name)
 2. Update `README.md` — add the skill in the relevant category row, update the count
 

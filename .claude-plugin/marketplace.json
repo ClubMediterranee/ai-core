@@ -3,7 +3,7 @@
   "name": "clubmed",
   "displayName": "Club Med AI",
   "description": "Club Med AI Guild - skills and tools shared across developer and designer teams.",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "owner": {
     "name": "Jeremy Wallez",
     "email": "jeremy.wallez@clubmed.com"
@@ -16,7 +16,7 @@
       "name": "clubmed-tracking-data",
       "displayName": "Club Med - Tracking & Analytics",
       "description": "Build and maintain tracking plans from a Figma link, a DRD (Design Requirement Details), or a live URL: infer events, auto-approve with a confidence score, validate against GTM, render a review markdown, export to Excel, PDF or Markdown.",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "source": "./plugins/clubmed-tracking-data",
       "keywords": [
         "tracking",
@@ -31,7 +31,7 @@
       "name": "clubmed-product",
       "displayName": "Club Med - Product",
       "description": "Skills for product managers and product owners: spec generation from PRDs with a live-resolved data contract and Gherkin acceptance tests, user story enrichment, and developer-ready documentation.",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "source": "./plugins/clubmed-product",
       "keywords": [
         "product",
@@ -46,7 +46,7 @@
       "name": "clubmed-github",
       "displayName": "Club Med - GitHub",
       "description": "Send work to GitHub without knowing git: five commands (publish, update, new, cancel, my-prs) covering the whole loop from local changes to a merged pull request. Bundles the GitHub and Playwright MCP servers, PAT lifecycle, and the reusable git building blocks used underneath.",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "source": "./plugins/clubmed-github",
       "keywords": [
         "github",
@@ -62,7 +62,7 @@
       "name": "clubmed-qa",
       "displayName": "Club Med - QA",
       "description": "Robust Playwright/TypeScript E2E test generation: qualify the intent (reads docs/ PRDs and glossary), ground selectors on the live site, plan, write reusing existing code, prove non-flakiness by repeated cross-browser runs, and review with independent critics.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "source": "./plugins/clubmed-qa",
       "keywords": [
         "qa",

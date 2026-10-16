@@ -53,7 +53,7 @@ Browser automation uses the **Playwright MCP** (`mcp__playwright__browser_*` too
 ### Step 1 — Run the main script
 
 ```bash
-GITHUB_USERNAME=$(python3 .claude/skills/github-authentication/scripts/manage-token.py)
+GITHUB_USERNAME=$(python3 ${CLAUDE_SKILL_DIR}/scripts/manage-token.py)
 EXIT_CODE=$?
 echo "EXIT_CODE=$EXIT_CODE"
 ```
@@ -209,7 +209,7 @@ Capture the returned value as the token. **Guard**: if the result is empty or do
 Save via the script, which re-validates against the GitHub API before writing:
 
 ```bash
-python3 .claude/skills/github-authentication/scripts/manage-token.py --save "$TOKEN_VALUE"
+python3 ${CLAUDE_SKILL_DIR}/scripts/manage-token.py --save "$TOKEN_VALUE"
 ```
 
 On success the token is written to `~/.claude/settings.json` → `env.GITHUB_TOKEN` and the file is `chmod 600`. The write merges into the existing document, so the rest of the user's configuration is untouched; a malformed file aborts the save instead of being replaced.

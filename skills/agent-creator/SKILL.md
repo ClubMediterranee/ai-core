@@ -103,7 +103,7 @@ Then ask the user: *"Should this agent have any skills pre-loaded?"* and show on
 ```yaml
 skills:
   - skills/a11y-web
-  - skills/figma-client
+  - skills/excalidraw
 ```
 
 ---
