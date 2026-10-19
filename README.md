@@ -46,7 +46,7 @@ claude plugin install clubmed-qa@clubmed --scope project              # Playwrig
 
 | Plugin | Stack | Skills included |
 |--------|-------|-----------------|
-| `clubmed-tracking-data` | GA4 tracking plans · analytics · Figma | 5 skills |
+| `clubmed-tracking-data` | GA4 tracking plans · analytics · Figma | 6 skills |
 | `clubmed-product` | Spec generation · PRD · User stories | 1 skill |
 | `clubmed-github` | GitHub workflow · PR lifecycle · MCP | 10 skills |
 | `clubmed-qa` | Playwright · E2E · cross-browser testing | 1 skill |
