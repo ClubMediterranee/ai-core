@@ -55,6 +55,7 @@ claude plugin update clubmed-qa@clubmed --scope project
 | `figma-client` | Figma REST client — fetches node metadata, interactions, instances, hidden layers, and semantic hints. Feeds the Figma inference path. |
 | `tracking-plan` | GA4 tracking-plan engine. From a Figma link, a DRD (Design Requirement Details), or a live URL, infers the trackable moments (clicks, impressions, ecommerce, page views), auto-approves every event with a confidence score, and produces a validated, tool-agnostic `plan.json` plus a review markdown. Fully automatic — the user reviews and adjusts the rendered markdown afterwards. |
 | `tracking-plan-render` | Renders a validated `plan.json` to Excel, PDF or Markdown for sharing and review. The Markdown render shows each event's confidence level. |
+| `ecvr-forensics` | Monthly analysis of the ECVR BE (booking-engine conversion rate): every figure is computed from live GA4 and cross-checked against the explicability model, and the result is posted as 4 Teams cards plus a Word report. |
 
 ---
 
